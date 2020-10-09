@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
-class VarietyProductM with ChangeNotifier {
+part 'VarietyProductModel.g.dart';
+
+// flutter packages pub run build_runner build
+@HiveType(typeId: 1)
+class VarietyProductM extends HiveObject {
+  @HiveField(0)
   final String productid;
+  @HiveField(1)
   final String id;
+  @HiveField(2)
   String varityname;
+  @HiveField(3)
   double price;
+  @HiveField(4)
   double wsp;
 
   VarietyProductM({
@@ -27,17 +37,14 @@ class VarietyProductM with ChangeNotifier {
 
   void updatename(name) {
     this.varityname = name;
-    notifyListeners();
   }
 
   void updateprice(double price) {
     this.price = price;
-    notifyListeners();
   }
 
   void updatewsp(double wsp) {
     this.wsp = wsp;
-    notifyListeners();
   }
 
   String getIndex(int index) {

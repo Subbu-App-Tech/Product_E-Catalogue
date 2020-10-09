@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import '../Models/VarietyProductModel.dart';
 import '../Tool/DB_Helper.dart';
+import 'package:hive/hive.dart';
 
 class VarietyData with ChangeNotifier {
   List<VarietyProductM> _items = [];
+  Box<VarietyProductM> _dbbox;
 
+  VarietyData(Box<VarietyProductM> db) {
+    _dbbox = db;
+    _items = [..._dbbox.values];
+  }
   List<VarietyProductM> get items {
     return [..._items];
   }
@@ -12,6 +18,7 @@ class VarietyData with ChangeNotifier {
   void deleteall() {
     DBHelper.deleteall('varietydata');
     _items = [];
+    _dbbox.deleteAll(_dbbox.keys);
     return null;
   }
 
@@ -87,13 +94,14 @@ class VarietyData with ChangeNotifier {
               varityname: i.varityname,
               price: i.price,
               wsp: i.wsp));
-          DBHelper.insert('varietydata', {
-            'id': id,
-            'productid': i.productid,
-            'name': i.varityname,
-            'price': i.price,
-            'wsp': i.wsp
-          });
+          // DBHelper.insert('varietydata', {
+          //   'id': id,
+          //   'productid': i.productid,
+          //   'name': i.varityname,
+          //   'price': i.price,
+          //   'wsp': i.wsp
+          // });
+          _dbbox.put(i.id, i);
         }
       }
     }
@@ -112,13 +120,16 @@ class VarietyData with ChangeNotifier {
               wsp: item['wsp']),
         )
         .toList();
+    _items.forEach((e) {
+      _dbbox.put(e.id, e);
+    });
     notifyListeners();
   }
 
   void editvariety(List<VarietyProductM> varietylist) {
     if (varietylist.length > 0) {
       _items.removeWhere((ele) => ele.productid == varietylist[0].productid);
-      DBHelper.deletevariery('varietydata', varietylist[0].productid);
+      // DBHelper.deletevariery('varietydata', varietylist[0].productid);
       addvariety(varietylist);
     }
     notifyListeners();
@@ -126,6 +137,8 @@ class VarietyData with ChangeNotifier {
 
   void delete(String productid) {
     _items.removeWhere((ele) => ele.productid == productid);
-    DBHelper.deletevariery('varietydata', productid);
+    // DBHelper.deletevariery('varietydata', productid);
+    _dbbox.delete(
+        _dbbox.values.where((e) => e.productid == productid).map((e) => e.id));
   }
 }

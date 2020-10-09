@@ -1,19 +1,21 @@
 import 'package:flutter/widgets.dart';
+import 'package:hive/hive.dart';
 
+part 'CategoryModel.g.dart';
+
+@HiveType(typeId: 0)
 class CategoryModel with ChangeNotifier {
+  @HiveField(0)
   final String id;
+  @HiveField(1)
   final String name;
   CategoryModel({
     this.id,
     this.name,
   });
-  
-  
+
   Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-    };
+    return {'id': id, 'name': name};
   }
 }
 

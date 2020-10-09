@@ -20,27 +20,58 @@ import 'contact/Aboutus.dart';
 import 'contact/Contactus.dart';
 import 'contact/loadingscreen.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'Screens/FilteredProductList.dart';
+import 'Models/ProductModel.dart';
+import 'Models/VarietyProductModel.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:firebase_core/firebase_core.dart' as fs;
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'Models/CategoryModel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterDownloader.initialize();
-  runApp(HomePage());
+  Box<ProductModel> pbox;
+  Box<VarietyProductM> vbox;
+  Box<CategoryModel> cbox;
+  Directory dir = await getApplicationDocumentsDirectory();
+  Hive.init(dir.path);
+  if (!(Hive.isAdapterRegistered(0))) {
+    Hive.registerAdapter(ProductModelAdapter());
+    Hive.registerAdapter(VarietyProductMAdapter());
+    Hive.registerAdapter(CategoryModelAdapter());
+  }
+  pbox = await Hive.openBox<ProductModel>('ProductModel');
+  vbox = await Hive.openBox<VarietyProductM>('VarietyProductM');
+  cbox = await Hive.openBox<CategoryModel>('CategoryModel');
+  runApp(HomePage(cbox: cbox, pbox: pbox, vbox: vbox));
 }
 
 class HomePage extends StatelessWidget {
+  final Box<ProductModel> pbox;
+  final Box<VarietyProductM> vbox;
+  final Box<CategoryModel> cbox;
+
+  HomePage({this.pbox, this.vbox, this.cbox});
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: Future.delayed(Duration(seconds: 2)),
         builder: (c, s) => s.connectionState != ConnectionState.done
             ? LoadingScreen()
-            : ProductCatalogue());
+            : ProductCatalogue(cbox: cbox, pbox: pbox, vbox: vbox));
   }
 }
 
 class ProductCatalogue extends StatefulWidget {
+  final Box<ProductModel> pbox;
+  final Box<VarietyProductM> vbox;
+  final Box<CategoryModel> cbox;
   static const routeName = '/ProductCatalogue';
-  const ProductCatalogue({Key key}) : super(key: key);
+  const ProductCatalogue({Key key, this.pbox, this.vbox, this.cbox})
+      : super(key: key);
 
   @override
   _ProductCatalogueState createState() => _ProductCatalogueState();
@@ -49,7 +80,6 @@ class ProductCatalogue extends StatefulWidget {
 class _ProductCatalogueState extends State<ProductCatalogue> {
   SecureStorage storage = SecureStorage();
   String loginstatus;
-
 
   @override
   void initState() {
@@ -71,13 +101,11 @@ class _ProductCatalogueState extends State<ProductCatalogue> {
             return Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasData) {
-            // FirebaseUser user = snapshot.data; // this is your user instance
             return Tabscreenwithdata();
           } else {
             if (loginstatus == 'Skiped_login') {
               return Tabscreenwithdata();
             } else {
-              // other way there is no user logged.
               return LoginPage();
             }
           }
@@ -87,9 +115,9 @@ class _ProductCatalogueState extends State<ProductCatalogue> {
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider.value(value: ProductData()),
-        ChangeNotifierProvider.value(value: CategoryData()),
-        ChangeNotifierProvider.value(value: VarietyData()),
+        ChangeNotifierProvider.value(value: ProductData(widget.pbox)),
+        ChangeNotifierProvider.value(value: CategoryData(widget.cbox)),
+        ChangeNotifierProvider.value(value: VarietyData(widget.vbox)),
         ChangeNotifierProvider.value(value: SecureStorage())
       ],
       child: MaterialApp(
@@ -107,7 +135,6 @@ class _ProductCatalogueState extends State<ProductCatalogue> {
           ContactUs.routeName: (ctx) => ContactUs(),
           AboutUs.routeName: (ctx) => AboutUs(),
           Tabscreenwithdata.routeName: (ctx) => Tabscreenwithdata(),
-          // Tabscreenwithdata
         },
       ),
     );

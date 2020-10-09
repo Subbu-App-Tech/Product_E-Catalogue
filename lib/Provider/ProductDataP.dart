@@ -4,9 +4,15 @@ import '../Models/CategoryModel.dart';
 import '../Tool/DB_Helper.dart';
 export '../Models/ProductModel.dart';
 // import 'dart:io';
+import 'package:hive/hive.dart';
 
 class ProductData with ChangeNotifier {
   List<ProductModel> _items = [];
+  Box<ProductModel> _dbbox;
+  ProductData(Box<ProductModel> db) {
+    _dbbox = db;
+    _items = [..._dbbox.values];
+  }
 
   void deleteall() {
     DBHelper.deleteall('product_data');
@@ -23,7 +29,7 @@ class ProductData with ChangeNotifier {
   }
 
   ProductModel findbyid(String id) {
-    return _items.firstWhere((prd) => prd.id == id,orElse: ()=> null );
+    return _items.firstWhere((prd) => prd.id == id, orElse: () => null);
   }
 
   String lsttostring(List vallist) {
@@ -34,9 +40,9 @@ class ProductData with ChangeNotifier {
     }
   }
 
-List<ProductModel> findbybrand(String brandname){
-return [..._items.where((e) => e.brand == brandname)];
-}
+  List<ProductModel> findbybrand(String brandname) {
+    return [..._items.where((e) => e.brand == brandname)];
+  }
 
   void addallproduct(List<ProductModel> list) {
     // _items.addAll(list);
@@ -50,7 +56,8 @@ return [..._items.where((e) => e.brand == brandname)];
     final prodindex = _items.indexWhere((p) => p.id == id);
     if (prodindex >= 0) {
       _items[prodindex] = newdata;
-      DBHelper.updateData('product_data', newdata);
+      // DBHelper.updateData('product_data', newdata);
+      _dbbox.put(newdata.id, newdata);
       notifyListeners();
     } else {}
   }
@@ -75,13 +82,15 @@ return [..._items.where((e) => e.brand == brandname)];
         imagepathlist: product.imagepathlist,
         favourite: tog(product.favourite));
     _items[prodindex] = newdata;
-    DBHelper.updateData('product_data', newdata);
+    _dbbox.put(newdata.id, newdata);
+    // DBHelper.updateData('product_data', newdata);
     notifyListeners();
   }
 
   void deleteproduct(String id) {
     _items.removeWhere((p) => p.id == id);
     DBHelper.delete('product_data', id);
+    _dbbox.delete(id);
     notifyListeners();
   }
 
@@ -143,13 +152,16 @@ return [..._items.where((e) => e.brand == brandname)];
       rst.add(Brandcount(name: uniqval[i], count: valcount[i]));
     }
     return rst;
-  } 
+  }
 
   List<ProductModel> productlistbycatid(String id) {
     if (id == null || id == 'null') {
       return [];
     } else {
-      return  [..._items.where((f) => (f.categorylist != null)? f.categorylist.contains(id): false)];
+      return [
+        ..._items.where((f) =>
+            (f.categorylist != null) ? f.categorylist.contains(id) : false)
+      ];
     }
   }
 
@@ -185,17 +197,18 @@ return [..._items.where((e) => e.brand == brandname)];
 
   Future<void> addproduct(ProductModel data) async {
     _items.add(data);
-    DBHelper.insert('product_data', {
-      'id': data.id,
-      'name': data.name,
-      'description': data.description,
-      'imageurl': lsttostring(data.imagepathlist),
-      'rank': data.rank,
-      // 'wsp': data.wsp,
-      'catlist': lsttostring(data.categorylist),
-      'brand': data.brand,
-      'fav': data.favourite.toString()
-    });
+    _dbbox.put(data.id, data);
+    // DBHelper.insert('product_data', {
+    //   'id': data.id,
+    //   'name': data.name,
+    //   'description': data.description,
+    //   'imageurl': lsttostring(data.imagepathlist),
+    //   'rank': data.rank,
+    //   // 'wsp': data.wsp,
+    //   'catlist': lsttostring(data.categorylist),
+    //   'brand': data.brand,
+    //   'fav': data.favourite.toString()
+    // });
     notifyListeners();
   }
 
@@ -209,13 +222,15 @@ return [..._items.where((e) => e.brand == brandname)];
             description: item['description'],
             imagepathlist: stringtolist(item['imageurl']),
             rank: item['rank'],
-            // wsp: item['wsp'],
             brand: item['brand'],
             favourite: bolval(item['fav']),
             categorylist: stringtolist(item['catlist']),
           ),
         )
         .toList();
+    _items.forEach((e) {
+      _dbbox.put(e.id, e);
+    });
     notifyListeners();
   }
 }

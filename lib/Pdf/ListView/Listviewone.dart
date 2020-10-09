@@ -278,17 +278,28 @@ class _PDFListviewoneState extends State<PDFListviewone> {
     }
 
     Future savePdf() async {
+      // await _interstitialAd?.dispose();
+      // _interstitialAd = createInterstitialAd();
+      // await _interstitialAd.load();
+      // await _interstitialAd?.show();
+      // await writeOnPdf();
+      // Directory documentDirectory = await getTemporaryDirectory();
+      // String documentPath = documentDirectory.path;
+      // filepath = "$documentPath/ProductCatalogue6.pdf";
+      // File file = File(filepath);
+      // await file.writeAsBytes(pdf.save(), flush: true, mode: FileMode.write);
+      // _pdfdoc = await PDFDocument.fromFile(file);
       await _interstitialAd?.dispose();
       _interstitialAd = createInterstitialAd();
       await _interstitialAd.load();
       await _interstitialAd?.show();
       await writeOnPdf();
-      Directory documentDirectory = await getTemporaryDirectory();
+      Directory documentDirectory = await getApplicationDocumentsDirectory();
       String documentPath = documentDirectory.path;
-      filepath = "$documentPath/ProductCatalogue6.pdf";
+      filepath = "$documentPath/ProductCatalogue4.pdf";
       File file = File(filepath);
-      await file.writeAsBytes(pdf.save(), flush: true, mode: FileMode.write);
-      _pdfdoc = await PDFDocument.fromFile(file);
+      file.writeAsBytesSync(pdf.save());
+      _pdfdoc = await PDFDocument.fromFile(File(filepath));
     }
 
     return FutureBuilder(

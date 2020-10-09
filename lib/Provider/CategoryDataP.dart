@@ -2,10 +2,16 @@ import 'package:flutter/material.dart';
 // import 'package:provider/provider.dart';
 import '../Models/CategoryModel.dart';
 import '../Tool/DB_Helper.dart';
+import 'package:hive/hive.dart';
 
 class CategoryData with ChangeNotifier {
   List<CategoryModel> _items = [];
+  Box<CategoryModel> _dbbox;
 
+  CategoryData(Box<CategoryModel> db) {
+    _dbbox = db;
+    _items = [..._dbbox.values];
+  }
   List<CategoryModel> get items {
     return [..._items];
   }
@@ -20,12 +26,14 @@ class CategoryData with ChangeNotifier {
 
   void delete(String catid) {
     _items.removeWhere((ele) => ele.id == catid);
-    DBHelper.delete('catdata', catid);
+    // DBHelper.delete('catdata', catid);
+    _dbbox.delete(catid);
   }
 
   void deleteall() {
     _items = [];
-    DBHelper.deleteall('catdata');
+    // DBHelper.deleteall('catdata');
+    _dbbox.deleteAll(_dbbox.keys);
     return null;
   }
 
@@ -36,9 +44,6 @@ class CategoryData with ChangeNotifier {
   List<String> findcategorylist(List categorylist) {
     List<String> _lst = [];
     String s;
-    // if (categorylist == null) {
-    // } else {
-    // }
     categorylist == null ? categorylist = [] : categorylist
       ..remove('');
     if (categorylist.length > 0) {
@@ -87,11 +92,12 @@ class CategoryData with ChangeNotifier {
 
   void addallcategory(List<CategoryModel> list) {
     for (CategoryModel i in list) {
-      DBHelper.insert('catdata', {
-        'id': i.id,
-        'name': i.name,
-      });
+      // DBHelper.insert('catdata', {
+      //   'id': i.id,
+      //   'name': i.name,
+      // });
       _items.add(i);
+      _dbbox.put(i.id, i);
     }
     notifyListeners();
   }
@@ -99,11 +105,11 @@ class CategoryData with ChangeNotifier {
   void addcategory(String categoryname) {
     String _id = UniqueKey().toString();
     final newcat = CategoryModel(id: _id, name: categoryname);
-    DBHelper.insert('catdata', {
-      'id': _id,
-      'name': categoryname,
-    });
-    print(categoryname);
+    // DBHelper.insert('catdata', {
+    //   'id': _id,
+    //   'name': categoryname,
+    // });
+    _dbbox.put(newcat.id, newcat);
     _items.add(newcat);
   }
 
@@ -117,6 +123,9 @@ class CategoryData with ChangeNotifier {
           ),
         )
         .toList();
+    _items.forEach((e) {
+      _dbbox.put(e.id, e);
+    });
     notifyListeners();
   }
 }

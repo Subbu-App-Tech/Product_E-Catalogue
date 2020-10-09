@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
-class ProductModel with ChangeNotifier {
+part 'ProductModel.g.dart';
+
+@HiveType(typeId: 0)
+class ProductModel extends HiveObject {
+  @HiveField(0)
   String id;
+  @HiveField(1)
   String name;
+  @HiveField(3)
   String description;
+  @HiveField(4)
   List imagepathlist;
+  @HiveField(5)
   int favpic;
+  @HiveField(6)
   int rank;
+  @HiveField(7)
   List categorylist;
+  @HiveField(8)
   String brand;
+  @HiveField(9)
   bool favourite;
 
   ProductModel(
@@ -20,7 +33,7 @@ class ProductModel with ChangeNotifier {
       this.brand,
       this.categorylist,
       this.description,
-      this.favourite = false});
+      this.favourite});
 
   String lsttostring(List vallist) {
     if (vallist == null) {
@@ -55,36 +68,30 @@ class ProductModel with ChangeNotifier {
 
   void updatename(name) {
     this.name = name;
-    notifyListeners();
   }
 
   void toggleFavoriteStatus() {
     favourite = !favourite;
-    notifyListeners();
   }
 
   void updaterank(int rank) {
     this.rank = rank;
-    notifyListeners();
   }
 
   void updatefavimage(int favpic) {
     this.favpic = favpic;
-    notifyListeners();
   }
 
   void updatedescription(description) {
     this.description = description;
-    notifyListeners();
   }
 
   void updateimageurl(imagepath) {
     this.imagepathlist = imagepath;
-    notifyListeners();
   }
 
   void updatebrand(brand) {
     this.brand = brand;
-    notifyListeners();
   }
+
 }
