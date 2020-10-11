@@ -19,7 +19,6 @@ class _ViewAdToDownloadState extends State<ViewAdToDownload> {
   void initState() {
     isloded = false;
     retries = 0;
-    // loadandshow();
     FirebaseAdMob.instance.initialize(appId:
     //  FirebaseAdMob.testAppId
         'ca-app-pub-9568938816087708~5406343573'
@@ -32,7 +31,6 @@ class _ViewAdToDownloadState extends State<ViewAdToDownload> {
         setState(() {
           _coins += rewardAmount;
         });
-
         print('$_coins | $rewardAmount');
         _scaffoldKey.currentState
             .showSnackBar(SnackBar(content: Text('You Earned 10 Points.')));
@@ -59,7 +57,7 @@ class _ViewAdToDownloadState extends State<ViewAdToDownload> {
       _scaffoldKey.currentState.showSnackBar(
           SnackBar(content: Text('Sorry, Error To Load Ad : $e')));
     });
-    await Future.delayed(Duration(seconds: 1), () {});
+    await Future.delayed(Duration(seconds: 2), () {});
     print('Completed | $isloded');
   }
 
@@ -68,7 +66,7 @@ class _ViewAdToDownloadState extends State<ViewAdToDownload> {
       // testDevices: ['70986832EA2D276F6277A5461962A4EC'],
       nonPersonalizedAds: true);
   Widget _firstwidget() {
-    int balance = ispaid ? 40 - _coins : 20 - _coins;
+    int balance = ispaid ? 30 - _coins : 10 - _coins;
     return Column(
       children: [
         SizedBox(height: 20),
@@ -102,8 +100,9 @@ class _ViewAdToDownloadState extends State<ViewAdToDownload> {
                 if (events == RewardedVideoAdEvent.loaded) {
                   RewardedVideoAd.instance.show();
                 } else {
-                  await loadandshow();
-                  RewardedVideoAd.instance.show();
+                  // await loadandshow();
+                  // RewardedVideoAd.instance.show();
+                  setState((){});
                   // Navigator.pop(context);
                 }
                 // Navigator.pop(context);
@@ -121,14 +120,14 @@ class _ViewAdToDownloadState extends State<ViewAdToDownload> {
           color: Colors.grey[100],
           padding: EdgeInsets.all(10),
           child: Text(
-              (_coins >= (ispaid ? 40 : 20))
+              (_coins >= (ispaid ? 30 : 10))
                   ? 'Thanks For Viewing Ad. This Help Me to Generate Fund to Improve App'
                   : '$balance Points Is Required to Download your PDF ',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
               textAlign: TextAlign.center),
         ),
         SizedBox(height: 20),
-        if ((_coins >= (ispaid ? 40 : 20)) || retries > 25)
+        if ((_coins >= (ispaid ? 30 : 10)) || retries > 7)
           RaisedButton(
             padding: EdgeInsets.all(10),
             color: Colors.blue,

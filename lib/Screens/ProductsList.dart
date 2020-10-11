@@ -141,8 +141,8 @@ class _ProductsListState extends State<ProductsList> {
     void sortbyname(List<ProductModel> list) {
       list
         ..sort((a, b) => issortname
-            ? b.name.toLowerCase().compareTo(a.name.toLowerCase())
-            : a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+            ? (b.name?.toLowerCase() ?? '').compareTo((a.name?.toLowerCase() ?? ''))
+            : (a.name?.toLowerCase() ?? '').compareTo((b.name?.toLowerCase() ?? '')));
       issortname = !issortname;
       setState(() {});
     }
@@ -340,11 +340,11 @@ class _ProductsListState extends State<ProductsList> {
     if (productlist == null) {
       productlist = [];
     }
-    List<int> ints = List<int>.generate(25, (i) => i * 6);
+    List<int> ints = List<int>.generate(5, (i) => i * 6);
     ints.remove(0);
     productlist = productlist
         .where(
-            (e) => e.name.toLowerCase().contains(filter?.toLowerCase() ?? ''))
+            (e) => (e.name?.toLowerCase() ?? '').contains(filter?.toLowerCase() ?? ''))
         .toList();
     return (allproductlist == null)
         ? CircularProgressIndicator()

@@ -80,6 +80,9 @@ class ProductCatalogue extends StatefulWidget {
 class _ProductCatalogueState extends State<ProductCatalogue> {
   SecureStorage storage = SecureStorage();
   String loginstatus;
+  Box<ProductModel> pbox;
+  Box<VarietyProductM> vbox;
+  Box<CategoryModel> cbox;
 
   @override
   void initState() {
@@ -89,6 +92,12 @@ class _ProductCatalogueState extends State<ProductCatalogue> {
 
   void loginstate() async {
     loginstatus = await storage.getloginstatus();
+  }
+
+  Future future() async {
+    pbox = widget.pbox ?? Hive.box<ProductModel>('ProductModel');
+    vbox = widget.vbox ?? Hive.box<VarietyProductM>('VarietyProductM');
+    cbox = widget.cbox ?? Hive.box<CategoryModel>('CategoryModel');
   }
 
   @override
@@ -113,31 +122,44 @@ class _ProductCatalogueState extends State<ProductCatalogue> {
       );
     }
 
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: ProductData(widget.pbox)),
-        ChangeNotifierProvider.value(value: CategoryData(widget.cbox)),
-        ChangeNotifierProvider.value(value: VarietyData(widget.vbox)),
-        ChangeNotifierProvider.value(value: SecureStorage())
-      ],
-      child: MaterialApp(
-        home: homescreen(),
-        routes: {
-          AddVariety.routeName: (ctx) => AddVariety(),
-          CategoryGridS.routeName: (ctx) => CategoryGridS(),
-          BrandListS.routeName: (ctx) => BrandListS(),
-          FavProductsList.routeName: (ctx) => FavProductsList(),
-          ImportExport.routeName: (ctx) => ImportExport(),
-          FilterProduct.routeName: (ctx) => FilterProduct(),
-          UserAEForm.routeName: (ctx) => UserAEForm(),
-          ExportData.routeName: (ctx) => ExportData(),
-          SettingScreen.routeName: (ctx) => SettingScreen(),
-          ContactUs.routeName: (ctx) => ContactUs(),
-          AboutUs.routeName: (ctx) => AboutUs(),
-          Tabscreenwithdata.routeName: (ctx) => Tabscreenwithdata(),
+    Widget setboxes() {
+      return FutureBuilder(
+        future: future(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return MultiProvider(
+              providers: [
+                ChangeNotifierProvider.value(value: ProductData(pbox)),
+                ChangeNotifierProvider.value(value: CategoryData(cbox)),
+                ChangeNotifierProvider.value(value: VarietyData(vbox)),
+                ChangeNotifierProvider.value(value: SecureStorage())
+              ],
+              child: MaterialApp(
+                home: homescreen(),
+                routes: {
+                  AddVariety.routeName: (ctx) => AddVariety(),
+                  CategoryGridS.routeName: (ctx) => CategoryGridS(),
+                  BrandListS.routeName: (ctx) => BrandListS(),
+                  FavProductsList.routeName: (ctx) => FavProductsList(),
+                  ImportExport.routeName: (ctx) => ImportExport(),
+                  FilterProduct.routeName: (ctx) => FilterProduct(),
+                  UserAEForm.routeName: (ctx) => UserAEForm(),
+                  ExportData.routeName: (ctx) => ExportData(),
+                  SettingScreen.routeName: (ctx) => SettingScreen(),
+                  ContactUs.routeName: (ctx) => ContactUs(),
+                  AboutUs.routeName: (ctx) => AboutUs(),
+                  Tabscreenwithdata.routeName: (ctx) => Tabscreenwithdata(),
+                },
+              ),
+            );
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
         },
-      ),
-    );
+      );
+    }
+
+    return setboxes();
   }
 }
 

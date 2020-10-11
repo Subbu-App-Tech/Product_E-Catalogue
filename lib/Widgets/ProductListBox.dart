@@ -22,9 +22,9 @@ class _ProductListBoxState extends State<ProductListBox> {
   String currency = '';
   SecureStorage storage = SecureStorage();
   List<String> categorylist = [];
-  // bool _sortAsc;
   List<VarietyProductM> selectedvariety;
   List<VarietyProductM> varietylist = [];
+  // bool _sortAsc;
   // int _sortColumnIndex;
   // bool _sortnameAsc;
   // bool _sortpriceAsc;
@@ -98,115 +98,6 @@ class _ProductListBoxState extends State<ProductListBox> {
       return image;
     }
 
-    // onSortnameColum(
-    //     int columnIndex, bool ascending, List<VarietyProductM> list) {
-    //   if (columnIndex == _sortColumnIndex) {
-    //     _sortAsc = _sortnameAsc = ascending;
-    //   } else {
-    //     _sortColumnIndex = columnIndex;
-    //     _sortAsc = _sortnameAsc;
-    //   }
-    //   list.sort((a, b) => _sortAsc
-    //       ? b.varityname.compareTo(a.varityname)
-    //       : a.varityname.compareTo(b.varityname));
-    //   setState(() {});
-    // }
-
-    // onSortpriceColum(
-    //     int columnIndex, bool ascending, List<VarietyProductM> list) {
-    //   if (columnIndex == _sortColumnIndex) {
-    //     _sortAsc = _sortpriceAsc = ascending;
-    //   } else {
-    //     _sortColumnIndex = columnIndex;
-    //     _sortAsc = _sortpriceAsc;
-    //   }
-    //   list.sort((a, b) =>
-    //       _sortAsc ? b.price.compareTo(a.price) : a.price.compareTo(b.price));
-    //   setState(() {});
-    // }
-
-    // onSortwspColum(
-    //     int columnIndex, bool ascending, List<VarietyProductM> list) {
-    //   if (columnIndex == _sortColumnIndex) {
-    //     _sortAsc = _sortwspAsc = ascending;
-    //   } else {
-    //     _sortColumnIndex = columnIndex;
-    //     _sortAsc = _sortwspAsc;
-    //   }
-    //   list.sort((a, b) =>
-    //       _sortAsc ? b.wsp.compareTo(a.price) : a.wsp.compareTo(b.price));
-    //   setState(() {});
-    // }
-
-    // List<DataRow> varietydatarow(List<VarietyProductM> varietylist) {
-    //   List<DataRow> rowlist = [];
-    //   for (VarietyProductM i in varietylist) {
-    //     rowlist.add(DataRow(selected: selectedvariety.contains(i), cells: [
-    //       DataCell(Text(i.varityname)),
-    //       DataCell(Text(i.price.toString())),
-    //       DataCell(Text(i.wsp.toString()))
-    //     ]));
-    //   }
-    //   return rowlist;
-    // }
-
-    // Widget varietytable() {
-    //   return varietylist.isEmpty
-    //       ? Container(
-    //           width: double.infinity,
-    //           padding: EdgeInsets.all(8),
-    //           child: Text(
-    //             'No Variety Available',
-    //             style: TextStyle(
-    //               fontWeight: FontWeight.bold,
-    //               fontSize: 15,
-    //             ),
-    //             textAlign: TextAlign.center,
-    //           ),
-    //         )
-    //       : Column(
-    //           children: <Widget>[
-    //             Container(
-    //               padding: EdgeInsets.all(0),
-    //               child: SingleChildScrollView(
-    //                 scrollDirection: Axis.horizontal,
-    //                 child: DataTable(
-    //                   headingRowHeight: 50,
-    //                   columnSpacing: 40,
-    //                   dataRowHeight: 40,
-    //                   sortAscending: _sortAsc,
-    //                   sortColumnIndex: _sortColumnIndex,
-    //                   columns: [
-    //                     DataColumn(
-    //                         label: Text('Variety Name'),
-    //                         numeric: false,
-    //                         onSort: (columnIndex, ascending) {
-    //                           onSortnameColum(
-    //                               columnIndex, ascending, varietylist);
-    //                         }),
-    //                     DataColumn(
-    //                         label: Text('Variety Price'),
-    //                         numeric: true,
-    //                         onSort: (columnIndex, ascending) {
-    //                           onSortpriceColum(
-    //                               columnIndex, ascending, varietylist);
-    //                         }),
-    //                     DataColumn(
-    //                         label: Text('WSP'),
-    //                         numeric: true,
-    //                         onSort: (columnIndex, ascending) {
-    //                           onSortwspColum(
-    //                               columnIndex, ascending, varietylist);
-    //                         })
-    //                   ],
-    //                   rows: varietydatarow(varietylist),
-    //                 ),
-    //               ),
-    //             ),
-    //           ],
-    //         );
-    // }
-
     return Material(
       child: InkWell(
         onTap: () {
@@ -233,7 +124,7 @@ class _ProductListBoxState extends State<ProductListBox> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(2.5),
-                            child: checkimagepath(widget.product.imagepathlist)
+                            child: checkimagepath(widget?.product?.imagepathlist?.cast<String>() ?? [])
                                 ? Container(
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.all(
@@ -243,7 +134,7 @@ class _ProductListBoxState extends State<ProductListBox> {
                                     width: 80,
                                     child: Carousel(
                                       images: imagefilelist(
-                                          widget.product.imagepathlist),
+                                          widget.product.imagepathlist.cast<String>() ?? []),
                                       dotSize: 3,
                                       dotSpacing: 5,
                                       dotColor: Colors.white,
@@ -285,7 +176,7 @@ class _ProductListBoxState extends State<ProductListBox> {
                                 Container(
                                   width: double.infinity,
                                   child: Text(
-                                    widget.product.name,
+                                    widget.product.name ?? '',
                                     textAlign: TextAlign.left,
                                     overflow: TextOverflow.fade,
                                     style: TextStyle(
@@ -359,8 +250,6 @@ class _ProductListBoxState extends State<ProductListBox> {
                   Positioned(
                       top: 10,
                       right: 10,
-                      // bottom: 15,
-                      // right: 15,
                       child: InkWell(
                         child: Container(
                           decoration: BoxDecoration(
@@ -368,7 +257,7 @@ class _ProductListBoxState extends State<ProductListBox> {
                             color: Colors.grey[100],
                           ),
                           padding: EdgeInsets.all(5),
-                          child: widget.product.favourite
+                          child: (widget.product?.favourite ?? false)
                               ? Icon(Icons.favorite,
                                   color: Colors.red, size: 27)
                               : Icon(Icons.favorite_border, size: 27),
@@ -381,39 +270,40 @@ class _ProductListBoxState extends State<ProductListBox> {
                           });
                         },
                       )),
-            //       Positioned(
-            //         bottom: 0,
-            //         right: 2,
-            //         child: FlatButton.icon(
-            //           color: Colors.grey[200],
-            //           // autofocus: true, focusColor: Colors.amber,
-            //           // splashColor: Colors.blueAccent,
-            //           label: Text('Varieties',
-            //               style: TextStyle(
-            //                   fontSize: 12,
-            //                   color: !isexpand ? Colors.black : Colors.blue)),
-            //           icon: Icon(
-            //               !isexpand ? Icons.expand_more : Icons.expand_less,
-            //               size: 12,
-            //               color: !isexpand ? Colors.black : Colors.blue),
-            //           onPressed: () {
-            //             isexpand = !isexpand;
-            //             setState(() {});
-            //           },
-            //         ),
-            //       )
                 ],
               ),
             ),
-            // isexpand
-            //     ? Container(child: varietytable(), width: double.infinity)
-            //     : SizedBox.shrink(),
           ],
         ),
       ),
     );
   }
 }
+
+//       Positioned(
+//         bottom: 0,
+//         right: 2,
+//         child: FlatButton.icon(
+//           color: Colors.grey[200],
+//           // autofocus: true, focusColor: Colors.amber,
+//           // splashColor: Colors.blueAccent,
+//           label: Text('Varieties',
+//               style: TextStyle(
+//                   fontSize: 12,
+//                   color: !isexpand ? Colors.black : Colors.blue)),
+//           icon: Icon(
+//               !isexpand ? Icons.expand_more : Icons.expand_less,
+//               size: 12,
+//               color: !isexpand ? Colors.black : Colors.blue),
+//           onPressed: () {
+//             isexpand = !isexpand;
+//             setState(() {});
+//           },
+//         ),
+//       )
+// isexpand
+//     ? Container(child: varietytable(), width: double.infinity)
+//     : SizedBox.shrink(),
 
 // (product.description == null || product.description == '')
 //     ? SizedBox.shrink()
@@ -434,3 +324,112 @@ class _ProductListBoxState extends State<ProductListBox> {
 //             overflow: TextOverflow.fade,
 //           )
 //     : Text('Brand: ${product.brand}'),
+
+// onSortnameColum(
+//     int columnIndex, bool ascending, List<VarietyProductM> list) {
+//   if (columnIndex == _sortColumnIndex) {
+//     _sortAsc = _sortnameAsc = ascending;
+//   } else {
+//     _sortColumnIndex = columnIndex;
+//     _sortAsc = _sortnameAsc;
+//   }
+//   list.sort((a, b) => _sortAsc
+//       ? b.varityname.compareTo(a.varityname)
+//       : a.varityname.compareTo(b.varityname));
+//   setState(() {});
+// }
+
+// onSortpriceColum(
+//     int columnIndex, bool ascending, List<VarietyProductM> list) {
+//   if (columnIndex == _sortColumnIndex) {
+//     _sortAsc = _sortpriceAsc = ascending;
+//   } else {
+//     _sortColumnIndex = columnIndex;
+//     _sortAsc = _sortpriceAsc;
+//   }
+//   list.sort((a, b) =>
+//       _sortAsc ? b.price.compareTo(a.price) : a.price.compareTo(b.price));
+//   setState(() {});
+// }
+
+// onSortwspColum(
+//     int columnIndex, bool ascending, List<VarietyProductM> list) {
+//   if (columnIndex == _sortColumnIndex) {
+//     _sortAsc = _sortwspAsc = ascending;
+//   } else {
+//     _sortColumnIndex = columnIndex;
+//     _sortAsc = _sortwspAsc;
+//   }
+//   list.sort((a, b) =>
+//       _sortAsc ? b.wsp.compareTo(a.price) : a.wsp.compareTo(b.price));
+//   setState(() {});
+// }
+
+// List<DataRow> varietydatarow(List<VarietyProductM> varietylist) {
+//   List<DataRow> rowlist = [];
+//   for (VarietyProductM i in varietylist) {
+//     rowlist.add(DataRow(selected: selectedvariety.contains(i), cells: [
+//       DataCell(Text(i.varityname)),
+//       DataCell(Text(i.price.toString())),
+//       DataCell(Text(i.wsp.toString()))
+//     ]));
+//   }
+//   return rowlist;
+// }
+
+// Widget varietytable() {
+//   return varietylist.isEmpty
+//       ? Container(
+//           width: double.infinity,
+//           padding: EdgeInsets.all(8),
+//           child: Text(
+//             'No Variety Available',
+//             style: TextStyle(
+//               fontWeight: FontWeight.bold,
+//               fontSize: 15,
+//             ),
+//             textAlign: TextAlign.center,
+//           ),
+//         )
+//       : Column(
+//           children: <Widget>[
+//             Container(
+//               padding: EdgeInsets.all(0),
+//               child: SingleChildScrollView(
+//                 scrollDirection: Axis.horizontal,
+//                 child: DataTable(
+//                   headingRowHeight: 50,
+//                   columnSpacing: 40,
+//                   dataRowHeight: 40,
+//                   sortAscending: _sortAsc,
+//                   sortColumnIndex: _sortColumnIndex,
+//                   columns: [
+//                     DataColumn(
+//                         label: Text('Variety Name'),
+//                         numeric: false,
+//                         onSort: (columnIndex, ascending) {
+//                           onSortnameColum(
+//                               columnIndex, ascending, varietylist);
+//                         }),
+//                     DataColumn(
+//                         label: Text('Variety Price'),
+//                         numeric: true,
+//                         onSort: (columnIndex, ascending) {
+//                           onSortpriceColum(
+//                               columnIndex, ascending, varietylist);
+//                         }),
+//                     DataColumn(
+//                         label: Text('WSP'),
+//                         numeric: true,
+//                         onSort: (columnIndex, ascending) {
+//                           onSortwspColum(
+//                               columnIndex, ascending, varietylist);
+//                         })
+//                   ],
+//                   rows: varietydatarow(varietylist),
+//                 ),
+//               ),
+//             ),
+//           ],
+//         );
+// }

@@ -110,9 +110,9 @@ class _PDFGridViewPVState extends State<PDFGridViewPV> {
       Uint8List logo = bytes.buffer.asUint8List();
       PdfImage logoimage = PdfImage.file(pdf.document, bytes: logo);
       Future<pw.Widget> _list(ProductModel productdata) async {
-        if (pdftool.checkimagepath(productdata.imagepathlist)) {
+        if (pdftool.checkimagepath(productdata?.imagepathlist?.cast<String>()?? [])) {
           list = await new File(
-                  '${pdftool.validimagepath(productdata.imagepathlist)[0]}')
+                  '${pdftool.validimagepath(productdata?.imagepathlist?.cast<String>())[0]}')
               .readAsBytes();
           image = PdfImage.file(pdf.document, bytes: list);
         } else {

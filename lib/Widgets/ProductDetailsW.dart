@@ -167,7 +167,7 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
       List<Widget> widlist = [];
       for (String i in list) {
         widlist.add(Container(
-          child: Text(i),
+          child: Text(i ?? ''),
           padding: EdgeInsets.all(7),
           color: Colors.lightBlue[300],
         ));
@@ -219,9 +219,9 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
       List<DataRow> rowlist = [];
       for (VarietyProductM i in varietylist) {
         rowlist.add(DataRow(selected: selectedvariety.contains(i), cells: [
-          DataCell(Text(i.varityname)),
-          DataCell(Text(i.price.toString())),
-          DataCell(Text(i.wsp.toString()))
+          DataCell(Text(i.varityname ?? '')),
+          DataCell(Text((i.price ?? 0).toString())),
+          DataCell(Text((i?.wsp ?? 0).toString()))
         ]));
       }
       return rowlist;
@@ -285,12 +285,12 @@ Created with Product E-Catalogue App''';
     void _shareImageAndText() async {
       try {
         Uint8List bytes;
-        if (pdftool.checkimagepath(widget.product.imagepathlist)) {
+        if (pdftool.checkimagepath(widget.product.imagepathlist?.cast<String>() ?? [])) {
           bytes = await File(
                   '${pdftool.validimagepath(widget.product.imagepathlist)[0]}')
               .readAsBytes();
           String ext = pdftool
-              .validimagepath(widget.product.imagepathlist)[0]
+              .validimagepath(widget.product.imagepathlist.cast<String>())[0]
               .split('.')
               .last;
           await WcFlutterShare.share(
@@ -315,7 +315,7 @@ Created with Product E-Catalogue App''';
     currency = currency ?? '';
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.product.name),
+        title: Text(widget.product.name ?? ''),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -328,10 +328,10 @@ Created with Product E-Catalogue App''';
                       height: 250,
                       width: double.infinity,
                       padding: EdgeInsets.all(8),
-                      child: checkimagepath(widget.product.imagepathlist)
+                      child: checkimagepath(widget.product?.imagepathlist?.cast<String>() ?? [])
                           ? Carousel(
                               images:
-                                  imagefilelist(widget.product.imagepathlist),
+                                  imagefilelist(widget.product.imagepathlist?.cast<String>() ?? []),
                               dotSize: 4.0,
                               dotSpacing: 15.0,
                               dotColor: Colors.white,
@@ -361,7 +361,7 @@ Created with Product E-Catalogue App''';
                         splashColor: Colors.red,
                         elevation: 7,
                         shape: CircleBorder(),
-                        child: widget.product.favourite
+                        child: (widget?.product?.favourite ?? false)
                             ? Icon(Icons.favorite, color: Colors.red, size: 30)
                             : Icon(Icons.favorite_border, size: 30),
                         fillColor: Colors.white,
@@ -383,7 +383,7 @@ Created with Product E-Catalogue App''';
               width: double.infinity,
               padding: EdgeInsets.fromLTRB(10, 7, 10, 7),
               child: Text(
-                widget.product.name,
+                widget.product.name ?? '',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 30,

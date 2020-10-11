@@ -44,16 +44,18 @@ class _UserAEFormState extends State<UserAEForm> {
   var _init = true;
   List<VarietyProductM> varietymodel = [];
   List<String> categoryselected = [];
-  var _product = ProductModel(
-      id: UniqueKey().toString(),
-      name: null,
-      imagepathlist: null,
-      brand: null,
-      description: null,
-      categorylist: null);
+  String uq = UniqueKey().toString();
+  ProductModel _product;
 
   @override
   void didChangeDependencies() {
+    _product = ProductModel(
+        id: uq,
+        name: null,
+        imagepathlist: null,
+        brand: null,
+        description: null,
+        categorylist: null);
     if (_init) {
       final _prodid = ModalRoute.of(context).settings.arguments as String;
       if (_prodid != null) {
@@ -64,7 +66,7 @@ class _UserAEFormState extends State<UserAEForm> {
             .findcategorylist(_product.categorylist);
         _namecontroller.text = _product.name;
         _rankcontroller.text = _product.rank.toString();
-        _imagefiles = _product.imagepathlist;
+        _imagefiles = _product.imagepathlist?.cast<String>() ?? [];
         _desccontroller.text = _product.description;
         _brandcontroller.text = _product.brand;
       }
@@ -107,6 +109,7 @@ class _UserAEFormState extends State<UserAEForm> {
 
   void _saveform(BuildContext context) {
     final isValid = form.currentState.validate();
+    print(_product.id.runtimeType);
     if (varietymodel.length <= 0) {
       showDialog(
           context: context,
@@ -211,11 +214,10 @@ class _UserAEFormState extends State<UserAEForm> {
   Directory imagedir;
   String appDirs;
   Future getImage(ImageSource imagesource) async {
-        appDirs = await ExtStorage.getExternalStorageDirectory();
+    appDirs = await ExtStorage.getExternalStorageDirectory();
     var status = await Permission.storage.status;
-                  if (!status.isGranted) 
-                    await Permission.storage.request();        
-        imagedir = await Directory('$appDirs/Product E-catalogue/Product Pictures')
+    if (!status.isGranted) await Permission.storage.request();
+    imagedir = await Directory('$appDirs/Product E-catalogue/Product Pictures')
         .create(recursive: true);
     final pickedFile = await ImagePicker().getImage(source: imagesource);
     if (pickedFile != null) {
@@ -247,7 +249,6 @@ class _UserAEFormState extends State<UserAEForm> {
     setState(() {});
     _scaffoldkey.currentState.showSnackBar(snackBar);
   }
-
 
   void chooseimage(BuildContext context) {
     showModalBottomSheet(
@@ -284,10 +285,7 @@ class _UserAEFormState extends State<UserAEForm> {
                   child: FlatButton(
                     child: Column(
                       children: [
-                        Image.asset(
-                          'assets/gallery.png',
-                          fit: BoxFit.fill
-                        ),
+                        Image.asset('assets/gallery.png', fit: BoxFit.fill),
                         Text('Gallery')
                       ],
                     ),
@@ -627,47 +625,47 @@ class _UserAEFormState extends State<UserAEForm> {
 
 // }
 
-  // Future pickimage() async {
-  //   final pickedFile =
-  //       await ImagePicker().getImage(source: ImageSource.gallery);
-  //   appDir = await pPath.getExternalStorageDirectory();
-  //   imagedir =
-  //       await Directory('${appDir.path}/Pictures').create(recursive: true);
-  //   // appDirs = await ExtStorage.getExternalStorageDirectory();
-  //   // print('<<<<<<<<<<<< $appDirs >>>>>>>>>>');
-  //   // imagedir = await Directory('$appDirs/Product E-catalogue/Product Pictures')
-  //   // .create(recursive: true);
-  //   if (pickedFile != null) {
-  //     File croppedFile = await ImageCropper.cropImage(
-  //         sourcePath: pickedFile.path,
-  //         aspectRatioPresets: [
-  //           CropAspectRatioPreset.square,
-  //           CropAspectRatioPreset.ratio3x2,
-  //           CropAspectRatioPreset.original,
-  //           CropAspectRatioPreset.ratio4x3,
-  //           CropAspectRatioPreset.ratio16x9
-  //         ],
-  //         androidUiSettings: AndroidUiSettings(
-  //             toolbarTitle: 'Crop Image',
-  //             toolbarColor: Colors.blue,
-  //             toolbarWidgetColor: Colors.white,
-  //             initAspectRatio: CropAspectRatioPreset.original,
-  //             lockAspectRatio: false),
-  //         iosUiSettings: IOSUiSettings(
-  //           minimumAspectRatio: 1.0,
-  //         ));
-  //     // appDir = await pPath.getExternalStorageDirectory();
-  //     fileName = path.basename(croppedFile.path);
-  //     savedImage =
-  //         await File(croppedFile.path).copy('${imagedir.path}/$fileName');
-  //     // _imagefiles.add('${imagedir.path}/$fileName');
-  //     _imagefiles.add(savedImage.path);
-  //     print(_imagefiles);
-  //     _product.updateimageurl(_imagefiles);
-  //     snackBar = SnackBar(content: Text('Image Uploaded Succesfully..!'));
-  //   } else {
-  //     snackBar = SnackBar(content: Text('No Image Selected..!'));
-  //   }
-  //   setState(() {});
-  //   _scaffoldkey.currentState.showSnackBar(snackBar);
-  // }
+// Future pickimage() async {
+//   final pickedFile =
+//       await ImagePicker().getImage(source: ImageSource.gallery);
+//   appDir = await pPath.getExternalStorageDirectory();
+//   imagedir =
+//       await Directory('${appDir.path}/Pictures').create(recursive: true);
+//   // appDirs = await ExtStorage.getExternalStorageDirectory();
+//   // print('<<<<<<<<<<<< $appDirs >>>>>>>>>>');
+//   // imagedir = await Directory('$appDirs/Product E-catalogue/Product Pictures')
+//   // .create(recursive: true);
+//   if (pickedFile != null) {
+//     File croppedFile = await ImageCropper.cropImage(
+//         sourcePath: pickedFile.path,
+//         aspectRatioPresets: [
+//           CropAspectRatioPreset.square,
+//           CropAspectRatioPreset.ratio3x2,
+//           CropAspectRatioPreset.original,
+//           CropAspectRatioPreset.ratio4x3,
+//           CropAspectRatioPreset.ratio16x9
+//         ],
+//         androidUiSettings: AndroidUiSettings(
+//             toolbarTitle: 'Crop Image',
+//             toolbarColor: Colors.blue,
+//             toolbarWidgetColor: Colors.white,
+//             initAspectRatio: CropAspectRatioPreset.original,
+//             lockAspectRatio: false),
+//         iosUiSettings: IOSUiSettings(
+//           minimumAspectRatio: 1.0,
+//         ));
+//     // appDir = await pPath.getExternalStorageDirectory();
+//     fileName = path.basename(croppedFile.path);
+//     savedImage =
+//         await File(croppedFile.path).copy('${imagedir.path}/$fileName');
+//     // _imagefiles.add('${imagedir.path}/$fileName');
+//     _imagefiles.add(savedImage.path);
+//     print(_imagefiles);
+//     _product.updateimageurl(_imagefiles);
+//     snackBar = SnackBar(content: Text('Image Uploaded Succesfully..!'));
+//   } else {
+//     snackBar = SnackBar(content: Text('No Image Selected..!'));
+//   }
+//   setState(() {});
+//   _scaffoldkey.currentState.showSnackBar(snackBar);
+// }

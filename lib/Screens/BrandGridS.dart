@@ -90,7 +90,7 @@ class _BrandListSState extends State<BrandListS> {
     List<Brandcount> branddata = Provider.of<ProductData>(context).uqbrand();
     // final productlist =
     //     Provider.of<ProductData>(context).productlistbybrandname;
-    branddata = [...branddata, ...branddata];
+    // branddata = [...branddata, ...branddata];
     return (branddata.length == 0)
         ? Center(
             child: Column(

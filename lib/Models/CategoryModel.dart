@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 
 part 'CategoryModel.g.dart';
 
-@HiveType(typeId: 0)
+@HiveType(typeId: 3)
 class CategoryModel with ChangeNotifier {
   @HiveField(0)
   final String id;

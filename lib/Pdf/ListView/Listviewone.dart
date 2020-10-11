@@ -116,9 +116,9 @@ class _PDFListviewoneState extends State<PDFListviewone> {
       );
 
       Future<pw.Widget> _list(ProductModel productdata) async {
-        if (pdftool.checkimagepath(productdata.imagepathlist)) {
+        if (pdftool.checkimagepath(productdata?.imagepathlist?.cast<String>()?? [])) {
           list = await new File(
-                  '${pdftool.validimagepath(productdata.imagepathlist)[0]}')
+                  '${pdftool.validimagepath(productdata?.imagepathlist?.cast<String>()?? [])[0]}')
               .readAsBytes();
           image = PdfImage.file(
             pdf.document,

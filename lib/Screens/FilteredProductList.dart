@@ -26,6 +26,7 @@ class FilteredProductsList extends StatefulWidget {
 class _FilteredProductsListState extends State<FilteredProductsList> {
   TextEditingController controller = new TextEditingController();
   List<ProductModel> productlist = [];
+  List<ProductModel> allproductlist = [];
   Function varietypricerange;
   bool issortname = false;
   String filter;
@@ -62,10 +63,10 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
   @override
   void didChangeDependencies() {
     if (widget.catid != null) {
-      productlist =
+      allproductlist =
           Provider.of<ProductData>(context).productlistbycatid(widget.catid);
     } else if (widget.brand != null) {
-      productlist = Provider.of<ProductData>(context).findbybrand(widget.brand);
+      allproductlist = Provider.of<ProductData>(context).findbybrand(widget.brand);
     }
     varietypricerange = Provider.of<VarietyData>(context).minmaxvalue;
     super.didChangeDependencies();
@@ -87,7 +88,7 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
         break;
       case AdLoadState.loadCompleted:
         setState(() {
-          _height = 65;
+          _height = 50;
         });
         break;
       default:
@@ -118,14 +119,13 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
 
   @override
   Widget build(BuildContext context) {
+    productlist = [...allproductlist];
     void sortbyname(List<ProductModel> list) {
       list
         ..sort((a, b) => issortname
             ? b.name.toLowerCase().compareTo(a.name.toLowerCase())
             : a.name.toLowerCase().compareTo(b.name.toLowerCase()));
       issortname = !issortname;
-      // _sortby = 1;
-      // acc = issortname;
       setState(() {});
     }
 
@@ -135,8 +135,6 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
             ? varietypricerange(b.id)[0].compareTo(varietypricerange(a.id)[0])
             : varietypricerange(a.id)[0].compareTo(varietypricerange(b.id)[0]));
       issortprice = !issortprice;
-      // _sortby = 2;
-      // acc = issortprice;
       setState(() {});
     }
 
@@ -145,8 +143,6 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
         ..sort((a, b) =>
             issortrank ? (b.rank).compareTo(a.rank) : a.rank.compareTo(b.rank));
       issortrank = !issortrank;
-      // _sortby = 3;
-      // acc = issortrank;
       setState(() {});
     }
 
@@ -165,7 +161,7 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
                           : Text('By Name A-Z'),
                       onTap: () {
                         Navigator.pop(context);
-                        sortbyname(productlist);
+                        sortbyname(allproductlist);
                       },
                     ),
                   ),
@@ -177,7 +173,7 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
                           : Text('Price: Low to High'),
                       onTap: () {
                         Navigator.pop(context);
-                        sortbyprice(productlist);
+                        sortbyprice(allproductlist);
                       },
                     ),
                   ),
@@ -189,7 +185,7 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
                           : Text('Rank: Low to High'),
                       onTap: () {
                         Navigator.pop(context);
-                        sortbyrank(productlist);
+                        sortbyrank(allproductlist);
                       },
                     ),
                   )
@@ -200,119 +196,126 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
           elevation: 5);
     }
 
-    List<int> ints = List<int>.generate(25, (i) => i * 6);
+    List<int> ints = List<int>.generate(5, (i) => i * 6);
+    
+    productlist = productlist
+        .where(
+            (e) => e.name.toLowerCase().contains(filter?.toLowerCase() ?? ''))
+        .toList();
     ints.remove(0);
     return MaterialApp(
       home: Scaffold(
-        appBar: (widget.title == 'Favoutite Products')
-            ? AppBar(
-                leading: IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ))
-            : AppBar(
-                title: Text('Product List'),
-                leading: IconButton(
-                  icon: Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                )),
-        body: (productlist.length == 0)
-            ? NewWidget()
-            : Column(
-                children: <Widget>[
-                  Container(
-                    child: RichText(
-                      text: TextSpan(
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: 'Products in ',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 18,
-                                fontWeight: FontWeight.normal),
+              body: Column(
+                children: [
+                  Expanded(
+                                      child: Scaffold(
+          appBar: (widget.title == 'Favoutite Products')
+                    ? AppBar(
+                        leading: IconButton(
+                        icon: Icon(Icons.arrow_back),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ))
+                    : AppBar(
+                        title: Text('Product List'),
+                        leading: IconButton(
+                          icon: Icon(Icons.arrow_back),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        )),
+          body: (allproductlist.length == 0)
+                    ? NewWidget()
+                    : Column(
+                        children: <Widget>[
+                          Container(
+                            child: RichText(
+                              text: TextSpan(
+                                children: <TextSpan>[
+                                  TextSpan(
+                                    text: 'Products in ',
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                  TextSpan(
+                                    text: '${widget.title}',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  )
+                                ],
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                            padding: EdgeInsets.all(8),
                           ),
-                          TextSpan(
-                            text: '${widget.title}',
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          )
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              IconButton(
+                                  color: Colors.black,
+                                  icon: Icon(Icons.sort),
+                                  onPressed: () {
+                                    setState(() {
+                                      sortbottomsheet(context, productlist);
+                                    });
+                                  }),
+                              SizedBox(width: 5),
+                              Expanded(
+                                child: Container(
+                                  height: 40,
+                                  child: TextField(
+                                    decoration: new InputDecoration(
+                                        prefixIcon: Icon(Icons.search),
+                                        labelText: "Search Product",
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                        )),
+                                    controller: controller,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 5),
+                            ],
+                          ),
+                          (productlist.length == 0)
+                              ? Center(child: Text('No Product Available'))
+                              : Expanded(
+                                  child: Container(
+                                    child: ListView.separated(
+                                      separatorBuilder: (ctx, idx) {
+                                        return ints.contains(idx)
+                                            ? adwidget
+                                            : Container();
+                                      },
+                                      itemBuilder: (ctx, index) => ProductListBox(
+                                                  product: productlist[index])
+                                             ,
+                                      itemCount: productlist.length,
+                                      shrinkWrap: true,
+                                    ),
+                                  ),
+                                ),
                         ],
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                    padding: EdgeInsets.all(8),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+                    Navigator.of(context).pushNamed(UserAEForm.routeName);
+            },
+            child: Icon(Icons.add),
+          ),
+        ),
                   ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      IconButton(
-                          color: Colors.black,
-                          icon: Icon(Icons.sort),
-                          onPressed: () {
-                            setState(() {
-                              sortbottomsheet(context, productlist);
-                            });
-                          }),
-                      SizedBox(width: 5),
-                      Expanded(
-                        child: Container(
-                          height: 40,
-                          child: TextField(
-                            decoration: new InputDecoration(
-                                prefixIcon: Icon(Icons.search),
-                                labelText: "Search Product",
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                )),
-                            controller: controller,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 5),
-                    ],
-                  ),
-                  (productlist.length == 0)
-                      ? Center(child: Text('No Product Available'))
-                      : Expanded(
-                          child: Container(
-                            child: ListView.separated(
-                              separatorBuilder: (ctx, idx) {
-                                return ints.contains(idx)
-                                    ? adwidget
-                                    : Container();
-                              },
-                              itemBuilder: (ctx, index) => filter == null ||
-                                      filter == ''
-                                  ? ProductListBox(product: productlist[index])
-                                  : productlist[index]
-                                          .name
-                                          .toLowerCase()
-                                          .contains(filter.toLowerCase())
-                                      ? ProductListBox(
-                                          product: productlist[index])
-                                      : SizedBox.shrink(),
-                              itemCount: productlist.length,
-                              shrinkWrap: true,
-                            ),
-                          ),
-                        ),
+                  adwidget
                 ],
               ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).pushNamed(UserAEForm.routeName);
-          },
-          child: Icon(Icons.add),
-        ),
       ),
       routes: {
         UserAEForm.routeName: (ctx) => UserAEForm(),

@@ -51,7 +51,10 @@ class CategoryData with ChangeNotifier {
         if (i == 'otherid') {
           s = null;
         } else {
-          s = _items.firstWhere((cat) => cat.id == i).name;
+          s = _items
+                  .firstWhere((cat) => cat.id == i, orElse: () => null)
+                  ?.name ??
+              '';
         }
         s == null ? _lst = [] : _lst.add(s);
       }
@@ -97,7 +100,7 @@ class CategoryData with ChangeNotifier {
       //   'name': i.name,
       // });
       _items.add(i);
-      _dbbox.put(i.id, i);
+      _dbbox.put(i.id.toString(), i);
     }
     notifyListeners();
   }
@@ -109,23 +112,27 @@ class CategoryData with ChangeNotifier {
     //   'id': _id,
     //   'name': categoryname,
     // });
-    _dbbox.put(newcat.id, newcat);
+    _dbbox.put(newcat.id.toString(), newcat);
     _items.add(newcat);
   }
 
   Future<void> fetchcategory() async {
-    final dataList = await DBHelper.getData('catdata');
-    _items = dataList
-        .map(
-          (item) => CategoryModel(
-            id: item['id'],
-            name: item['name'],
-          ),
-        )
-        .toList();
-    _items.forEach((e) {
-      _dbbox.put(e.id, e);
-    });
+    if (_dbbox.keys.length == 0) {
+      final dataList = await DBHelper.getData('catdata');
+      _items = dataList
+          .map(
+            (item) => CategoryModel(
+              id: item['id'],
+              name: item['name'],
+            ),
+          )
+          .toList();
+      _items.forEach((e) {
+        _dbbox.put(e.id.toString(), e);
+      });
+    }
+    _items = [];
+    _items = [...(_dbbox?.values ?? [])];
     notifyListeners();
   }
 }

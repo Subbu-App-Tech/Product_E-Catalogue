@@ -71,7 +71,7 @@ class ProductModel extends HiveObject {
   }
 
   void toggleFavoriteStatus() {
-    favourite = !favourite;
+    favourite = !(favourite ?? false);
   }
 
   void updaterank(int rank) {

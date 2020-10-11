@@ -101,7 +101,7 @@ class VarietyData with ChangeNotifier {
           //   'price': i.price,
           //   'wsp': i.wsp
           // });
-          _dbbox.put(i.id, i);
+          _dbbox.put(i.id.toString(), i);
         }
       }
     }
@@ -109,20 +109,24 @@ class VarietyData with ChangeNotifier {
   }
 
   Future<void> fetchvariety() async {
-    final dataList = await DBHelper.getData('varietydata');
-    _items = dataList
-        .map(
-          (item) => VarietyProductM(
-              id: item['id'],
-              productid: item['productid'],
-              varityname: item['name'],
-              price: item['price'],
-              wsp: item['wsp']),
-        )
-        .toList();
-    _items.forEach((e) {
-      _dbbox.put(e.id, e);
-    });
+    if (_dbbox.keys.length == 0) {
+      final dataList = await DBHelper.getData('varietydata');
+      _items = dataList
+          .map(
+            (item) => VarietyProductM(
+                id: item['id'],
+                productid: item['productid'],
+                varityname: item['name'],
+                price: item['price'],
+                wsp: item['wsp']),
+          )
+          .toList();
+      _items.forEach((e) {
+        _dbbox.put(e.id.toString(), e);
+      });
+    }
+    _items = [];
+    _items = [...(_dbbox?.values ?? [])];
     notifyListeners();
   }
 

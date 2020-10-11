@@ -13,6 +13,10 @@ import '../Provider/VarietyDataP.dart';
 import '../Tool/FilterProduct.dart';
 import 'package:rate_my_app/rate_my_app.dart';
 import '../contact/Contactus.dart';
+import 'package:flutter_native_admob/native_admob_options.dart';
+import 'dart:async';
+import 'package:flutter_native_admob/flutter_native_admob.dart' as ad;
+import 'package:flutter_native_admob/native_admob_controller.dart';
 
 class Tabscreenwithdata extends StatelessWidget {
   static const routeName = '/Tabscreenwithdata';
@@ -88,7 +92,39 @@ class _TabScreenState extends State<TabScreen> {
         }
       });
     });
+    _subscription = _nativeAdController.stateChanged.listen(_onStateChanged);
+    _nativeAdController.setAdUnitID(_adUnitID, numberAds: 1);
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    _nativeAdController.dispose();
+    super.dispose();
+  }
+
+// ca-app-pub-9568938816087708~5406343573
+  static const _adUnitID = "ca-app-pub-9568938816087708/6044993041";
+  final _nativeAdController = NativeAdmobController();
+  double _height = 0;
+  StreamSubscription _subscription;
+  void _onStateChanged(AdLoadState state) {
+    switch (state) {
+      case AdLoadState.loading:
+        setState(() {
+          _height = 0;
+        });
+        break;
+      case AdLoadState.loadCompleted:
+        setState(() {
+          _height = 50;
+        });
+        break;
+      default:
+        break;
+    }
   }
 
   @override
@@ -120,6 +156,27 @@ class _TabScreenState extends State<TabScreen> {
     });
   }
 
+  Widget get adwidget {
+    return Card(
+      child: Container(
+        height: _height,
+        padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+        child: ad.NativeAdmob(
+            adUnitID: _adUnitID,
+            error: Text('Error'),
+            numberAds: 2,
+            type: ad.NativeAdmobType.banner,
+            controller: _nativeAdController,
+            options: NativeAdmobOptions(
+                priceTextStyle:
+                    NativeTextStyle(fontSize: 15, color: Colors.red),
+                bodyTextStyle:
+                    NativeTextStyle(fontSize: 14, color: Colors.black)),
+            loading: Text('Loading')),
+      ),
+    );
+  }
+
   Future fetchdata() async {
     await Provider.of<ProductData>(context, listen: false).fetchproduct();
     await Provider.of<CategoryData>(context, listen: false).fetchcategory();
@@ -129,88 +186,99 @@ class _TabScreenState extends State<TabScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: MyDrawer(),
-      appBar: AppBar(
-        title: Text(_pages[_selectedPageIndex]['title']),
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.shopping_bag),
-              onPressed: () {
-                Navigator.pushNamed(context, ContactUs.routeName,
-                    arguments: true);
-              }),
-          Container(
-            child: Stack(
-              children: [
-                Container(
-                  alignment: Alignment.center,
-                  child: IconButton(
-                    icon: Icon(Icons.favorite, size: 27),
-                    onPressed: () {
-                      Navigator.pushNamed(context, FavProductsList.routeName);
-                    },
-                  ),
-                ),
-                (favproducts.length == 0)
-                    ? SizedBox.shrink()
-                    : Positioned(
-                        right: 3,
-                        top: 5,
-                        child: Container(
-                          padding: EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.red,
-                          ),
-                          child: Text(
-                            '${favproducts.length}',
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Scaffold(
+              drawer: MyDrawer(),
+              appBar: AppBar(
+                title: Text(_pages[_selectedPageIndex]['title']),
+                actions: <Widget>[
+                  IconButton(
+                      icon: Icon(Icons.shopping_bag),
+                      onPressed: () {
+                        Navigator.pushNamed(context, ContactUs.routeName,
+                            arguments: true);
+                      }),
+                  Container(
+                    child: Stack(
+                      children: [
+                        Container(
+                          alignment: Alignment.center,
+                          child: IconButton(
+                            icon: Icon(Icons.favorite, size: 27),
+                            onPressed: () {
+                              Navigator.pushNamed(
+                                  context, FavProductsList.routeName);
+                            },
                           ),
                         ),
-                      )
-              ],
+                        (favproducts.length == 0)
+                            ? SizedBox.shrink()
+                            : Positioned(
+                                right: 3,
+                                top: 5,
+                                child: Container(
+                                  padding: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.red,
+                                  ),
+                                  child: Text(
+                                    '${favproducts.length}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              body: _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : _pages[_selectedPageIndex]['page'],
+              floatingActionButton: FloatingActionButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(UserAEForm.routeName);
+                },
+                child: Icon(Icons.add),
+              ),
+              bottomNavigationBar: BottomNavigationBar(
+                onTap: _selectPage,
+                items: [
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.apps), label: ('Product')),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.category), label: ('Category')),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.branding_watermark), label: ('Brand')),
+                ],
+                showSelectedLabels: true,
+                elevation: 7,
+                currentIndex: _selectedPageIndex,
+              ),
+              // ),
+              // routes: {
+              //   AddVariety.routeName: (ctx) => AddVariety(),
+              //   CategoryGridS.routeName: (ctx) => CategoryGridS(),
+              //   BrandListS.routeName: (ctx) => BrandListS(),
+              //   FavProductsList.routeName: (ctx) => FavProductsList(),
+              //   ImportExport.routeName: (ctx) => ImportExport(),
+              //   FilterProduct.routeName: (ctx) => FilterProduct(),
+              //   UserAEForm.routeName: (ctx) => UserAEForm(),
+              //   ExportData.routeName: (ctx) => ExportData(),
+              //   SettingScreen.routeName: (ctx) => SettingScreen(),
+              //   ContactUs.routeName: (ctx) => ContactUs(),
+              //   AboutUs.routeName: (ctx) => AboutUs()
+              // },
             ),
-          )
+          ),
+          adwidget
         ],
       ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : _pages[_selectedPageIndex]['page'],
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed(UserAEForm.routeName);
-        },
-        child: Icon(Icons.add),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: _selectPage,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.apps), label: ('Product')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.category), label: ('Category')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.branding_watermark), label: ('Brand')),
-        ],
-        showSelectedLabels: true,
-        elevation: 7,
-        currentIndex: _selectedPageIndex,
-      ),
-      // ),
-      // routes: {
-      //   AddVariety.routeName: (ctx) => AddVariety(),
-      //   CategoryGridS.routeName: (ctx) => CategoryGridS(),
-      //   BrandListS.routeName: (ctx) => BrandListS(),
-      //   FavProductsList.routeName: (ctx) => FavProductsList(),
-      //   ImportExport.routeName: (ctx) => ImportExport(),
-      //   FilterProduct.routeName: (ctx) => FilterProduct(),
-      //   UserAEForm.routeName: (ctx) => UserAEForm(),
-      //   ExportData.routeName: (ctx) => ExportData(),
-      //   SettingScreen.routeName: (ctx) => SettingScreen(),
-      //   ContactUs.routeName: (ctx) => ContactUs(),
-      //   AboutUs.routeName: (ctx) => AboutUs()
-      // },
     );
   }
 }
