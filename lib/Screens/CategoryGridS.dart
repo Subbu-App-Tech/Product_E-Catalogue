@@ -136,7 +136,7 @@ class _CategoryGridSState extends State<CategoryGridS> {
                 adwidget(false),
                 Container(
                   child: Image.asset('assets/emptybox.png'),
-                  width: 150,
+                  width: 150
                 ),
                 Text('No Product Available Yet'),
                 SizedBox(height: 2),
@@ -173,7 +173,7 @@ class _CategoryGridSState extends State<CategoryGridS> {
                     ? SizedBox.shrink()
                     : Column(
                         children: [
-                          adwidget(false),
+                          // adwidget(false),
                           SizedBox(height: 10),
                           Container(
                             padding: EdgeInsets.all(5),
@@ -205,7 +205,7 @@ class _CategoryGridSState extends State<CategoryGridS> {
                           ),
                         ],
                       ),
-                adwidget(true),
+                // adwidget(true),
               ],
             ),
           );

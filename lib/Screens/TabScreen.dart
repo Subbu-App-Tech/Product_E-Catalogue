@@ -105,7 +105,7 @@ class _TabScreenState extends State<TabScreen> {
     super.dispose();
   }
 
-// ca-app-pub-9568938816087708~5406343573
+//static const _adUnitID = ca-app-pub-9568938816087708~5406343573
   static const _adUnitID = "ca-app-pub-9568938816087708/6044993041";
   final _nativeAdController = NativeAdmobController();
   double _height = 0;

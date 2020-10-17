@@ -340,7 +340,7 @@ class _ProductsListState extends State<ProductsList> {
     if (productlist == null) {
       productlist = [];
     }
-    List<int> ints = List<int>.generate(5, (i) => i * 6);
+    List<int> ints = List<int>.generate(5, (i) => i * 7);
     ints.remove(0);
     productlist = productlist
         .where(

@@ -100,14 +100,9 @@ class _ViewAdToDownloadState extends State<ViewAdToDownload> {
                 if (events == RewardedVideoAdEvent.loaded) {
                   RewardedVideoAd.instance.show();
                 } else {
-                  // await loadandshow();
-                  // RewardedVideoAd.instance.show();
                   setState((){});
-                  // Navigator.pop(context);
                 }
-                // Navigator.pop(context);
               } catch (e) {
-                // Navigator.pop(context);
                 _scaffoldKey.currentState.showSnackBar(
                     SnackBar(content: Text('Sorry, Error To Load Ads : $e')));
               }
@@ -137,7 +132,8 @@ class _ViewAdToDownloadState extends State<ViewAdToDownload> {
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white),
             ),
-          ),
+          ),        SizedBox(height: 30),
+          Text('If Ad Not Loading, Please press Button for 10 times.')
       ],
     );
   }

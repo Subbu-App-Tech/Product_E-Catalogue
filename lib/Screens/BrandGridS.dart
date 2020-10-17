@@ -113,7 +113,7 @@ class _BrandListSState extends State<BrandListS> {
         : SingleChildScrollView(
             child: Column(
               children: [
-                adwidget(true),
+                // adwidget(true),
                 GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
@@ -133,7 +133,7 @@ class _BrandListSState extends State<BrandListS> {
                   physics: NeverScrollableScrollPhysics(),
                   itemCount: branddata.length,
                 ),
-                adwidget(false)
+                // adwidget(false)
               ],
             ),
           );
