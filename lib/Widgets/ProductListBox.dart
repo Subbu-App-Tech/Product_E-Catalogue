@@ -24,25 +24,15 @@ class _ProductListBoxState extends State<ProductListBox> {
   List<String> categorylist = [];
   List<VarietyProductM> selectedvariety;
   List<VarietyProductM> varietylist = [];
-  // bool _sortAsc;
-  // int _sortColumnIndex;
-  // bool _sortnameAsc;
-  // bool _sortpriceAsc;
-  // bool _sortwspAsc;
   String varietydetails;
   String text;
   bool isexpand;
 
   @override
   void initState() {
-    // _sortAsc = false;
     isexpand = false;
     varietydetails = '';
     selectedvariety = [];
-    // _sortColumnIndex = 0;
-    // _sortpriceAsc = false;
-    // _sortnameAsc = false;
-    // _sortwspAsc = false;
     currencyset();
     setState(() {});
     super.initState();

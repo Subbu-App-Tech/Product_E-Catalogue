@@ -46,8 +46,9 @@ class VarietyData with ChangeNotifier {
     ];
     List<String> _varlst = [];
     for (VarietyProductM i in _vartylist) {
-      _varlst.add(
-          '${changenullstring(i.varityname)},  ${changenulldouble(i.price)},  ${changenulldouble(i.wsp)} ');
+      _varlst.add('${changenullstring(i.varityname)},'
+          ' ${changenulldouble(i.price)}, '
+          '${changenulldouble(i.wsp)} ');
     }
     return _varlst.join('\n');
   }
@@ -94,13 +95,7 @@ class VarietyData with ChangeNotifier {
               varityname: i.varityname,
               price: i.price,
               wsp: i.wsp));
-          // DBHelper.insert('varietydata', {
-          //   'id': id,
-          //   'productid': i.productid,
-          //   'name': i.varityname,
-          //   'price': i.price,
-          //   'wsp': i.wsp
-          // });
+
           _dbbox.put(i.id.toString(), i);
         }
       }
@@ -133,7 +128,6 @@ class VarietyData with ChangeNotifier {
   void editvariety(List<VarietyProductM> varietylist) {
     if (varietylist.length > 0) {
       _items.removeWhere((ele) => ele.productid == varietylist[0].productid);
-      // DBHelper.deletevariery('varietydata', varietylist[0].productid);
       addvariety(varietylist);
     }
     notifyListeners();
@@ -141,7 +135,6 @@ class VarietyData with ChangeNotifier {
 
   void delete(String productid) {
     _items.removeWhere((ele) => ele.productid == productid);
-    // DBHelper.deletevariery('varietydata', productid);
     _dbbox.delete(
         _dbbox.values.where((e) => e.productid == productid).map((e) => e.id));
   }

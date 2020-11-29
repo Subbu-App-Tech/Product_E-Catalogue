@@ -36,7 +36,7 @@ class _ProductsListState extends State<ProductsList> {
   bool issortname = false;
   bool issortprice = false;
   bool issortrank = false;
-// final _nativeAdmob = NativeAdmob();
+  // final _nativeAdmob = NativeAdmob();
   @override
   void initState() {
     controller.addListener(() {
@@ -44,12 +44,11 @@ class _ProductsListState extends State<ProductsList> {
         filter = controller.text;
       });
     });
-
     // _initAdMob();
     // nativeAd..load();
     // _nativeAdmob.initialize(appID: "ca-app-pub-3940256099942544~3347511713");
-    _subscription = _nativeAdController.stateChanged.listen(_onStateChanged);
-    _nativeAdController.setAdUnitID(_adUnitID, numberAds: 2);
+    // _subscription = _nativeAdController.stateChanged.listen(_onStateChanged);
+    // _nativeAdController.setAdUnitID(_adUnitID, numberAds: 2);
     // _nativeAdController.setTestDeviceIds([
     //   '400A0E6F669C5ECA',
     //   '33BE2250B43518CCDA7DE426D04EE231',
@@ -409,9 +408,11 @@ class _ProductsListState extends State<ProductsList> {
                           child: Container(
                             child: ListView.separated(
                               separatorBuilder: (context, idx) {
-                                return ints.contains(idx)
-                                    ? adwidget
-                                    : Container();
+                                return 
+                                // ints.contains(idx)
+                                //     ? adwidget
+                                //     :
+                                     SizedBox.shrink();
                               },
                               itemBuilder: (ctx, index) {
                                 return ProductListBox(

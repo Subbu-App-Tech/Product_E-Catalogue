@@ -158,7 +158,6 @@ class _ProductCatalogueState extends State<ProductCatalogue> {
         },
       );
     }
-
     return setboxes();
   }
 }

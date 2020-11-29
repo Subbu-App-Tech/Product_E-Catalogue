@@ -122,7 +122,7 @@ class _ViewAdToDownloadState extends State<ViewAdToDownload> {
               textAlign: TextAlign.center),
         ),
         SizedBox(height: 20),
-        if ((_coins >= (ispaid ? 30 : 10)) || retries > 7)
+        if ((_coins >= (ispaid ? 30 : 10)) || retries > 3)
           RaisedButton(
             padding: EdgeInsets.all(10),
             color: Colors.blue,
@@ -132,8 +132,8 @@ class _ViewAdToDownloadState extends State<ViewAdToDownload> {
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white),
             ),
-          ),        SizedBox(height: 30),
-          Text('If Ad Not Loading, Please press Button for 10 times.')
+          ),SizedBox(height: 30),
+          Text('If Ad Not Loading, Please press Button for 5 times.')
       ],
     );
   }
