@@ -18,6 +18,7 @@ import 'package:flutter_native_admob/native_admob_options.dart';
 import 'dart:async';
 import 'package:flutter_native_admob/flutter_native_admob.dart' as ad;
 import 'package:flutter_native_admob/native_admob_controller.dart';
+import 'package:toast/toast.dart';
 
 class ProductDetailsW extends StatefulWidget {
   final ProductModel product;
@@ -50,7 +51,7 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
     _sortpriceAsc = false;
     _sortnameAsc = false;
     _sortwspAsc = false;
-     currencyset();
+    currencyset();
     _subscription = _nativeAdController.stateChanged.listen(_onStateChanged);
     _nativeAdController.setAdUnitID(_adUnitID, numberAds: 2);
     super.initState();
@@ -169,7 +170,7 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
         widlist.add(Container(
           child: Text(i ?? ''),
           padding: EdgeInsets.all(7),
-          color: Colors.lightBlue[300],
+          color: Colors.lightBlue[300]
         ));
       }
       return widlist;
@@ -285,9 +286,10 @@ Created with Product E-Catalogue App''';
     void _shareImageAndText() async {
       try {
         Uint8List bytes;
-        if (pdftool.checkimagepath(widget.product.imagepathlist?.cast<String>() ?? [])) {
+        if (pdftool.checkimagepath(
+            widget.product.imagepathlist?.cast<String>() ?? [])) {
           bytes = await File(
-                  '${pdftool.validimagepath(widget.product.imagepathlist)[0]}')
+                  '${pdftool.validimagepath(widget.product.imagepathlist).first}')
               .readAsBytes();
           String ext = pdftool
               .validimagepath(widget.product.imagepathlist.cast<String>())[0]
@@ -308,15 +310,14 @@ Created with Product E-Catalogue App''';
               mimeType: 'text/plain');
         }
       } catch (e) {
-        print('error: $e');
+        // print('error: $e');
+        Toast.show('Error Occurs :: $e', context);
       }
     }
 
     currency = currency ?? '';
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.product.name ?? ''),
-      ),
+      appBar: AppBar(title: Text(widget.product.name ?? '')),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
@@ -328,10 +329,13 @@ Created with Product E-Catalogue App''';
                       height: 250,
                       width: double.infinity,
                       padding: EdgeInsets.all(8),
-                      child: checkimagepath(widget.product?.imagepathlist?.cast<String>() ?? [])
+                      child: checkimagepath(
+                              widget.product?.imagepathlist?.cast<String>() ??
+                                  [])
                           ? Carousel(
-                              images:
-                                  imagefilelist(widget.product.imagepathlist?.cast<String>() ?? []),
+                              images: imagefilelist(widget.product.imagepathlist
+                                      ?.cast<String>() ??
+                                  []),
                               dotSize: 4.0,
                               dotSpacing: 15.0,
                               dotColor: Colors.white,

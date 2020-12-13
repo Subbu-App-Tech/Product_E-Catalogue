@@ -86,17 +86,16 @@ class VarietyData with ChangeNotifier {
 
   void addvariety(List<VarietyProductM> varietylist) {
     if (varietylist.length > 0) {
-      for (var i in varietylist) {
+      for (VarietyProductM i in varietylist) {
         if (i.varityname != null) {
-          String id = UniqueKey().toString();
+          String id = i.id.toString() ?? UniqueKey().toString();
           _items.add(VarietyProductM(
               productid: i.productid,
               id: id,
               varityname: i.varityname,
               price: i.price,
               wsp: i.wsp));
-
-          _dbbox.put(i.id.toString(), i);
+          _dbbox.put(id, i);
         }
       }
     }
@@ -127,7 +126,12 @@ class VarietyData with ChangeNotifier {
 
   void editvariety(List<VarietyProductM> varietylist) {
     if (varietylist.length > 0) {
-      _items.removeWhere((ele) => ele.productid == varietylist[0].productid);
+      List<String> delids = _items
+          .where((ele) => ele.productid == varietylist[0].productid)
+          .map((e) => e.id)
+          .toList();
+      _dbbox.deleteAll(delids);
+      _items.removeWhere((e) => delids.contains(e.id));
       addvariety(varietylist);
     }
     notifyListeners();

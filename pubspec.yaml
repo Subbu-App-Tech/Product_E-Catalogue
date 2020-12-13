@@ -65,7 +65,7 @@ dependencies:
   flutter_native_admob: ^2.1.0+3
   hive: ^1.4.4
   hive_flutter: ^0.3.1
-
+  toast: ^0.1.5
 
 
 dev_dependencies:
