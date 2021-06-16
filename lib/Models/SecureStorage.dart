@@ -21,7 +21,7 @@ class SecureStorage with ChangeNotifier {
   }
 
   Future<String> getcurrency() async {
-    String value = await storage.read(key: "currency");
+    String? value = await storage.read(key: "currency");
     if (value == null) {
       return '';
     } else if (value == 'null') {
@@ -37,7 +37,7 @@ class SecureStorage with ChangeNotifier {
   }
 
   Future<String> getloginstatus() async {
-    String value = await storage.read(key: "login");
+    String? value = await storage.read(key: "login");
     if (value == null) {
       return '';
     } else if (value == 'null') {
@@ -48,7 +48,7 @@ class SecureStorage with ChangeNotifier {
   }
 
   Future<String> getcompanyname() async {
-    String value = await storage.read(key: "companyname");
+    String? value = await storage.read(key: "companyname");
     if (value == null) {
       return '';
     } else if (value == 'null') {
@@ -59,7 +59,7 @@ class SecureStorage with ChangeNotifier {
   }
 
   Future<String> getcontactno() async {
-    String value = await storage.read(key: "contactnumber");
+    String? value = await storage.read(key: "contactnumber");
     if (value == null) {
       return '';
     } else if (value == 'null') {

@@ -14,14 +14,13 @@ import 'dart:async';
 import 'dart:typed_data';
 import '../../Provider/VarietyDataP.dart';
 import '../PdfTools.dart';
-import 'package:flutter_plugin_pdf_viewer/flutter_plugin_pdf_viewer.dart';
-import '../../Auth/ViewAdtoDownload.dart';
+import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
 import '../../Models/SecureStorage.dart';
-import 'package:firebase_admob/firebase_admob.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class PDFGridpicVarietyVertical extends StatefulWidget {
   static const routeName = '/PDFGridpicVarietyVertical';
-  const PDFGridpicVarietyVertical({Key key}) : super(key: key);
+  const PDFGridpicVarietyVertical({Key? key}) : super(key: key);
 
   @override
   _PDFGridpicVarietyVerticalState createState() =>
@@ -29,34 +28,13 @@ class PDFGridpicVarietyVertical extends StatefulWidget {
 }
 
 class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
+
   @override
   void initState() {
-    FirebaseAdMob.instance
-        .initialize(appId: 'ca-app-pub-9568938816087708~5406343573');
+    Pdftools.createInterstitialAd();
     super.initState();
   }
 
-  @override
-  void dispose() {
-    _interstitialAd?.dispose();
-    super.dispose();
-  }
-
-  MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
-    childDirected: true,
-    nonPersonalizedAds: true,
-    // testDevices: ['70986832EA2D276F6277A5461962A4EC'],
-  );
-  InterstitialAd _interstitialAd;
-  InterstitialAd createInterstitialAd() {
-    return InterstitialAd(
-      adUnitId: 'ca-app-pub-9568938816087708/7976666598',
-      targetingInfo: targetingInfo,
-      listener: (MobileAdEvent event) {
-        print("InterstitialAd event $event");
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +42,7 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
     PdfImage image;
     Uint8List list;
     String filepath;
-    PDFDocument pdfdoc;
+    PDFDocument? pdfdoc;
     Pdftools pdftool = Pdftools();
     List<CategoryModel> category = Provider.of<CategoryData>(context).items;
     List<ProcuctbasedModel> pbitems = [];
@@ -73,13 +51,13 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
     List<Brandcount> uqbrand = Provider.of<ProductData>(context).uqbrand();
     SecureStorage storage = SecureStorage();
     String currency;
-    List frowd = ModalRoute.of(context).settings.arguments as List;
+    List frowd = ModalRoute.of(context)!.settings.arguments as List;
     Function findvarcount = Provider.of<VarietyData>(context).findvarietycount;
     String input = frowd[0];
     String sortby = frowd[1];
     bool ispaid = frowd[2];
 
-    List<ProductModel> pm;
+    List<ProductModel?> pm;
     if (input == 'brand') {
       for (Brandcount i in uqbrand) {
         pm = Provider.of<ProductData>(context).productlistbybrandname(i.name);
@@ -97,7 +75,7 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
                 list: pm, functofindvarietycount: findvarcount, type: sortby)));
       }
     } else if (input == 'all') {
-      List<ProductModel> pm = Provider.of<ProductData>(context).items;
+      List<ProductModel?> pm = Provider.of<ProductData>(context).items;
       pbitems.add(ProcuctbasedModel(
           basedon: 'All Product',
           productlist: pdftool.sortedlist(
@@ -105,7 +83,7 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
     }
     String contactno;
     String companyname;
-    writeOnPdf() async {
+    Future writeOnPdf() async {
       currency = await storage.getcurrency();
       contactno = await storage.getcontactno();
       companyname = await storage.getcompanyname();
@@ -117,9 +95,9 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
       );
 
       Future<pw.Widget> _list(ProductModel productdata) async {
-        final List<double> varietyrange = varietyrangefunc(productdata.id);
-        String priceA;
-        String priceB;
+        final List<double>? varietyrange = varietyrangefunc(productdata.id);
+        String? priceA;
+        String? priceB;
         if (varietyrange == null || varietyrange.length == 0) {
           priceA = '0';
           priceB = null;
@@ -130,9 +108,10 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
           priceA = varietyrange[0].toString();
           priceB = varietyrange[1].toString();
         }
-        if (pdftool.checkimagepath(productdata?.imagepathlist?.cast<String>()?? [])) {
+        if (pdftool
+            .checkimagepath(productdata.imagepathlist?.cast<String>() ?? [])) {
           list = await new File(
-                  '${pdftool.validimagepath(productdata?.imagepathlist?.cast<String>()?? [])[0]}')
+                  '${pdftool.validimagepath(productdata.imagepathlist?.cast<String>() ?? [])[0]}')
               .readAsBytes();
           image = PdfImage.file(
             pdf.document,
@@ -170,7 +149,8 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
                   width: 190,
                   alignment: pw.Alignment.center,
                   padding: pw.EdgeInsets.all(3),
-                  child: pw.Image(image, fit: pw.BoxFit.contain, height: 100),
+                  child: pw.Image(pw.ImageProxy(image),
+                      fit: pw.BoxFit.contain, height: 100),
                 ),
                 pw.SizedBox(height: 4),
                 pw.Text((priceB == null) ? 'Price' : 'Price Range',
@@ -203,7 +183,7 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
                           maxLines: 1,
                         )),
                 (productdata.description == null ||
-                        productdata.description.trim() == '')
+                        productdata.description!.trim() == '')
                     ? pw.SizedBox.shrink()
                     : pw.Container(
                         padding: pw.EdgeInsets.only(
@@ -240,8 +220,8 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
 
       for (ProcuctbasedModel i in pbitems) {
         List<pw.Widget> _listview = [];
-        for (ProductModel j in i.productlist) {
-          _listview.add(await _list(j));
+        for (ProductModel? j in i.productlist!) {
+          _listview.add(await _list(j!));
         }
         pdf.addPage(
           pw.MultiPage(
@@ -252,7 +232,7 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
               maxPages: 200,
               // margin: pw.EdgeInsets.all(5),
               header: (pw.Context ctx) {
-                return pdftool.buildHeader(i.basedon, logoimage);
+                return pdftool.buildHeader(i.basedon!, logoimage);
               },
               footer: (pw.Context ctx) {
                 return pdftool.buildFooter(
@@ -278,16 +258,17 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
     }
 
     Future savePdf() async {
-      _interstitialAd = createInterstitialAd();
-      await _interstitialAd.load();
-      await _interstitialAd?.show();
-      await writeOnPdf();
-      Directory documentDirectory = await getApplicationDocumentsDirectory();
-      String documentPath = documentDirectory.path;
-      filepath = "$documentPath/ProductCatalogue5.pdf";
-      File file = File(filepath);
-      file.writeAsBytesSync(pdf.save());
-      pdfdoc = await PDFDocument.fromFile(File(filepath));
+      try {
+        await writeOnPdf();
+        Directory documentDirectory = await getApplicationDocumentsDirectory();
+        String documentPath = documentDirectory.path;
+        filepath = "$documentPath/ProductCatalogue5.pdf";
+        File file = File(filepath);
+        file.writeAsBytesSync(await pdf.save());
+        pdfdoc = await PDFDocument.fromFile(File(filepath));
+      } catch (e) {
+        print('Error on gpv :: $e');
+      }
     }
 
     return FutureBuilder(
@@ -301,26 +282,20 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
                   IconButton(
                     icon: Icon(Icons.print),
                     onPressed: () {
-                      _interstitialAd?.dispose();
-                      // OpenFile.open(filepath);
-                      // pdftool.payandprint(context: context, filepath: filepath);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (ctx) => ViewAdToDownload(
-                                    filepath: filepath,
-                                    ispaid: ispaid,
-                                  )));
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (ctx) => ViewAdToDownload(
+                      //               filepath: filepath,
+                      //               ispaid: ispaid,
+                      //             )));
                     },
                   )
                 ],
               ),
               body: (pdfdoc == null)
                   ? Center(child: Text('Sorry,Error Creating PDF'))
-                  : PDFViewer(
-                      document: pdfdoc,
-                      showNavigation: true,
-                    ));
+                  : PDFViewer(document: pdfdoc!, showNavigation: true));
         } else {
           return Scaffold(
               body: Center(

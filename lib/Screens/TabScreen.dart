@@ -13,15 +13,12 @@ import '../Provider/VarietyDataP.dart';
 import '../Tool/FilterProduct.dart';
 import 'package:rate_my_app/rate_my_app.dart';
 import '../contact/Contactus.dart';
-import 'package:flutter_native_admob/native_admob_options.dart';
 import 'dart:async';
-import 'package:flutter_native_admob/flutter_native_admob.dart' as ad;
-import 'package:flutter_native_admob/native_admob_controller.dart';
 
 class Tabscreenwithdata extends StatelessWidget {
   static const routeName = '/Tabscreenwithdata';
 
-  const Tabscreenwithdata({Key key}) : super(key: key);
+  const Tabscreenwithdata({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +27,7 @@ class Tabscreenwithdata extends StatelessWidget {
 }
 
 class TabScreen extends StatefulWidget {
-  final Filterdata filterdata;
+  final Filterdata? filterdata;
   TabScreen({this.filterdata});
 
   @override
@@ -38,9 +35,9 @@ class TabScreen extends StatefulWidget {
 }
 
 class _TabScreenState extends State<TabScreen> {
-  List<Map<String, Object>> _pages;
+  late List<Map<String, Object>> _pages;
   int _selectedPageIndex = 0;
-  List<ProductModel> favproducts;
+  late List<ProductModel?> favproducts;
   var _isInit = true;
   var _isLoading = false;
   RateMyApp _rateMyApp = RateMyApp(
@@ -54,7 +51,7 @@ class _TabScreenState extends State<TabScreen> {
       remindLaunches: 11);
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       _rateMyApp.init().then((_) {
         if (_rateMyApp.shouldOpenDialog) {
           _rateMyApp.showStarRateDialog(
@@ -92,52 +89,25 @@ class _TabScreenState extends State<TabScreen> {
         }
       });
     });
-    _subscription = _nativeAdController.stateChanged.listen(_onStateChanged);
-    _nativeAdController.setAdUnitID(_adUnitID, numberAds: 1);
-
     super.initState();
   }
 
   @override
   void dispose() {
-    _subscription.cancel();
-    _nativeAdController.dispose();
+    // _subscription.cancel();
     super.dispose();
   }
 
 //static const _adUnitID = ca-app-pub-9568938816087708~5406343573
-  static const _adUnitID = "ca-app-pub-9568938816087708/6044993041";
-  final _nativeAdController = NativeAdmobController();
-  double _height = 0;
-  StreamSubscription _subscription;
-  void _onStateChanged(AdLoadState state) {
-    switch (state) {
-      case AdLoadState.loading:
-        setState(() {
-          _height = 0;
-        });
-        break;
-      case AdLoadState.loadCompleted:
-        setState(() {
-          _height = 50;
-        });
-        break;
-      default:
-        break;
-    }
-  }
+  // static const _adUnitID = "ca-app-pub-9568938816087708/6044993041";
+  // double _height = 0;
+  // late StreamSubscription _subscription;
 
   @override
   void didChangeDependencies() {
     if (_isInit) {
-      setState(() {
-        _isLoading = true;
-      });
-      fetchdata().then((_) {
-        setState(() {
-          _isLoading = false;
-        });
-      });
+      setState(() => _isLoading = true);
+      fetchdata().then((_) => setState(() => _isLoading = false));
     }
     _isInit = false;
 
@@ -151,30 +121,7 @@ class _TabScreenState extends State<TabScreen> {
   }
 
   void _selectPage(int index) {
-    setState(() {
-      _selectedPageIndex = index;
-    });
-  }
-
-  Widget get adwidget {
-    return Card(
-      child: Container(
-        height: _height,
-        padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-        child: ad.NativeAdmob(
-            adUnitID: _adUnitID,
-            error: Text('Error'),
-            numberAds: 2,
-            type: ad.NativeAdmobType.banner,
-            controller: _nativeAdController,
-            options: NativeAdmobOptions(
-                priceTextStyle:
-                    NativeTextStyle(fontSize: 15, color: Colors.red),
-                bodyTextStyle:
-                    NativeTextStyle(fontSize: 14, color: Colors.black)),
-            loading: Text('Loading')),
-      ),
-    );
+    setState(() => _selectedPageIndex = index);
   }
 
   Future fetchdata() async {
@@ -192,7 +139,7 @@ class _TabScreenState extends State<TabScreen> {
             child: Scaffold(
               drawer: MyDrawer(),
               appBar: AppBar(
-                title: Text(_pages[_selectedPageIndex]['title']),
+                title: Text(_pages[_selectedPageIndex]['title'] as String),
                 actions: <Widget>[
                   IconButton(
                       icon: Icon(Icons.shopping_bag),
@@ -239,7 +186,7 @@ class _TabScreenState extends State<TabScreen> {
               ),
               body: _isLoading
                   ? Center(child: CircularProgressIndicator())
-                  : _pages[_selectedPageIndex]['page'],
+                  : _pages[_selectedPageIndex]['page'] as Widget?,
               floatingActionButton: FloatingActionButton(
                 onPressed: () {
                   Navigator.of(context).pushNamed(UserAEForm.routeName);
@@ -260,23 +207,9 @@ class _TabScreenState extends State<TabScreen> {
                 elevation: 7,
                 currentIndex: _selectedPageIndex,
               ),
-              // ),
-              // routes: {
-              //   AddVariety.routeName: (ctx) => AddVariety(),
-              //   CategoryGridS.routeName: (ctx) => CategoryGridS(),
-              //   BrandListS.routeName: (ctx) => BrandListS(),
-              //   FavProductsList.routeName: (ctx) => FavProductsList(),
-              //   ImportExport.routeName: (ctx) => ImportExport(),
-              //   FilterProduct.routeName: (ctx) => FilterProduct(),
-              //   UserAEForm.routeName: (ctx) => UserAEForm(),
-              //   ExportData.routeName: (ctx) => ExportData(),
-              //   SettingScreen.routeName: (ctx) => SettingScreen(),
-              //   ContactUs.routeName: (ctx) => ContactUs(),
-              //   AboutUs.routeName: (ctx) => AboutUs()
-              // },
             ),
           ),
-          adwidget
+          // adwidget
         ],
       ),
     );

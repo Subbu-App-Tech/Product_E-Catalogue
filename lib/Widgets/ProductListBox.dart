@@ -8,10 +8,10 @@ import '../Provider/VarietyDataP.dart';
 import 'package:provider/provider.dart';
 import '../Provider/ProductDataP.dart';
 import '../Models/SecureStorage.dart';
-import 'package:carousel_pro/carousel_pro.dart';
+import '../Widgets/Group/carousel_pro/carousel_pro.dart';
 
 class ProductListBox extends StatefulWidget {
-  final ProductModel product;
+  final ProductModel? product;
   ProductListBox({this.product});
 
   @override
@@ -22,11 +22,11 @@ class _ProductListBoxState extends State<ProductListBox> {
   String currency = '';
   SecureStorage storage = SecureStorage();
   List<String> categorylist = [];
-  List<VarietyProductM> selectedvariety;
+  List<VarietyProductM>? selectedvariety;
   List<VarietyProductM> varietylist = [];
-  String varietydetails;
-  String text;
-  bool isexpand;
+  String? varietydetails;
+  String? text;
+  bool? isexpand;
 
   @override
   void initState() {
@@ -44,16 +44,17 @@ class _ProductListBoxState extends State<ProductListBox> {
 
   @override
   void didChangeDependencies() {
-    varietylist = Provider.of<VarietyData>(context).findbyid(widget.product.id);
+    varietylist =
+        Provider.of<VarietyData>(context).findbyid(widget.product!.id);
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
     final varietyrange =
-        Provider.of<VarietyData>(context).minmaxvalue(widget.product.id);
+        Provider.of<VarietyData>(context).minmaxvalue(widget.product!.id);
     final varietycount =
-        Provider.of<VarietyData>(context).findbyid(widget.product.id);
+        Provider.of<VarietyData>(context).findbyid(widget.product!.id);
     List<String> validimagepath(List<String> pathlist) {
       List<String> valid = [];
       for (String i in pathlist) {
@@ -64,20 +65,13 @@ class _ProductListBoxState extends State<ProductListBox> {
       return valid;
     }
 
-    if (currency == null) {
-      currency = '';
-    }
     bool checkimagepath(List<String> imagelist) {
-      if (imagelist == null) {
-        return false;
-      } else {
-        if (imagelist.length > 0) {
-          if (validimagepath(imagelist).length > 0) {
-            return true;
-          }
+      if (imagelist.length > 0) {
+        if (validimagepath(imagelist).length > 0) {
+          return true;
         }
-        return false;
       }
+      return false;
     }
 
     List imagefilelist(List<String> pathlist) {
@@ -114,7 +108,8 @@ class _ProductListBoxState extends State<ProductListBox> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(2.5),
-                            child: checkimagepath(widget?.product?.imagepathlist?.cast<String>() ?? [])
+                            child: checkimagepath(
+                                    widget.product?.imagepathlist ?? [])
                                 ? Container(
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.all(
@@ -123,8 +118,9 @@ class _ProductListBoxState extends State<ProductListBox> {
                                     height: 80,
                                     width: 80,
                                     child: Carousel(
-                                      images: imagefilelist(
-                                          widget.product.imagepathlist.cast<String>() ?? []),
+                                      images: imagefilelist(widget
+                                          .product!.imagepathlist!
+                                          .cast<String>()),
                                       dotSize: 3,
                                       dotSpacing: 5,
                                       dotColor: Colors.white,
@@ -166,7 +162,7 @@ class _ProductListBoxState extends State<ProductListBox> {
                                 Container(
                                   width: double.infinity,
                                   child: Text(
-                                    widget.product.name ?? '',
+                                    widget.product!.name ?? '',
                                     textAlign: TextAlign.left,
                                     overflow: TextOverflow.fade,
                                     style: TextStyle(
@@ -184,7 +180,7 @@ class _ProductListBoxState extends State<ProductListBox> {
                                           style: TextStyle(
                                             fontSize: 16,
                                             color: Colors.red,
-                                            fontWeight: FontWeight.bold,
+                                            fontWeight: FontWeight.bold
                                           ),
                                         )
                                       : (varietyrange[0] == varietyrange[1])
@@ -194,10 +190,11 @@ class _ProductListBoxState extends State<ProductListBox> {
                                                 fontSize: 16,
                                                 color: Colors.red,
                                                 fontWeight: FontWeight.bold,
-                                              ),
+                                              )
                                             )
                                           : Text(
-                                              '${currency.toUpperCase()} ${varietyrange[0].toStringAsFixed(2)} - ${varietyrange[1].toStringAsFixed(2)}',
+                                              '${currency.toUpperCase()} ${varietyrange[0].toStringAsFixed(2)} - '
+                                              '${varietyrange[1].toStringAsFixed(2)}',
                                               overflow: TextOverflow.clip,
                                               style: TextStyle(
                                                 fontSize: 16,
@@ -207,13 +204,13 @@ class _ProductListBoxState extends State<ProductListBox> {
                                             ),
                                 ),
                                 SizedBox(height: 7),
-                                (widget.product.brand == null ||
-                                        widget.product.brand == '')
+                                (widget.product!.brand == null ||
+                                        widget.product!.brand == '')
                                     ? SizedBox.shrink()
                                     : FittedBox(
                                         fit: BoxFit.contain,
                                         child: Text(
-                                          'Brand: ${widget.product.brand}',
+                                          'Brand: ${widget.product!.brand}',
                                           style: TextStyle(
                                               fontSize: 13,
                                               color: Colors.black54),
@@ -254,9 +251,9 @@ class _ProductListBoxState extends State<ProductListBox> {
                         ),
                         onTap: () {
                           setState(() {
-                            widget.product.toggleFavoriteStatus();
+                            widget.product!.toggleFavoriteStatus();
                             Provider.of<ProductData>(context, listen: false)
-                                .toggleFavoriteStatus(widget.product);
+                                .toggleFavoriteStatus(widget.product!);
                           });
                         },
                       )),

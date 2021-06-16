@@ -31,7 +31,7 @@ class DBHelper {
     return db.query(table);
   }
 
-  static Future<void> updateData(String table, var newdata) async {
+  static Future<int> updateData(String table, var newdata) async {
     final db = await DBHelper.database();
     return db.update(table, newdata.toMap(),
         where: "id = ?", whereArgs: [newdata.id]);
@@ -42,12 +42,12 @@ class DBHelper {
     return db.execute("delete from " + table);
   }
 
-  static Future<void> delete(String table, String id) async {
+  static Future<int> delete(String table, String? id) async {
     final db = await DBHelper.database();
     return db.delete(table, where: "id = ?", whereArgs: [id]);
   }
 
-  static Future<void> deletevariery(String table, String id) async {
+  static Future<int> deletevariery(String table, String id) async {
     final db = await DBHelper.database();
     return db.delete(table, where: "productid = ?", whereArgs: [id]);
   }

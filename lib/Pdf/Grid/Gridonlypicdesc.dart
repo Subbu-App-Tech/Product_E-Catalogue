@@ -1,3 +1,4 @@
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:io';
@@ -14,70 +15,49 @@ import 'dart:async';
 import 'dart:typed_data';
 import '../PdfTools.dart';
 import '../../Provider/VarietyDataP.dart';
-import 'package:flutter_plugin_pdf_viewer/flutter_plugin_pdf_viewer.dart';
-import '../../Auth/ViewAdtoDownload.dart';
+import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
+// import '../../Auth/ViewAdtoDownload.dart';
 import '../../Models/SecureStorage.dart';
-import 'package:firebase_admob/firebase_admob.dart';
 
 class PDFGridPicDecs extends StatefulWidget {
   static const routeName = '/PDFGridPicDecs';
-  const PDFGridPicDecs({Key key}) : super(key: key);
+  const PDFGridPicDecs({Key? key}) : super(key: key);
 
   @override
   _PDFGridPicDecsState createState() => _PDFGridPicDecsState();
 }
 
 class _PDFGridPicDecsState extends State<PDFGridPicDecs> {
-    @override
-  void initState() {
-    super.initState();
-    FirebaseAdMob.instance.initialize(appId:  'ca-app-pub-9568938816087708~5406343573');
-  }
-
   @override
-  void dispose() {
-    _interstitialAd?.dispose();
-    super.dispose();
+  void initState() {
+    Pdftools.createInterstitialAd();
+    super.initState();
   }
 
-  MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
-    childDirected: true,
-    nonPersonalizedAds: true,
-    // testDevices: ['70986832EA2D276F6277A5461962A4EC'],
-  );
-  InterstitialAd _interstitialAd;
-  InterstitialAd createInterstitialAd() {
-    return InterstitialAd(
-      adUnitId: 'ca-app-pub-9568938816087708/7976666598',
-      targetingInfo: targetingInfo,
-      listener: (MobileAdEvent event) {
-        print("InterstitialAd event $event");
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
-
     final pdf = pw.Document();
     PdfImage image;
-    PDFDocument pdfdoc;
+    PDFDocument? pdfdoc;
     Uint8List list;
     String filepath;
     Pdftools pdftool = Pdftools();
     List<CategoryModel> category = Provider.of<CategoryData>(context).items;
     List<ProcuctbasedModel> pbitems = [];
-    Function varietyrangefunc = Provider.of<VarietyData>(context).minmaxvalue;
+    List<double>? Function(String?) varietyrangefunc =
+        Provider.of<VarietyData>(context).minmaxvalue;
     SecureStorage storage = SecureStorage();
     String currency;
 
     List<Brandcount> uqbrand = Provider.of<ProductData>(context).uqbrand();
-    List frowd = ModalRoute.of(context).settings.arguments as List;
+    List frowd = ModalRoute.of(context)!.settings.arguments as List;
     Function findvarcount = Provider.of<VarietyData>(context).findvarietycount;
     String input = frowd[0];
-    String sortby = frowd[1];    bool ispaid = frowd[2];
+    String sortby = frowd[1];
+    bool ispaid = frowd[2];
 
-    List<ProductModel> pm;
+    List<ProductModel?> pm;
     if (input == 'brand') {
       for (Brandcount i in uqbrand) {
         pm = Provider.of<ProductData>(context).productlistbybrandname(i.name);
@@ -95,7 +75,7 @@ class _PDFGridPicDecsState extends State<PDFGridPicDecs> {
                 list: pm, functofindvarietycount: findvarcount, type: sortby)));
       }
     } else if (input == 'all') {
-      List<ProductModel> pm = Provider.of<ProductData>(context).items;
+      List<ProductModel?> pm = Provider.of<ProductData>(context).items;
       pbitems.add(ProcuctbasedModel(
           basedon: 'All Product',
           productlist: pdftool.sortedlist(
@@ -103,22 +83,20 @@ class _PDFGridPicDecsState extends State<PDFGridPicDecs> {
     }
     String contactno;
     String companyname;
-    _writeOnPdf() async {
+    Future _writeOnPdf() async {
       currency = await storage.getcurrency();
       contactno = await storage.getcontactno();
       companyname = await storage.getcompanyname();
       ByteData bytes = await rootBundle.load('assets/productc.png');
       Uint8List logo = bytes.buffer.asUint8List();
-      PdfImage logoimage = PdfImage.file(
-        pdf.document,
-        bytes: logo,
-      );
+      PdfImage logoimage = PdfImage.file(pdf.document, bytes: logo);
 
       Future<pw.Widget> _list(ProductModel productdata) async {
-        final List<double> varietyrange = varietyrangefunc(productdata.id);
-        String priceA;
-        String priceB;
-        if (varietyrange == null || varietyrange.length == 0) {
+        final List<double> varietyrange =
+            varietyrangefunc(productdata.id) ?? [];
+        String? priceA;
+        String? priceB;
+        if (varietyrange.length == 0) {
           priceA = '0';
           priceB = null;
         } else if (varietyrange[0] == varietyrange[1]) {
@@ -128,9 +106,10 @@ class _PDFGridPicDecsState extends State<PDFGridPicDecs> {
           priceA = varietyrange[0].toString();
           priceB = varietyrange[1].toString();
         }
-        if (pdftool.checkimagepath(productdata?.imagepathlist?.cast<String>()?? [])) {
+        if (pdftool
+            .checkimagepath(productdata.imagepathlist?.cast<String>() ?? [])) {
           list = await new File(
-                  '${pdftool.validimagepath(productdata?.imagepathlist?.cast<String>()?? [])[0]}')
+                  '${pdftool.validimagepath(productdata.imagepathlist?.cast<String>() ?? [])[0]}')
               .readAsBytes();
           image = PdfImage.file(
             pdf.document,
@@ -140,22 +119,14 @@ class _PDFGridPicDecsState extends State<PDFGridPicDecs> {
           ByteData bytes = await rootBundle.load('assets/NoImage.png');
           list = bytes.buffer.asUint8List();
         }
-        image = PdfImage.file(
-          pdf.document,
-          bytes: list,
-        );
+        image = PdfImage.file(pdf.document, bytes: list);
 
         return pw.Container(
           width: 185,
-          // color: PdfColors.grey100,
           padding: pw.EdgeInsets.all(8),
           foregroundDecoration: pw.BoxDecoration(
-            borderRadius: 5,
-            border: pw.BoxBorder(
-                bottom: true, right: true, left: true, top: true, width: 1),
-          ),
+              borderRadius: pw.BorderRadius.all(pw.Radius.circular(5))),
           child: pw.Container(
-              // color: PdfColors.white,
               width: 150,
               child: pw.Column(
                   mainAxisSize: pw.MainAxisSize.max,
@@ -178,8 +149,8 @@ class _PDFGridPicDecsState extends State<PDFGridPicDecs> {
                       width: 150,
                       alignment: pw.Alignment.center,
                       padding: pw.EdgeInsets.all(1),
-                      child:
-                          pw.Image(image, fit: pw.BoxFit.contain, height: 100),
+                      child: pw.Image(pw.ImageProxy(image),
+                          fit: pw.BoxFit.contain, height: 100),
                     ),
                     pw.SizedBox(height: 7),
                     pw.Text((priceB == null) ? 'Price' : 'Price Range',
@@ -212,7 +183,7 @@ class _PDFGridPicDecsState extends State<PDFGridPicDecs> {
                               maxLines: 1,
                             )),
                     (productdata.description == null ||
-                            productdata.description.trim() == '')
+                            productdata.description!.trim() == '')
                         ? pw.SizedBox.shrink()
                         : pw.Container(
                             height: 125,
@@ -243,20 +214,16 @@ class _PDFGridPicDecsState extends State<PDFGridPicDecs> {
 
       for (ProcuctbasedModel i in pbitems) {
         List<pw.Widget> _listview = [];
-        for (ProductModel j in i.productlist) {
-          _listview.add(await _list(j));
+        for (ProductModel? j in i.productlist!) {
+          _listview.add(await _list(j!));
         }
         pdf.addPage(
           pw.MultiPage(
-              pageTheme: await pdftool.pagetheam(5,ispaid),
-              // theme: await pdftool.theamdata(),
-              // pageFormat: PdfPageFormat.a4,
+              pageTheme: await pdftool.pagetheam(5, ispaid),
               crossAxisAlignment: pw.CrossAxisAlignment.stretch,
               maxPages: 200,
-              // margin: pw.EdgeInsets.all(20),
-              header: (pw.Context ctx) {
-                return pdftool.buildHeader(i.basedon, logoimage);
-              },
+              header: (pw.Context ctx) =>
+                  pdftool.buildHeader(i.basedon!, logoimage),
               footer: (pw.Context ctx) {
                 return pdftool.buildFooter(
                     context: ctx,
@@ -270,17 +237,17 @@ class _PDFGridPicDecsState extends State<PDFGridPicDecs> {
     }
 
     Future savePdf() async {
-       await _interstitialAd?.dispose();
-      _interstitialAd = createInterstitialAd();
-      await _interstitialAd.load();
-      await _interstitialAd?.show();
-      await _writeOnPdf();
-      Directory documentDirectory = await getApplicationDocumentsDirectory();
-      String documentPath = documentDirectory.path;
-      filepath = "$documentPath/ProductCatalogue2.pdf";
-      File file = File(filepath);
-      file.writeAsBytesSync(pdf.save());
-      pdfdoc = await PDFDocument.fromFile(File(filepath));
+      try {
+        await _writeOnPdf();
+        Directory documentDirectory = await getApplicationDocumentsDirectory();
+        String documentPath = documentDirectory.path;
+        filepath = "$documentPath/ProductCatalogue2.pdf";
+        File file = File(filepath);
+        file.writeAsBytesSync(await pdf.save());
+        pdfdoc = await PDFDocument.fromFile(File(filepath));
+      } catch (e) {
+        print('Error on gopd :: $e');
+      }
     }
 
     return FutureBuilder(
@@ -294,23 +261,20 @@ class _PDFGridPicDecsState extends State<PDFGridPicDecs> {
                   IconButton(
                     icon: Icon(Icons.print),
                     onPressed: () {
-                      // OpenFile.open(filepath);
-                      // pdftool.payandprint(context: context, filepath: filepath);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (ctx) => ViewAdToDownload(
-                                    filepath: filepath,ispaid: ispaid,
-                                  )));
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (ctx) => ViewAdToDownload(
+                      //               filepath: filepath,
+                      //               ispaid: ispaid,
+                      //             )));
                     },
                   )
                 ],
               ),
-              body: PDFViewer(
-                document: pdfdoc,
-                showNavigation: true,
-              )
-              );
+              body: (pdfdoc == null)
+                  ? Text('Error Occurs')
+                  : PDFViewer(document: pdfdoc!, showNavigation: true));
         } else {
           return Scaffold(
               body: Center(

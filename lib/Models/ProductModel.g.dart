@@ -17,15 +17,15 @@ class ProductModelAdapter extends TypeAdapter<ProductModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return ProductModel(
-      id: fields[0] as String,
-      name: fields[1] as String,
-      favpic: fields[5] as int,
-      rank: fields[6] as int,
-      imagepathlist: (fields[4] as List)?.cast<dynamic>(),
-      brand: fields[8] as String,
-      categorylist: (fields[7] as List)?.cast<dynamic>(),
-      description: fields[3] as String,
-      favourite: fields[9] as bool,
+      id: fields[0] as String?,
+      name: fields[1] as String?,
+      favpic: fields[5] as int?,
+      rank: fields[6] as int?,
+      imagepathlist: (fields[4] as List?)?.cast<String>(),
+      brand: fields[8] as String?,
+      categorylist: (fields[7] as List?)?.cast<String>(),
+      description: fields[3] as String?,
+      favourite: fields[9] as bool?,
     );
   }
 

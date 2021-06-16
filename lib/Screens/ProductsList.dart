@@ -9,11 +9,12 @@ import '../Provider/VarietyDataP.dart';
 import '../Screens/Import.dart';
 import '../contact/Aboutus.dart';
 import '../Screens/UserAEFrom.dart';
-// import 'package:firebase_admob/firebase_admob.dart';
-import 'package:flutter_native_admob/native_admob_options.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+// import 'package:flutter_native_admob/native_admob_options.dart';
 import 'dart:async';
-import 'package:flutter_native_admob/flutter_native_admob.dart' as ad;
-import 'package:flutter_native_admob/native_admob_controller.dart';
+// import 'package:flutter_native_admob/flutter_native_admob.dart' as ad;
+// import 'package:flutter_native_admob/native_admob_controller.dart';
 
 class ProductsList extends StatefulWidget {
   static const routeName = '/productlist';
@@ -24,15 +25,15 @@ class ProductsList extends StatefulWidget {
 
 class _ProductsListState extends State<ProductsList> {
   TextEditingController controller = new TextEditingController();
-  String filter;
+  String? filter;
   Filtertool filtertool = Filtertool();
-  List<ProductModel> filteredlist;
-  List<ProductModel> productlist;
-  List<ProductModel> allproductlist;
-  Function findcategorynamebyid;
-  Filterdata filterdata;
+  List<ProductModel>? filteredlist;
+  List<ProductModel?>? productlist;
+  List<ProductModel?>? allproductlist;
+  late Function findcategorynamebyid;
+  Filterdata? filterdata;
   List<String> brandlist = [];
-  Function varietyrangefunc;
+  Function? varietyrangefunc;
   bool issortname = false;
   bool issortprice = false;
   bool issortrank = false;
@@ -44,72 +45,23 @@ class _ProductsListState extends State<ProductsList> {
         filter = controller.text;
       });
     });
-    // _initAdMob();
-    // nativeAd..load();
-    // _nativeAdmob.initialize(appID: "ca-app-pub-3940256099942544~3347511713");
-    // _subscription = _nativeAdController.stateChanged.listen(_onStateChanged);
-    // _nativeAdController.setAdUnitID(_adUnitID, numberAds: 2);
-    // _nativeAdController.setTestDeviceIds([
-    //   '400A0E6F669C5ECA',
-    //   '33BE2250B43518CCDA7DE426D04EE231',
-    //   '70986832EA2D276F6277A5461962A4EC'
-    // ]);
     super.initState();
   }
 
   @override
   void dispose() {
     controller.dispose();
-    _subscription.cancel();
-    _nativeAdController.dispose();
+    // _subscription.cancel();
     super.dispose();
   }
 
 // ca-app-pub-9568938816087708~5406343573
-  static const _adUnitID = "ca-app-pub-9568938816087708/6044993041";
-  final _nativeAdController = NativeAdmobController();
-  double _height = 0;
-  StreamSubscription _subscription;
+  // static const _adUnitID = "ca-app-pub-9568938816087708/6044993041";
+  // double _height = 0;
+  // late StreamSubscription _subscription;
   // static const _adUnitID = "ca-app-pub-3940256099942544/2247696110";
   //-> native sample
 
-  void _onStateChanged(AdLoadState state) {
-    switch (state) {
-      case AdLoadState.loading:
-        setState(() {
-          _height = 0;
-        });
-        break;
-      case AdLoadState.loadCompleted:
-        setState(() {
-          _height = 65;
-        });
-        break;
-      default:
-        break;
-    }
-  }
-
-  Widget get adwidget {
-    return Card(
-      child: Container(
-        height: _height,
-        padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-        child: ad.NativeAdmob(
-            adUnitID: _adUnitID,
-            error: Text('Error'),
-            numberAds: 2,
-            type: ad.NativeAdmobType.banner,
-            controller: _nativeAdController,
-            options: NativeAdmobOptions(
-                priceTextStyle:
-                    NativeTextStyle(fontSize: 15, color: Colors.red),
-                bodyTextStyle:
-                    NativeTextStyle(fontSize: 14, color: Colors.black)),
-            loading: Text('Loading')),
-      ),
-    );
-  }
 
   @override
   void didChangeDependencies() {
@@ -120,7 +72,7 @@ class _ProductsListState extends State<ProductsList> {
     filterdata = filterdata ??
         Filterdata(brandlist: null, categorylist: null, rangeofprice: null);
     productlist = filtertool.filteredproduct(
-        allproductlist, filterdata, varietyrangefunc);
+        allproductlist, filterdata!, varietyrangefunc);
     super.didChangeDependencies();
   }
 
@@ -132,38 +84,38 @@ class _ProductsListState extends State<ProductsList> {
     super.didUpdateWidget(oldWidget);
   }
 
-  bool issort;
+  bool? issort;
   @override
   Widget build(BuildContext context) {
     productlist = filtertool.filteredproduct(
-        allproductlist, filterdata, varietyrangefunc);
-    void sortbyname(List<ProductModel> list) {
+        allproductlist, filterdata!, varietyrangefunc);
+    void sortbyname(List<ProductModel?> list) {
       list
         ..sort((a, b) => issortname
-            ? (b.name?.toLowerCase() ?? '').compareTo((a.name?.toLowerCase() ?? ''))
-            : (a.name?.toLowerCase() ?? '').compareTo((b.name?.toLowerCase() ?? '')));
+            ? (b!.name?.toLowerCase() ?? '').compareTo((a!.name?.toLowerCase() ?? ''))
+            : (a!.name?.toLowerCase() ?? '').compareTo((b!.name?.toLowerCase() ?? '')));
       issortname = !issortname;
       setState(() {});
     }
 
-    void sortbyprice(List<ProductModel> list) {
+    void sortbyprice(List<ProductModel?> list) {
       list
         ..sort((a, b) => issortprice
-            ? varietyrangefunc(b.id)[0].compareTo(varietyrangefunc(a.id)[0])
-            : varietyrangefunc(a.id)[1].compareTo(varietyrangefunc(b.id)[1]));
+            ? varietyrangefunc!(b!.id)[0].compareTo(varietyrangefunc!(a!.id)[0])
+            : varietyrangefunc!(a!.id)[1].compareTo(varietyrangefunc!(b!.id)[1]));
       issortprice = !issortprice;
       setState(() {});
     }
 
-    void sortbyrank(List<ProductModel> list) {
+    void sortbyrank(List<ProductModel?> list) {
       list
         ..sort((a, b) =>
-            issortrank ? (b.rank).compareTo(a.rank) : a.rank.compareTo(b.rank));
+            issortrank ? b!.rank!.compareTo(a!.rank!) : a!.rank!.compareTo(b!.rank!));
       issortrank = !issortrank;
       setState(() {});
     }
 
-    void sortbottomsheet(BuildContext context, List<ProductModel> productlist) {
+    void sortbottomsheet(BuildContext context, List<ProductModel?>? productlist) {
       showModalBottomSheet(
           context: context,
           builder: (_) {
@@ -178,7 +130,7 @@ class _ProductsListState extends State<ProductsList> {
                           : Text('By Name A-Z'),
                       onTap: () {
                         Navigator.pop(context);
-                        sortbyname(productlist);
+                        sortbyname(productlist!);
                       },
                     ),
                   ),
@@ -190,7 +142,7 @@ class _ProductsListState extends State<ProductsList> {
                           : Text('Price: Low to High'),
                       onTap: () {
                         Navigator.pop(context);
-                        sortbyprice(productlist);
+                        sortbyprice(productlist!);
                       },
                     ),
                   ),
@@ -202,7 +154,7 @@ class _ProductsListState extends State<ProductsList> {
                           : Text('Rank: Low to High'),
                       onTap: () {
                         Navigator.pop(context);
-                        sortbyrank(productlist);
+                        sortbyrank(productlist!);
                       },
                     ),
                   ),
@@ -237,7 +189,7 @@ class _ProductsListState extends State<ProductsList> {
                         padding: EdgeInsets.all(1),
                         child: FilterChip(
                             label: Text(
-                              'Price Range ${filterdata.rangeofprice.start} - ${filterdata.rangeofprice.end}',
+                              'Price Range ${filterdata!.rangeofprice!.start} - ${filterdata!.rangeofprice!.end}',
                               style: TextStyle(fontSize: 12),
                             ),
                             avatar: Icon(Icons.cancel, size: 15),
@@ -247,11 +199,11 @@ class _ProductsListState extends State<ProductsList> {
                                   categorylist: filterdata?.categorylist,
                                   rangeofprice: null);
                               productlist = filtertool.filteredproduct(
-                                  allproductlist, filterdata, varietyrangefunc);
+                                  allproductlist, filterdata!, varietyrangefunc);
                               setState(() {});
                             }),
                       ),
-                (filterdata.brandlist == null)
+                (filterdata!.brandlist == null)
                     ? SizedBox(width: 2)
                     : Container(
                         alignment: Alignment.center,
@@ -262,15 +214,15 @@ class _ProductsListState extends State<ProductsList> {
                             return Padding(
                               padding: const EdgeInsets.all(1.0),
                               child: FilterChip(
-                                  label: Text('${filterdata.brandlist[idx]}',
+                                  label: Text('${filterdata!.brandlist![idx]}',
                                       style: TextStyle(fontSize: 12)),
                                   avatar: Icon(Icons.cancel, size: 15),
                                   onSelected: (_) {
                                     setState(() {
-                                      filterdata.brandlist.removeAt(idx);
+                                      filterdata!.brandlist!.removeAt(idx);
                                       filterdata = Filterdata(
                                           brandlist:
-                                              (filterdata.brandlist.length == 0)
+                                              (filterdata!.brandlist!.length == 0)
                                                   ? null
                                                   : filterdata?.brandlist,
                                           categorylist:
@@ -279,7 +231,7 @@ class _ProductsListState extends State<ProductsList> {
                                               filterdata?.rangeofprice);
                                       productlist = filtertool.filteredproduct(
                                           allproductlist,
-                                          filterdata,
+                                          filterdata!,
                                           varietyrangefunc);
                                     });
                                   }),
@@ -287,10 +239,10 @@ class _ProductsListState extends State<ProductsList> {
                           },
                           scrollDirection: Axis.horizontal,
                           shrinkWrap: true,
-                          itemCount: filterdata.brandlist.length,
+                          itemCount: filterdata!.brandlist!.length,
                         ),
                       ),
-                (filterdata.categorylist == null)
+                (filterdata!.categorylist == null)
                     ? SizedBox(width: 2)
                     : Container(
                         alignment: Alignment.center,
@@ -301,16 +253,16 @@ class _ProductsListState extends State<ProductsList> {
                               padding: const EdgeInsets.all(1.0),
                               child: FilterChip(
                                   label: Text(
-                                      '${findcategorynamebyid(filterdata.categorylist[idx])}',
+                                      '${findcategorynamebyid(filterdata!.categorylist![idx])}',
                                       style: TextStyle(fontSize: 12)),
                                   avatar: Icon(Icons.cancel, size: 15),
                                   onSelected: (_) {
                                     setState(() {
-                                      filterdata.categorylist.removeAt(idx);
+                                      filterdata!.categorylist!.removeAt(idx);
                                       filterdata = Filterdata(
                                           brandlist: filterdata?.brandlist,
                                           categorylist:
-                                              (filterdata.categorylist.length ==
+                                              (filterdata!.categorylist!.length ==
                                                       0)
                                                   ? null
                                                   : filterdata?.categorylist,
@@ -318,7 +270,7 @@ class _ProductsListState extends State<ProductsList> {
                                               filterdata?.rangeofprice);
                                       productlist = filtertool.filteredproduct(
                                           allproductlist,
-                                          filterdata,
+                                          filterdata!,
                                           varietyrangefunc);
                                     });
                                   }),
@@ -326,7 +278,7 @@ class _ProductsListState extends State<ProductsList> {
                           },
                           scrollDirection: Axis.horizontal,
                           shrinkWrap: true,
-                          itemCount: filterdata.categorylist.length,
+                          itemCount: filterdata!.categorylist!.length,
                         ),
                       )
               ],
@@ -341,13 +293,13 @@ class _ProductsListState extends State<ProductsList> {
     }
     List<int> ints = List<int>.generate(5, (i) => i * 7);
     ints.remove(0);
-    productlist = productlist
+    productlist = productlist!
         .where(
-            (e) => (e.name?.toLowerCase() ?? '').contains(filter?.toLowerCase() ?? ''))
+            (e) => (e!.name?.toLowerCase() ?? '').contains(filter?.toLowerCase() ?? ''))
         .toList();
     return (allproductlist == null)
         ? CircularProgressIndicator()
-        : (allproductlist.length == 0)
+        : (allproductlist!.length == 0)
             ? NoItems()
             : Column(
                 children: <Widget>[
@@ -385,7 +337,7 @@ class _ProductsListState extends State<ProductsList> {
                           color: Colors.black,
                           icon: Icon(Icons.filter_list),
                           onPressed: () async {
-                            Filterdata fdata = await Navigator.push(
+                            Filterdata? fdata = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (ctx) =>
@@ -393,13 +345,13 @@ class _ProductsListState extends State<ProductsList> {
                             if (fdata != null) {
                               filterdata = fdata;
                               productlist = filtertool.filteredproduct(
-                                  allproductlist, filterdata, varietyrangefunc);
+                                  allproductlist, filterdata!, varietyrangefunc);
                               setState(() {});
                             }
                           })
                     ],
                   ),
-                  (productlist.length == 0)
+                  (productlist!.length == 0)
                       ? Center(
                           child: Text('No Product Available At your Filter',
                               textAlign: TextAlign.center),
@@ -416,9 +368,9 @@ class _ProductsListState extends State<ProductsList> {
                               },
                               itemBuilder: (ctx, index) {
                                 return ProductListBox(
-                                    product: productlist[index]);
+                                    product: productlist![index]);
                               },
-                              itemCount: productlist.length,
+                              itemCount: productlist!.length,
                               shrinkWrap: true,
                             ),
                           ),
@@ -438,7 +390,7 @@ class _ProductsListState extends State<ProductsList> {
 
 class NoItems extends StatelessWidget {
   const NoItems({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override

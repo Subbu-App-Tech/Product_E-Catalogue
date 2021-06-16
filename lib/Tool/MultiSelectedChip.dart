@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 
 class MultiSelectChip extends StatefulWidget {
-  final List<String> reportList;
-  final Function(List<String>) onSelectionChanged;
-  final List<String> preselected;
+  final List<String?> reportList;
+  final Function(List<String?>)? onSelectionChanged;
+  final List<String?> preselected;
   MultiSelectChip(this.reportList, this.preselected, {this.onSelectionChanged});
   @override
   _MultiSelectChipState createState() => _MultiSelectChipState();
 }
 
 class _MultiSelectChipState extends State<MultiSelectChip> {
-  List<String> selectedChoices = List();
+  List<String?> selectedChoices = [];
   _buildChoiceList() {
-    List<Widget> choices = List();
+    List<Widget> choices = [];
     widget.reportList.forEach((item) {
       choices.add(Container(
         padding: const EdgeInsets.all(4),
         child: ChoiceChip(
           label: Text(
-            item, 
+            item!, 
             // style: TextStyle(color: Colors.white), 
           ),
           // selectedColor: Colors.blue,
@@ -28,7 +28,7 @@ class _MultiSelectChipState extends State<MultiSelectChip> {
               selectedChoices.contains(item)
                   ? selectedChoices.remove(item)
                   : selectedChoices.add(item);
-              widget.onSelectionChanged(selectedChoices);
+              widget.onSelectionChanged!(selectedChoices);
             });
           },
         ),

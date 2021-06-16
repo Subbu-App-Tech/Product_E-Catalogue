@@ -5,11 +5,11 @@ import 'package:hive/hive.dart';
 
 class VarietyData with ChangeNotifier {
   List<VarietyProductM> _items = [];
-  Box<VarietyProductM> _dbbox;
+  Box<VarietyProductM>? _dbbox;
 
-  VarietyData(Box<VarietyProductM> db) {
+  VarietyData(Box<VarietyProductM>? db) {
     _dbbox = db;
-    _items = [..._dbbox.values];
+    _items = [..._dbbox!.values];
   }
   List<VarietyProductM> get items {
     return [..._items];
@@ -18,29 +18,29 @@ class VarietyData with ChangeNotifier {
   void deleteall() {
     DBHelper.deleteall('varietydata');
     _items = [];
-    _dbbox.deleteAll(_dbbox.keys);
+    _dbbox!.deleteAll(_dbbox!.keys);
     return null;
   }
 
-  List<VarietyProductM> findbyid(String productid) {
+  List<VarietyProductM> findbyid(String? productid) {
     return [..._items.where((vp) => vp.productid == productid)];
   }
 
-  String changenullstring(String val) {
+  String changenullstring(String? val) {
     if (val == null) {
       return '';
     } else
       return val;
   }
 
-  double changenulldouble(double val) {
+  double changenulldouble(double? val) {
     if (val == null) {
       return 0;
     } else
       return val;
   }
 
-  String vartext(String productid) {
+  String vartext(String? productid) {
     List<VarietyProductM> _vartylist = [
       ..._items.where((vp) => vp.productid == productid)
     ];
@@ -57,10 +57,10 @@ class VarietyData with ChangeNotifier {
     return [..._items.where((vp) => vp.productid == productid)].length;
   }
 
-  List<double> minmaxvalue(String productid) {
+  List<double>? minmaxvalue(String? productid) {
     List<double> value = [];
     for (VarietyProductM i in findbyid(productid)) {
-      value.add(i.price);
+      value.add(i.price ?? 0);
     }
     if (value.length == 0) {
       return null;
@@ -70,8 +70,8 @@ class VarietyData with ChangeNotifier {
     }
   }
 
-  List<double> sortedpricelist() {
-    List<double> price = [];
+  List<double?> sortedpricelist() {
+    List<double?> price = [];
     for (VarietyProductM i in _items) {
       price.add(i.price);
     }
@@ -88,14 +88,14 @@ class VarietyData with ChangeNotifier {
     if (varietylist.length > 0) {
       for (VarietyProductM i in varietylist) {
         if (i.varityname != null) {
-          String id = i.id.toString() ?? UniqueKey().toString();
+          String id = i.id.toString();
           _items.add(VarietyProductM(
               productid: i.productid,
               id: id,
               varityname: i.varityname,
               price: i.price,
               wsp: i.wsp));
-          _dbbox.put(id, i);
+          _dbbox!.put(id, i);
         }
       }
     }
@@ -103,7 +103,7 @@ class VarietyData with ChangeNotifier {
   }
 
   Future<void> fetchvariety() async {
-    if (_dbbox.keys.length == 0) {
+    if (_dbbox!.keys.length == 0) {
       final dataList = await DBHelper.getData('varietydata');
       _items = dataList
           .map(
@@ -116,7 +116,7 @@ class VarietyData with ChangeNotifier {
           )
           .toList();
       _items.forEach((e) {
-        _dbbox.put(e.id.toString(), e);
+        _dbbox!.put(e.id.toString(), e);
       });
     }
     _items = [];
@@ -126,20 +126,20 @@ class VarietyData with ChangeNotifier {
 
   void editvariety(List<VarietyProductM> varietylist) {
     if (varietylist.length > 0) {
-      List<String> delids = _items
+      List<String?> delids = _items
           .where((ele) => ele.productid == varietylist[0].productid)
           .map((e) => e.id)
           .toList();
-      _dbbox.deleteAll(delids);
+      _dbbox!.deleteAll(delids);
       _items.removeWhere((e) => delids.contains(e.id));
       addvariety(varietylist);
     }
     notifyListeners();
   }
 
-  void delete(String productid) {
+  void delete(String? productid) {
     _items.removeWhere((ele) => ele.productid == productid);
-    _dbbox.delete(
-        _dbbox.values.where((e) => e.productid == productid).map((e) => e.id));
+    _dbbox!.delete(
+        _dbbox!.values.where((e) => e.productid == productid).map((e) => e.id));
   }
 }

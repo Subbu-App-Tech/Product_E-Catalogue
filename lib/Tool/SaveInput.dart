@@ -26,7 +26,7 @@ Future savedata(String filepath) async {
       'category',
       'varietyname',
       'varietyprice'
-      'varietywsp',
+          'varietywsp',
     ];
     bool areListsEqual(var list1, var list2) {
       // check if both are lists
@@ -47,7 +47,7 @@ Future savedata(String filepath) async {
       return true;
     }
 
-    double doubleval(var input) {
+    double? doubleval(var input) {
       if (input == null || input == '' || input.runtimeType == String) {
         return 0.0;
       }
@@ -60,7 +60,7 @@ Future savedata(String filepath) async {
       return input.toDouble();
     }
 
-    String stringval(var input) {
+    String? stringval(var input) {
       if (input == null || input == '') {
         return null;
       } else {
@@ -107,8 +107,8 @@ Future savedata(String filepath) async {
             } else {
               final prodid = UniqueKey().toString();
 
-              List catid(String catstring) {
-                List _catid = [];
+              List<String>? catid(String? catstring) {
+                List<String?> _catid = [];
                 if (catstring == null || catstring.trim() == '') {
                   return null;
                 } else {
@@ -122,7 +122,8 @@ Future savedata(String filepath) async {
                       _catid.add(_cid);
                     }
                   }
-                  return _catid;
+                  _catid.removeWhere((e) => e == null);
+                  return _catid as List<String>;
                 }
               }
 

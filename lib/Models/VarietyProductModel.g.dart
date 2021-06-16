@@ -17,11 +17,11 @@ class VarietyProductMAdapter extends TypeAdapter<VarietyProductM> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return VarietyProductM(
-      productid: fields[0] as String,
-      id: fields[1] as String,
-      varityname: fields[2] as String,
-      price: fields[3] as double,
-      wsp: fields[4] as double,
+      productid: fields[0] as String?,
+      id: fields[1] as String?,
+      varityname: fields[2] as String?,
+      price: fields[3] as double?,
+      wsp: fields[4] as double?,
     );
   }
 

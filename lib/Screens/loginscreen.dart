@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../Auth/sign_in.dart';
-import '../main.dart';
+import '../Home.dart';
 import '../Models/SecureStorage.dart';
 
 
@@ -63,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   SecureStorage storage = SecureStorage();
-  String loginstatus;   
+  String? loginstatus;   
 
   @override
   Widget build(BuildContext context) {

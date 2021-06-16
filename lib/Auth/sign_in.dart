@@ -13,13 +13,14 @@ final GoogleSignIn googleSignIn = GoogleSignIn(scopes: [
   // 'https://www.googleapis.com/auth/drive.appdata',
   // 'https://www.googleapis.com/auth/drive.file',
 ]);
-GoogleSignInAccount googleSignInAccount;
+GoogleSignInAccount? googleSignInAccount;
 
 Future get googleauthheader async {
-  GoogleSignInAccount gauth = await googleSignIn.signInSilently();
+  GoogleSignInAccount? gauth = await googleSignIn.signInSilently();
   if (gauth == null) {
     signInWithGoogle();
-    GoogleSignInAccount gauth = await googleSignIn.signInSilently();
+    GoogleSignInAccount gauth =
+        await (googleSignIn.signInSilently() as Future<GoogleSignInAccount>);
     return gauth.authHeaders;
   }
   return gauth.authHeaders;
@@ -38,22 +39,24 @@ Future get googleauthheader async {
 // }
 
 Future<String> signInWithGoogle() async {
-  final googleSignInAccount = await googleSignIn.signIn();
-  final GoogleSignInAuthentication googleSignInAuthentication =
-      await googleSignInAccount.authentication;
-  final AuthCredential credential = GoogleAuthProvider.getCredential(
-    accessToken: googleSignInAuthentication.accessToken,
-    idToken: googleSignInAuthentication.idToken,
-  );
-  final AuthResult authResult = await auth.signInWithCredential(credential);
-  final FirebaseUser user = authResult.user;
-
-  assert(!user.isAnonymous);
-  assert(await user.getIdToken() != null);
-
-  final FirebaseUser currentUser = await auth.currentUser();
-  assert(user.uid == currentUser.uid);
+  GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
+  GoogleSignInAuthentication googleSignInAuthentication =
+      (await googleSignInAccount?.authentication)!;
+  // if (googleSignInAuthentication != null) {
+  print(googleSignInAuthentication);
+  AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleSignInAuthentication.accessToken,
+      idToken: googleSignInAuthentication.idToken);
+  final UserCredential authResult = await auth.signInWithCredential(credential);
+  final User? user = authResult.user;
+  if (user != null) {
+    assert(!user.isAnonymous);
+    User currentUser = auth.currentUser!;
+    assert(user.uid == currentUser.uid);
+  }
   return 'signInWithGoogle succeeded: $user';
+  // }
+  // return 'Not Found';
 }
 
 void signOutGoogle() async {

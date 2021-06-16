@@ -5,18 +5,18 @@ import '../Screens/UserAEFrom.dart';
 import '../Provider/VarietyDataP.dart';
 import '../Provider/ProductDataP.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_native_admob/native_admob_options.dart';
+// import 'package:flutter_native_admob/native_admob_options.dart';
 import 'dart:async';
-import 'package:flutter_native_admob/flutter_native_admob.dart' as ad;
-import 'package:flutter_native_admob/native_admob_controller.dart';
+// import 'package:flutter_native_admob/flutter_native_admob.dart' as ad;
+// import 'package:flutter_native_admob/native_admob_controller.dart';
 
 class FilteredProductsList extends StatefulWidget {
   // final List<ProductModel> productlist;
-  final String catid;
-  final String brand;
+  final String? catid;
+  final String? brand;
   // String type;
-  final String title;
-  final VoidCallback togfav;
+  final String? title;
+  final VoidCallback? togfav;
   FilteredProductsList({this.title, this.togfav, this.brand, this.catid});
 
   @override
@@ -25,11 +25,11 @@ class FilteredProductsList extends StatefulWidget {
 
 class _FilteredProductsListState extends State<FilteredProductsList> {
   TextEditingController controller = new TextEditingController();
-  List<ProductModel> productlist = [];
-  List<ProductModel> allproductlist = [];
-  Function varietypricerange;
+  List<ProductModel?> productlist = [];
+  List<ProductModel?> allproductlist = [];
+  late Function varietypricerange;
   bool issortname = false;
-  String filter;
+  String? filter;
   bool issortprice = false;
   bool issortrank = false;
   // int _sortby;
@@ -42,8 +42,8 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
         filter = controller.text;
       });
     });
-    _subscription = _nativeAdController.stateChanged.listen(_onStateChanged);
-    _nativeAdController.setAdUnitID(_adUnitID, numberAds: 2);
+    // _subscription = _nativeAdController.stateChanged.listen(_onStateChanged);
+    // _nativeAdController.setAdUnitID(_adUnitID, numberAds: 2);
     // _nativeAdController.setTestDeviceIds([
     //   '400A0E6F669C5ECA',
     //   '33BE2250B43518CCDA7DE426D04EE231',
@@ -55,8 +55,6 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
   @override
   void dispose() {
     controller.dispose();
-    _subscription.cancel();
-    _nativeAdController.dispose();
     super.dispose();
   }
 
@@ -66,87 +64,47 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
       allproductlist =
           Provider.of<ProductData>(context).productlistbycatid(widget.catid);
     } else if (widget.brand != null) {
-      allproductlist = Provider.of<ProductData>(context).findbybrand(widget.brand);
+      allproductlist =
+          Provider.of<ProductData>(context).findbybrand(widget.brand);
     }
     varietypricerange = Provider.of<VarietyData>(context).minmaxvalue;
     super.didChangeDependencies();
   }
 
-// ca-app-pub-9568938816087708~5406343573
-  static const _adUnitID = "ca-app-pub-9568938816087708/6044993041";
-  // static const _adUnitID = "ca-app-pub-3940256099942544/2247696110";
-  final _nativeAdController = NativeAdmobController();
-  double _height = 0;
-  StreamSubscription _subscription;
-
-  void _onStateChanged(AdLoadState state) {
-    switch (state) {
-      case AdLoadState.loading:
-        setState(() {
-          _height = 0;
-        });
-        break;
-      case AdLoadState.loadCompleted:
-        setState(() {
-          _height = 50;
-        });
-        break;
-      default:
-        break;
-    }
-  }
-
-  Widget get adwidget {
-    return Card(
-      child: Container(
-        height: _height,
-        padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-        child: ad.NativeAdmob(
-            adUnitID: _adUnitID,
-            error: Text('Error'),
-            numberAds: 2,
-            type: ad.NativeAdmobType.banner,
-            controller: _nativeAdController,
-            options: NativeAdmobOptions(
-                priceTextStyle:
-                    NativeTextStyle(fontSize: 15, color: Colors.red),
-                bodyTextStyle:
-                    NativeTextStyle(fontSize: 14, color: Colors.black)),
-            loading: Text('Loading')),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     productlist = [...allproductlist];
-    void sortbyname(List<ProductModel> list) {
+    void sortbyname(List<ProductModel?> list) {
       list
         ..sort((a, b) => issortname
-            ? b.name.toLowerCase().compareTo(a.name.toLowerCase())
-            : a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+            ? b!.name!.toLowerCase().compareTo(a!.name!.toLowerCase())
+            : a!.name!.toLowerCase().compareTo(b!.name!.toLowerCase()));
       issortname = !issortname;
       setState(() {});
     }
 
-    void sortbyprice(List<ProductModel> list) {
+    void sortbyprice(List<ProductModel?> list) {
       list
         ..sort((a, b) => issortprice
-            ? varietypricerange(b.id)[0].compareTo(varietypricerange(a.id)[0])
-            : varietypricerange(a.id)[0].compareTo(varietypricerange(b.id)[0]));
+            ? varietypricerange(b!.id)[0].compareTo(varietypricerange(a!.id)[0])
+            : varietypricerange(a!.id)[0]
+                .compareTo(varietypricerange(b!.id)[0]));
       issortprice = !issortprice;
       setState(() {});
     }
 
-    void sortbyrank(List<ProductModel> list) {
+    void sortbyrank(List<ProductModel?> list) {
       list
-        ..sort((a, b) =>
-            issortrank ? (b.rank).compareTo(a.rank) : a.rank.compareTo(b.rank));
+        ..sort((a, b) => issortrank
+            ? b!.rank!.compareTo(a!.rank!)
+            : a!.rank!.compareTo(b!.rank!));
       issortrank = !issortrank;
       setState(() {});
     }
 
-    void sortbottomsheet(BuildContext context, List<ProductModel> productlist) {
+    void sortbottomsheet(
+        BuildContext context, List<ProductModel?> productlist) {
       showModalBottomSheet(
           context: context,
           builder: (_) {
@@ -197,19 +155,19 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
     }
 
     List<int> ints = List<int>.generate(5, (i) => i * 6);
-    
+
     productlist = productlist
         .where(
-            (e) => e.name.toLowerCase().contains(filter?.toLowerCase() ?? ''))
+            (e) => e!.name!.toLowerCase().contains(filter?.toLowerCase() ?? ''))
         .toList();
     ints.remove(0);
     return MaterialApp(
       home: Scaffold(
-              body: Column(
-                children: [
-                  Expanded(
-                                      child: Scaffold(
-          appBar: (widget.title == 'Favoutite Products')
+        body: Column(
+          children: [
+            Expanded(
+              child: Scaffold(
+                appBar: (widget.title == 'Favoutite Products')
                     ? AppBar(
                         leading: IconButton(
                         icon: Icon(Icons.arrow_back),
@@ -225,7 +183,7 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
                             Navigator.pop(context);
                           },
                         )),
-          body: (allproductlist.length == 0)
+                body: (allproductlist.length == 0)
                     ? NewWidget()
                     : Column(
                         children: <Widget>[
@@ -276,7 +234,8 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
                                         prefixIcon: Icon(Icons.search),
                                         labelText: "Search Product",
                                         border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         )),
                                     controller: controller,
                                   ),
@@ -291,13 +250,14 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
                                   child: Container(
                                     child: ListView.separated(
                                       separatorBuilder: (ctx, idx) {
-                                        return ints.contains(idx)
-                                            ? adwidget
-                                            : Container();
+                                        // return ints.contains(idx)
+                                        //     ? adwidget
+                                        //     : Container();
+                                        return SizedBox();
                                       },
-                                      itemBuilder: (ctx, index) => ProductListBox(
-                                                  product: productlist[index])
-                                             ,
+                                      itemBuilder: (ctx, index) =>
+                                          ProductListBox(
+                                              product: productlist[index]),
                                       itemCount: productlist.length,
                                       shrinkWrap: true,
                                     ),
@@ -305,17 +265,17 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
                                 ),
                         ],
                       ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
+                floatingActionButton: FloatingActionButton(
+                  onPressed: () {
                     Navigator.of(context).pushNamed(UserAEForm.routeName);
-            },
-            child: Icon(Icons.add),
-          ),
-        ),
-                  ),
-                  adwidget
-                ],
+                  },
+                  child: Icon(Icons.add),
+                ),
               ),
+            ),
+            // adwidget
+          ],
+        ),
       ),
       routes: {
         UserAEForm.routeName: (ctx) => UserAEForm(),
@@ -326,7 +286,7 @@ class _FilteredProductsListState extends State<FilteredProductsList> {
 
 class NewWidget extends StatelessWidget {
   const NewWidget({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override

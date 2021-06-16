@@ -20,7 +20,7 @@ class ContactUs extends StatefulWidget {
 
 class _ContactUsState extends State<ContactUs> {
   List<String> attachments = [];
-  bool isHTML = false;
+  bool? isHTML = false;
 
   final _subjectController = TextEditingController();
 
@@ -33,13 +33,13 @@ class _ContactUsState extends State<ContactUs> {
   Future<void> send() async {
     final Email email = Email(
       body: _bodyController.text,
-      subject: isbus
+      subject: isbus!
           ? ''' App Develop Query '''
           : ''' Related to Product Catalogue :-
       ${_subjectController.text}''',
       recipients: ['anandsubbu7@gmail.com', 'anandsubbuapps@gmail.com'],
       attachmentPaths: attachments,
-      isHTML: isHTML,
+      isHTML: isHTML!,
     );
 
     String platformResponse;
@@ -53,20 +53,20 @@ class _ContactUsState extends State<ContactUs> {
     }
 
     if (!mounted) return;
-    _scaffoldKey.currentState.showSnackBar(SnackBar(
+    _scaffoldKey.currentState!.showSnackBar(SnackBar(
       content: Text(platformResponse),
     ));
   }
 
-  bool isbus;
+  bool? isbus;
   @override
   Widget build(BuildContext context) {
-    isbus = ModalRoute.of(context).settings.arguments as bool;
+    isbus = ModalRoute.of(context)!.settings.arguments as bool?;
     isbus = isbus ?? false;
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(isbus ? 'App Requirement' : 'Mail to Us'),
+        title: Text(isbus! ? 'App Requirement' : 'Mail to Us'),
         actions: <Widget>[
           IconButton(
             onPressed: send,
@@ -81,7 +81,7 @@ class _ContactUsState extends State<ContactUs> {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              if (isbus)
+              if (isbus!)
                 Container(
                   child: Column(
                     children: [
@@ -117,7 +117,7 @@ class _ContactUsState extends State<ContactUs> {
               ),
               CheckboxListTile(
                 title: Text('HTML'),
-                onChanged: (bool value) {
+                onChanged: (bool? value) {
                   setState(() {
                     isHTML = value;
                   });
@@ -171,10 +171,10 @@ class _ContactUsState extends State<ContactUs> {
                       ],
                     ),
                     onPressed: () async {
-                      PickedFile pick = await ImagePicker()
+                      PickedFile? pick = await ImagePicker()
                           .getImage(source: ImageSource.camera);
                       setState(() {
-                        attachments.add(pick.path);
+                        attachments.add(pick!.path);
                       });
                       Navigator.pop(context);
                     },
@@ -194,10 +194,10 @@ class _ContactUsState extends State<ContactUs> {
                       ],
                     ),
                     onPressed: () async {
-                      PickedFile pick = await ImagePicker()
+                      PickedFile? pick = await ImagePicker()
                           .getImage(source: ImageSource.gallery);
                       setState(() {
-                        attachments.add(pick.path);
+                        attachments.add(pick!.path);
                       });
                       Navigator.pop(context);
                     },

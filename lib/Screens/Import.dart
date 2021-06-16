@@ -16,7 +16,6 @@ import '../Provider/VarietyDataP.dart';
 import 'package:connectivity/connectivity.dart';
 // import 'package:flutter/services.dart' show rootBundle;
 import 'package:permission_handler/permission_handler.dart';
-import 'package:ext_storage/ext_storage.dart';
 import '../Tool/Helper.dart';
 import '../Screens/Export.dart';
 import '../Screens/Settingscreen.dart';
@@ -24,9 +23,12 @@ import '../contact/Aboutus.dart';
 import '../contact/Contactus.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter/services.dart';
+import 'package:external_path/external_path.dart';
+// import 'package:path/path.dart' as p;
+// import 'package:path_provider/path_provider.dart' as pr;
 
 class ImportExport extends StatefulWidget {
-  const ImportExport({Key key}) : super(key: key);
+  const ImportExport({Key? key}) : super(key: key);
   static const routeName = '/import_export';
 
   @override
@@ -35,13 +37,13 @@ class ImportExport extends StatefulWidget {
 
 class _ImportExportState extends State<ImportExport> {
   final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
-  SnackBar snackBar;
-  int importdata;
+  late SnackBar snackBar;
+  int? importdata;
   Helper helper = Helper();
-  String output;
-  String out;
-  bool importdatastatus;
-  bool importeddatastatus;
+  String? output;
+  String? out;
+  bool? importdatastatus;
+  bool? importeddatastatus;
   List<List<dynamic>> importeddata = [];
   @override
   void initState() {
@@ -77,27 +79,23 @@ class _ImportExportState extends State<ImportExport> {
       List<String> catnamedata = [];
 
       Future<void> validate(datafield) async {
-        String appDirs = await ExtStorage.getExternalStorageDirectory();
-        // print('<<<<<<<<<<<< $appDirs >>>>>>>>>>');
+        String appDirs = await ExternalPath.getExternalStoragePublicDirectory(
+            ExternalPath.DIRECTORY_DOWNLOADS);
         Directory imagedir =
             await Directory('$appDirs/Product E-catalogue/Product Pictures')
                 .create(recursive: true);
-                // /storage/emulated/0/Product E-catalogue/Product Pictures/image_cropper_1593598228629.jpg
-                // /storage/emulated/0/Product E-catalogue/Product Pictures/image_cropper_1593597554758.jpg
         if (helper.areListsEqual(datafield[0], header)) {
           {
             for (List i in fields) {
-              // print('>>> ${i[0]}');
-              // print('>>> ${i[1]}');
               if (i[0] == 'name' || i[1] == 'description') {
               } else {
                 if (helper.stringval(i[0]) != null ||
                     helper.stringval(i[4]) != null) {
-                  if (helper.stringval(i[0]).trim() != '' ||
-                      helper.stringval(i[4]).trim() != '') {
+                  if (helper.stringval(i[0])!.trim() != '' ||
+                      helper.stringval(i[4])!.trim() != '') {
                     final prodid = UniqueKey().toString();
-                    List catid(String catstring) {
-                      List _catid = [];
+                    List<String> catid(String? catstring) {
+                      List<String?> _catid = [];
                       if (catstring == null || catstring.trim() == '') {
                         return ['otherid'];
                       } else {
@@ -114,11 +112,12 @@ class _ImportExportState extends State<ImportExport> {
                             _catid.add(_cid);
                           }
                         }
-                        return _catid;
+                        _catid.removeWhere((e) => e == null);
+                        return _catid.map((e) => e!).toList();
                       }
                     }
 
-                    List<String> imageinput(String value) {
+                    List<String> imageinput(String? value) {
                       const List<String> empty = [];
                       if (value == null) {
                         return empty;
@@ -127,11 +126,7 @@ class _ImportExportState extends State<ImportExport> {
                       } else {
                         List<String> pathlist = [];
                         for (String i in value.split(',')) {
-                          if (i != null || i != '') {
-                            // pathlist.add(
-                            //     '/storage/emulated/0/Android/data/com.subbu.productcatalogue/files/Pictures/$i');
-                            // pathlist.add(
-                            //     '/storage/emulated/0/Product E-catalogue/Product Pictures/$i');
+                          if (i != '') {
                             pathlist.add('${imagedir.path}/$i');
                             print('>>>>>>>>>>>>>>>>>>>>>>>>>>> $pathlist');
                           }
@@ -190,7 +185,7 @@ class _ImportExportState extends State<ImportExport> {
                   .addallcategory(catdata);
               // out = 'Data Uploaded Succesfully..!';
             });
-            if (importdata > 0) {
+            if (importdata! > 0) {
               out = '$importdata Data Uploaded Succesfully..!';
             } else {
               out = 'No Valid Data to Upload..!';
@@ -210,91 +205,63 @@ class _ImportExportState extends State<ImportExport> {
     } catch (e) {
       importeddatastatus = true;
       print('>>> $e');
-      // if (e.toString() == 'FormatException: Missing extension byte (at offset 15)') {
       out = '''Error in Document formate ''';
-//       } else {
-//         out = '''Error Uploading CSV..!
-// May be permission due to permission denied''';
-//       }
       return output = '';
     }
   }
 
   void getFilePath(BuildContext context) async {
     try {
-      String filePath = await FilePicker.getFilePath(
-          type: FileType.custom, allowedExtensions: ['csv']);
-      if (filePath == '') {
-        return;
-      }
-      print("Path: " + filePath);
+      FilePickerResult? file = await (FilePicker.platform.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: ['csv'],
+          allowMultiple: false));
+      if (file == null) return;
+      String? filePath = file.files.first.path;
+      print("Path: " + filePath!);
       setState(() {
         importdatastatus = true;
         savedataa(filePath).whenComplete(() {
-          // if (importdata != '0') {
-          //   out = '$importdata Data Uploaded Succesfully..!';
-          // } else {
-          //   out = 'No Valid Data to Upload..!';
-          // }
-          // print('>>> $importdata');
           if (out != null) {
-            snackBar = SnackBar(content: Text(out));
-            _scaffoldkey.currentState.showSnackBar(snackBar);
+            snackBar = SnackBar(content: Text(out!));
+            // ignore: deprecated_member_use
+            _scaffoldkey.currentState!.showSnackBar(snackBar);
           }
         });
       });
     } catch (e) {
-      snackBar = SnackBar(content: Text(' 😔 Error Uploading Data! '));
+      snackBar = SnackBar(content: Text(' 😔 Error Uploading Data! :: $e'));
       setState(() {});
-      _scaffoldkey.currentState.showSnackBar(snackBar);
+      // ignore: deprecated_member_use
+      _scaffoldkey.currentState!.showSnackBar(snackBar);
     }
   }
 
   Future<void> emptydownload(BuildContext context) async {
-    String url =
-        'https://firebasestorage.googleapis.com/v0/b/product-catalogue-app-f7bf8.appspot.com/o/EmptyCatalogueTemplate.csv?alt=media&token=1f85a6da-8c8f-402a-bd03-2065e775ae58';
+    // EmptyHeader
+    String result = '';
     try {
-      if (await Permission.storage.request().isGranted) {
-        // String dir = await ExtStorage.getExternalStoragePublicDirectory(
-        //     ExtStorage.DIRECTORY_DOWNLOADS);
-        // final savedDir = await Directory("$dir/Product E-Catalogue/sample data")
-        //     .create(recursive: true);
-          String dir = await ExtStorage.getExternalStorageDirectory();
-          Directory savedDir = await Directory('$dir/Product E-catalogue/Sample Data')
-              .create(recursive: true);
-        bool hasExisted = await savedDir.exists();
-        if (!hasExisted) {
-          savedDir.create();
-        }
-        var connectivityResult = await (Connectivity().checkConnectivity());
-        if (connectivityResult != ConnectivityResult.none) {
-          await FlutterDownloader.enqueue(
-              url: url,
-              savedDir: savedDir.path,
-              fileName: 'PECEmptyTemplate.csv',
-              showNotification: true,
-              openFileFromNotification: true);
-          snackBar = SnackBar(
-              content: Text(
-                  'Template Downloaded Succesfully in Product E-catalogue folder..!'));
-        } else {
-          snackBar = SnackBar(content: Text('Check Network Connection..!'));
-        }
-      } else {
-        snackBar = SnackBar(content: Text('Permission Declined..!'));
-      }
+      bool isAcc = await Permission.storage.request().isGranted;
+      if (!isAcc) await Permission.storage.request();
+      isAcc = await Permission.storage.request().isGranted;
+      String dir = await ExternalPath.getExternalStoragePublicDirectory(
+          ExternalPath.DIRECTORY_DOWNLOADS);
+      Directory savedDir = Directory(dir + '/Product E-catalogue');
+      bool hasExisted = await savedDir.exists();
+      if (!hasExisted) await savedDir.create(recursive: true);
+      File file = await File(savedDir.path + '/EmptyData.csv')
+          .writeAsString(EmptyHeader);
+      file.create(recursive: false);
+      result =
+          'Template Downloaded Succesfully in Product E-catalogue folder..!';
     } catch (e) {
-      print('Error');
-      String output = await showDialog(
-          context: context,
-          builder: (BuildContext context) => _errorondownload(context, url));
-      if (output == 'copied') {
-        snackBar = SnackBar(content: Text('Download link copied..!'));
-      } else {
-        snackBar = SnackBar(content: Text('Link not Copied..!'));
-      }
+      print('Error ::$e');
+      result = 'Error Occurs :: $e';
     }
-    _scaffoldkey.currentState.showSnackBar(snackBar);
+    // ignore: deprecated_member_use
+    _scaffoldkey.currentState!.showSnackBar(SnackBar(content: Text(result)));
+    // ignore: deprecated_member_use
+    _scaffoldkey.currentState!.showSnackBar(snackBar);
   }
 
   Widget _errorondownload(BuildContext context, String url) {
@@ -303,10 +270,10 @@ class _ImportExportState extends State<ImportExport> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('''Sorry, Some Error Occurs.
-Download it Manually by copy & paste the link to your browser
-'''),
+          Text('Sorry, Some Error Occurs.'
+              '\nDownload it Manually by copy & paste the link to your browser'),
           SizedBox(height: 7),
+          // ignore: deprecated_member_use
           RaisedButton(
             color: Colors.green,
             child: Padding(
@@ -327,55 +294,28 @@ Download it Manually by copy & paste the link to your browser
   }
 
   Future<void> downloadwithdata(BuildContext context) async {
-    String url =
-        'https://firebasestorage.googleapis.com/v0/b/product-catalogue-app-f7bf8.appspot.com/o/Cataloguetemplatewithdata.csv?alt=media&token=df899fc0-f74f-4613-ab74-30350801776b';
+    String result = '';
     try {
-      if (await Permission.storage.request().isGranted) {
-        // String dir = await ExtStorage.getExternalStoragePublicDirectory(
-        //     ExtStorage.DIRECTORY_DOWNLOADS);
-        // print(dir);
-        String dir = await ExtStorage.getExternalStorageDirectory();
-          Directory savedDir = await Directory('$dir/Product E-catalogue/Sample Data')
-              .create(recursive: true);
-        // final savedDir =
-        //     await Directory("$dir/ProductE-Catalogue").create(recursive: true);
-        print('here');
-        bool hasExisted = await savedDir.exists();
-        if (!hasExisted) {
-          savedDir.create();
-        }
-        var connectivityResult = await (Connectivity().checkConnectivity());
-        if (connectivityResult != ConnectivityResult.none) {
-          // WidgetsFlutterBinding.ensureInitialized();
-          // await FlutterDownloader.initialize();
-          await FlutterDownloader.enqueue(
-              url: url,
-              savedDir: savedDir.path,
-              fileName: 'PECTemplatewithdata.csv',
-              showNotification: true,
-              openFileFromNotification: true);
-          snackBar = SnackBar(
-              content: Text(
-                  'Template Downloaded Succesfully in Product E-catalogue folder..!'));
-        } else {
-          snackBar = SnackBar(content: Text('Check Network Connection..!'));
-        }
-      } else {
-        snackBar = SnackBar(content: Text('Permission Declined..!'));
-      }
-      // _scaffoldkey.currentState.showSnackBar(snackBar);
+      bool isAcc = await Permission.storage.request().isGranted;
+      if (!isAcc) await Permission.storage.request();
+      isAcc = await Permission.storage.request().isGranted;
+      String dir = await ExternalPath.getExternalStoragePublicDirectory(
+          ExternalPath.DIRECTORY_DOWNLOADS);
+      Directory savedDir = Directory(dir + '/Product E-catalogue');
+      bool hasExisted = await savedDir.exists();
+      if (!hasExisted) await savedDir.create(recursive: true);
+      ByteData data = await rootBundle.load('assets/SampleData.csv');
+      File file = await File(savedDir.path + '/SampleData.csv')
+          .writeAsBytes(data.buffer.asUint8List());
+      file.create(recursive: false);
+      result =
+          'Template Downloaded Succesfully in Product E-catalogue folder..!';
     } catch (e) {
-      print('Error');
-      String output = await showDialog(
-          context: context,
-          builder: (BuildContext context) => _errorondownload(context, url));
-      if (output == 'copied') {
-        snackBar = SnackBar(content: Text('Download link copied..!'));
-      } else {
-        snackBar = SnackBar(content: Text('Link not Copied..!'));
-      }
+      print('Error ::$e');
+      result = 'Error Occurs :: $e';
     }
-    _scaffoldkey.currentState.showSnackBar(snackBar);
+    // ignore: deprecated_member_use
+    _scaffoldkey.currentState!.showSnackBar(SnackBar(content: Text(result)));
   }
 
   Widget _header(String text) {
@@ -391,10 +331,7 @@ Download it Manually by copy & paste the link to your browser
       text,
       textAlign: TextAlign.justify,
       style: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.normal,
-        wordSpacing: 1,
-      ),
+          fontSize: 14, fontWeight: FontWeight.normal, wordSpacing: 1),
     );
   }
 
@@ -418,12 +355,11 @@ Download it Manually by copy & paste the link to your browser
               Container(
                 padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
                 alignment: Alignment.center,
+                // ignore: deprecated_member_use
                 child: RaisedButton(
                   color: Colors.blue,
                   elevation: 5,
-                  onPressed: () {
-                    downloadwithdata(context);
-                  },
+                  onPressed: () => downloadwithdata(context),
                   child: Padding(
                     padding: const EdgeInsets.all(5),
                     child: Text(
@@ -512,15 +448,6 @@ $importdata Product Imported Successfuly
                 padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
                 child: Column(
                   children: [
-//                     _header('Import Template Details'),
-//                     SizedBox(height: 10),
-//                     _content('''
-
-// Note that the Import Template consist of 3 sheets.
-// 1. Template without data
-// 2. Template with sample data
-// 3. Hints & Instructions
-//                     '''),
                     _header('Table Column Details'),
                     SizedBox(height: 15),
                     _content('''
@@ -599,7 +526,8 @@ Then you would mention: product1.png, Product2.jpg .
                           textAlign: TextAlign.left,
                           style: TextStyle(fontSize: 14),
                         ),
-                        Text('''Product E-catalogue > Product Pictures Folder in Internal Storage''',
+                        Text(
+                          '''Product E-catalogue > Product Pictures Folder in Internal Storage''',
                           // ''' Android > data> com.subbu.productcatalogue > files > Pictures.''',
                           textAlign: TextAlign.left,
                           style: TextStyle(
@@ -641,52 +569,92 @@ Hint : If you want to update products.
   }
 }
 
-// Future<void> emptydownload(BuildContext context) async {
-//   final myData =
-//       await rootBundle.loadString("assets/EmptyCatalogueTemplate.csv");
-//   List<List<dynamic>> csvTable = CsvToListConverter().convert(myData);
-//   if (await Permission.storage.request().isGranted) {
-//     var dir = await ExtStorage.getExternalStoragePublicDirectory(
-//         ExtStorage.DIRECTORY_DOWNLOADS);
-//     File file = await new File("$dir/ProductE-CatalogueTemplate.csv")
-//         .create(recursive: true);
-//     var isExist = await file.exists();
-//     if (isExist) {
-//       String csv = const ListToCsvConverter().convert(csvTable);
-//       snackBar = SnackBar(
-//           content:
-//               Text('Template Downloaded Succesfully in Download folder..!'));
-//       _scaffoldkey.currentState.showSnackBar(snackBar);
-//       return file.writeAsString(csv);
-//     } else {
-//       snackBar =
-//           SnackBar(content: Text('Sorry, Error in Template Downloaded..!'));
-//       _scaffoldkey.currentState.showSnackBar(snackBar);
-//     }
-//   }
-// }
-
+const String EmptyHeader =
+    'name,description,brand,category,varietyname,varietyprice,varietywsp,rank,imagefilename';
 // Future<void> downloadwithdata(BuildContext context) async {
-//   final myData =
-//       await rootBundle.loadString("assets/Cataloguetemplatewithdata.csv");
-//   List<List<dynamic>> csvTable = CsvToListConverter().convert(myData);
-//   if (await Permission.storage.request().isGranted) {
-//     var dir = await ExtStorage.getExternalStoragePublicDirectory(
-//         ExtStorage.DIRECTORY_DOWNLOADS);
-//     File file = await new File("$dir/ProductE-Cataloguewithdata.csv")
-//         .create(recursive: true);
-//     var isExist = await file.exists();
-//     if (isExist) {
-//       String csv = const ListToCsvConverter().convert(csvTable);
+//   String url = 'https://firebasestorage.googleapis.com/v0/b/'
+//       'product-catalogue-app-f7bf8.appspot.com/o/Cataloguetemplatewithdata.csv'
+//       '?alt=media&token=df899fc0-f74f-4613-ab74-30350801776b';
+//   try {
+//     print(await Permission.storage.status);
+//     bool isAcc = await Permission.storage.request().isGranted;
+//     if (!isAcc) await Permission.storage.request();
+//     isAcc = await Permission.storage.request().isGranted;
+//     String dir = await ExternalPath.getExternalStoragePublicDirectory(
+//         ExternalPath.DIRECTORY_DOWNLOADS);
+//     Directory savedDir = Directory(dir + '/Product E-catalogue');
+//     bool hasExisted = await savedDir.exists();
+//    if (!hasExisted) await savedDir.create(recursive: true);
+//     var connectivityResult = await Connectivity().checkConnectivity();
+//     if (connectivityResult != ConnectivityResult.none) {
+//       await FlutterDownloader.enqueue(
+//           url: url,
+//           savedDir: savedDir.path,
+//           fileName: 'PECTemplatewithdata.csv',
+//           showNotification: true,
+//           openFileFromNotification: true);
 //       snackBar = SnackBar(
-//           content:
-//               Text('Template Downloaded Succesfully in Download folder..!'));
-//       _scaffoldkey.currentState.showSnackBar(snackBar);
-//       return file.writeAsString(csv);
+//           content: Text(
+//               'Template Downloaded Succesfully in Product E-catalogue folder..!'));
 //     } else {
-//       snackBar =
-//           SnackBar(content: Text('Sorry, Error in Template Downloaded..!'));
-//       _scaffoldkey.currentState.showSnackBar(snackBar);
+//       snackBar = SnackBar(content: Text('Check Network Connection..!'));
+//     }
+//   } catch (e) {
+//     print('Error ::$e');
+//     String? output = await showDialog(
+//         context: context,
+//         builder: (BuildContext context) => _errorondownload(context, url));
+//     if (output == 'copied') {
+//       snackBar = SnackBar(content: Text('Download link copied..!'));
+//     } else {
+//       snackBar = SnackBar(content: Text('Link not Copied..!'));
 //     }
 //   }
+//   // ignore: deprecated_member_use
+//   _scaffoldkey.currentState!.showSnackBar(snackBar);
+// }
+// Future<void> emptydownload(BuildContext context) async {
+//   // EmptyHeader
+//   String url =
+//       'https://firebasestorage.googleapis.com/v0/b/product-catalogue-app-f7bf8.appspot.com/o/EmptyCatalogueTemplate.csv?alt=media&token=1f85a6da-8c8f-402a-bd03-2065e775ae58';
+//   try {
+//     if (await Permission.storage.request().isGranted) {
+//       String dir = await ExternalPath.getExternalStoragePublicDirectory(
+//           ExternalPath.DIRECTORY_DOWNLOADS);
+//       Directory savedDir =
+//           await Directory('$dir/Product E-catalogue/Sample Data')
+//               .create(recursive: true);
+//       bool hasExisted = await savedDir.exists();
+//       if (!hasExisted) {
+//         savedDir.create();
+//       }
+//       var connectivityResult = await (Connectivity().checkConnectivity());
+//       if (connectivityResult != ConnectivityResult.none) {
+//         await FlutterDownloader.enqueue(
+//             url: url,
+//             savedDir: savedDir.path,
+//             fileName: 'PECEmptyTemplate.csv',
+//             showNotification: true,
+//             openFileFromNotification: true);
+//         snackBar = SnackBar(
+//             content: Text(
+//                 'Template Downloaded Succesfully in Product E-catalogue folder..!'));
+//       } else {
+//         snackBar = SnackBar(content: Text('Check Network Connection..!'));
+//       }
+//     } else {
+//       snackBar = SnackBar(content: Text('Permission Declined..!'));
+//     }
+//   } catch (e) {
+//     print('Error');
+//     String? output = await showDialog(
+//         context: context,
+//         builder: (BuildContext context) => _errorondownload(context, url));
+//     if (output == 'copied') {
+//       snackBar = SnackBar(content: Text('Download link copied..!'));
+//     } else {
+//       snackBar = SnackBar(content: Text('Link not Copied..!'));
+//     }
+//   }
+//   _scaffoldkey.currentState!.showSnackBar(snackBar);
 // }

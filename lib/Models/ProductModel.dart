@@ -6,27 +6,27 @@ part 'ProductModel.g.dart';
 @HiveType(typeId: 0)
 class ProductModel extends HiveObject {
   @HiveField(0)
-  String id;
+  String? id;
   @HiveField(1)
-  String name;
+  String? name;
   @HiveField(3)
-  String description;
+  String? description;
   @HiveField(4)
-  List imagepathlist;
+  List<String>? imagepathlist;
   @HiveField(5)
-  int favpic;
+  int? favpic;
   @HiveField(6)
-  int rank;
+  int? rank;
   @HiveField(7)
-  List categorylist;
+  List<String>? categorylist;
   @HiveField(8)
-  String brand;
+  String? brand;
   @HiveField(9)
-  bool favourite;
+  bool? favourite;
 
   ProductModel(
-      {@required this.id,
-      @required this.name,
+      {required this.id,
+      required this.name,
       this.favpic = 0,
       this.rank = 0,
       this.imagepathlist,
@@ -35,7 +35,7 @@ class ProductModel extends HiveObject {
       this.description,
       this.favourite});
 
-  String lsttostring(List vallist) {
+  String? lsttostring(List? vallist) {
     if (vallist == null) {
       return null;
     } else {

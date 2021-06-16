@@ -8,7 +8,7 @@ import '../Provider/ProductDataP.dart';
 import '../Provider/VarietyDataP.dart';
 import 'package:csv/csv.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:ext_storage/ext_storage.dart';
+import 'package:external_path/external_path.dart';
 import 'dart:io';
 import 'package:path/path.dart';
 import '../Pdf/Grid/GridViewPV.dart';
@@ -28,7 +28,7 @@ String localeName = Platform.localeName;
 
 class ExportData extends StatelessWidget {
   static const routeName = '/export_data';
-  const ExportData({Key key}) : super(key: key);
+  const ExportData({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -54,14 +54,14 @@ class ExportData extends StatelessWidget {
 }
 
 class ExportD extends StatelessWidget {
-  const ExportD({Key key}) : super(key: key);
+  const ExportD({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> _scaffoldkey =
         new GlobalKey<ScaffoldState>();
     SnackBar snackBar;
-    List<ProductModel> productdata = Provider.of<ProductData>(context).items;
+    List<ProductModel?> productdata = Provider.of<ProductData>(context).items;
     List<VarietyProductM> vardata = Provider.of<VarietyData>(context).items;
 
     String output(var val) {
@@ -74,8 +74,8 @@ class ExportD extends StatelessWidget {
       }
     }
 
-    Future<void> export(BuildContext context) async {
-      List<String> prodid = [];
+    Future export(BuildContext context) async {
+      List<String?> prodid = [];
       List<String> name = [];
       List<String> description = [];
       // List<String> price = [];
@@ -110,7 +110,7 @@ class ExportD extends StatelessWidget {
         }
       }
 
-      String filenamelist(List<String> list) {
+      String filenamelist(List<String>? list) {
         List filename = [];
         if (list == null) {
           return '';
@@ -130,14 +130,14 @@ class ExportD extends StatelessWidget {
         }
       }
 
-      void productd(String idx) {
-        ProductModel prod = productdata.firstWhere((f) => f.id == idx);
+      void productd(String? idx) {
+        ProductModel prod = productdata.firstWhere((f) => f!.id == idx)!;
         name.add(output(prod.name));
         description.add(output(prod.description));
         rank.add(output(prod.rank));
         brand.add(output(prod.brand));
         category.add(output(catstr(prod.categorylist)));
-        imagefilename.add(filenamelist(prod.imagepathlist));
+        imagefilename.add(filenamelist(prod.imagepathlist as List<String>?));
       }
 
       for (VarietyProductM i in vardata) {
@@ -148,8 +148,8 @@ class ExportD extends StatelessWidget {
         productd(i.productid);
       }
 
-      for (ProductModel i in productdata) {
-        if (!prodid.contains(i.id)) {
+      for (ProductModel? i in productdata) {
+        if (!prodid.contains(i!.id)) {
           varietyname.add('');
           varietyprice.add('');
           varietywsp.add('');
@@ -157,12 +157,12 @@ class ExportD extends StatelessWidget {
           productd(i.id);
         }
       }
-      List<List<dynamic>> rows = List<List<dynamic>>();
+      List<List<dynamic>> rows = [];
       rows.add(header);
 
       if (name.length == varietyname.length && category.length == name.length) {
         for (int i = 0; i < name.length; i++) {
-          List<dynamic> row = List();
+          List<dynamic> row = [];
           row.add(name[i]);
           row.add(description[i]);
           row.add(brand[i]);
@@ -182,10 +182,10 @@ class ExportD extends StatelessWidget {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('''Can't able to download in Download Directory
-Click below to save CSV to App Directory
-'''),
+              Text('Can\'t able to download in Download Directory '
+                  '\nClick below to save CSV to App Directory'),
               SizedBox(height: 7),
+              // ignore: deprecated_member_use
               RaisedButton(
                 color: Colors.green,
                 child: Padding(
@@ -205,7 +205,8 @@ Click below to save CSV to App Directory
 
       try {
         if (await Permission.storage.request().isGranted) {
-          var dir = await ExtStorage.getExternalStorageDirectory();
+          var dir = await ExternalPath.getExternalStoragePublicDirectory(
+              ExternalPath.DIRECTORY_DOWNLOADS);
           Directory imagedir =
               await Directory('$dir/Product E-catalogue/Exported Data')
                   .create(recursive: true);
@@ -217,7 +218,7 @@ Click below to save CSV to App Directory
             snackBar = SnackBar(
                 content: Text(
                     'Data Exported Succesfully to Product E-catalogue folder..!'));
-            _scaffoldkey.currentState.showSnackBar(snackBar);
+            _scaffoldkey.currentState!.showSnackBar(snackBar);
             return f.writeAsString(csv);
           }
         }
@@ -225,13 +226,14 @@ Click below to save CSV to App Directory
         print(e);
         try {
           // print('ddd');
-          Directory appDir = await pPath.getExternalStorageDirectory();
+          Directory appDir =
+              await (pPath.getExternalStorageDirectory() as Future<Directory>);
           Directory csvdir = await Directory('${appDir.path}/ProductDataCSV')
               .create(recursive: true);
           print(csvdir);
           File file = await new File("${csvdir.path}/ProductData.csv")
               .create(recursive: true);
-          String output = await showDialog(
+          String? output = await showDialog(
               context: context,
               builder: (BuildContext context) => _errorondownload(context));
           bool isExist = await file.exists();
@@ -240,7 +242,7 @@ Click below to save CSV to App Directory
               String csv = const ListToCsvConverter().convert(rows);
               snackBar =
                   SnackBar(content: Text('CSV exported to App Directory..!'));
-              _scaffoldkey.currentState.showSnackBar(snackBar);
+              _scaffoldkey.currentState!.showSnackBar(snackBar);
               return file.writeAsString(csv);
             } else {
               snackBar =
@@ -255,7 +257,7 @@ Click below to save CSV to App Directory
           snackBar = SnackBar(content: Text('Sorry, Error -> $ee'));
         }
         print(snackBar);
-        _scaffoldkey.currentState.showSnackBar(snackBar);
+        _scaffoldkey.currentState!.showSnackBar(snackBar);
       }
     }
 
@@ -293,8 +295,8 @@ Click below to save CSV to App Directory
               PDFDicv(ispaid: false),
               SizedBox(height: 10),
               Divider(),
-                Text('Download PDF Without WaterMark',
-                    style: TextStyle(fontSize: 20)),
+              Text('Download PDF Without WaterMark',
+                  style: TextStyle(fontSize: 20)),
               Divider(),
               PDFDicv(ispaid: true),
               SizedBox(height: 10),

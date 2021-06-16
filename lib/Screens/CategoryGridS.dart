@@ -3,15 +3,15 @@ import 'package:provider/provider.dart';
 import '../Widgets/GridW.dart';
 import '../Provider/ProductDataP.dart';
 import '../Provider/CategoryDataP.dart';
-import 'package:flutter_native_admob/native_admob_options.dart';
+// import 'package:flutter_native_admob/native_admob_options.dart';
 import 'dart:async';
-import 'package:flutter_native_admob/flutter_native_admob.dart' as ad;
-import 'package:flutter_native_admob/native_admob_controller.dart';
+// import 'package:flutter_native_admob/flutter_native_admob.dart' as ad;
+// import 'package:flutter_native_admob/native_admob_controller.dart';
 
 // import '../Models/CategoryModel.dart';
 
 class CategoryGridS extends StatefulWidget {
-  CategoryGridS({Key key}) : super(key: key);
+  CategoryGridS({Key? key}) : super(key: key);
   static const routeName = '/catgrid';
 
   @override
@@ -21,8 +21,8 @@ class CategoryGridS extends StatefulWidget {
 class _CategoryGridSState extends State<CategoryGridS> {
   @override
   void initState() {
-    _subscription = _nativeAdController.stateChanged.listen(_onStateChanged);
-    _nativeAdController.setAdUnitID(_adUnitID, numberAds: 2);
+    // _subscription = _nativeAdController.stateChanged.listen(_onStateChanged);
+    // _nativeAdController.setAdUnitID(_adUnitID, numberAds: 2);
     // _nativeAdController.setTestDeviceIds([
     //   '400A0E6F669C5ECA',
     //   '33BE2250B43518CCDA7DE426D04EE231',
@@ -34,7 +34,7 @@ class _CategoryGridSState extends State<CategoryGridS> {
   @override
   void dispose() {
     _subscription.cancel();
-    _nativeAdController.dispose();
+    // _nativeAdController.dispose();
     super.dispose();
   }
 
@@ -42,52 +42,50 @@ class _CategoryGridSState extends State<CategoryGridS> {
   static const _adUnitID = "ca-app-pub-9568938816087708/6044993041";
   // static const _adUnitID = "ca-app-pub-3940256099942544/2247696110";
   //-> native sample
-  final _nativeAdController = NativeAdmobController();
+  // final _nativeAdController = NativeAdmobController();
   double _height = 0;
   double _height2 = 0;
-  StreamSubscription _subscription;
+  late StreamSubscription _subscription;
 
-  void _onStateChanged(AdLoadState state) {
-    switch (state) {
-      case AdLoadState.loading:
-        setState(() {
-          _height = 0;
-          _height2 = 0;
-        });
-        break;
-      case AdLoadState.loadCompleted:
-        setState(() {
-          _height = 140;
-          _height2 = 60;
-        });
-        break;
-      default:
-        break;
-    }
-  }
+  // void _onStateChanged(AdLoadState state) {
+  //   switch (state) {
+  //     case AdLoadState.loading:
+  //       setState(() {
+  //         _height = 0;
+  //         _height2 = 0;
+  //       });
+  //       break;
+  //     case AdLoadState.loadCompleted:
+  //       setState(() {
+  //         _height = 140;
+  //         _height2 = 60;
+  //       });
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // }
 
-  Widget adwidget(bool isone) {
-    return Card(
-      child: Container(
-        height: (isone ?? true) ? _height : _height2,
-        padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-        child: ad.NativeAdmob(
-            adUnitID: _adUnitID,
-            error: Text('Error'),
-            numberAds: 2,
-            type: (isone ?? true)
-                ? ad.NativeAdmobType.full
-                : ad.NativeAdmobType.banner,
-            controller: _nativeAdController,
-            options: NativeAdmobOptions(
-                priceTextStyle:
-                    NativeTextStyle(fontSize: 15, color: Colors.red),
-                bodyTextStyle:
-                    NativeTextStyle(fontSize: 14, color: Colors.black)),
-            loading: Text('Loading')),
-      ),
-    );
-  }
+  // Widget adwidget(bool isone) {
+  //   return Card(
+  //     child: Container(
+  //       height: (isone) ? _height : _height2,
+  //       padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+  //       child: ad.NativeAdmob(
+  //           adUnitID: _adUnitID,
+  //           error: Text('Error'),
+  //           numberAds: 2,
+  //           type: (isone) ? ad.NativeAdmobType.full : ad.NativeAdmobType.banner,
+  //           controller: _nativeAdController,
+  //           options: NativeAdmobOptions(
+  //               priceTextStyle:
+  //                   NativeTextStyle(fontSize: 15, color: Colors.red),
+  //               bodyTextStyle:
+  //                   NativeTextStyle(fontSize: 14, color: Colors.black)),
+  //           loading: Text('Loading')),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -99,14 +97,14 @@ class _CategoryGridSState extends State<CategoryGridS> {
     List catids = Provider.of<CategoryData>(context).itemid();
     List emptycatid = [];
     List emptycatname = [];
-    for (String i in catids) {
+    for (String? i in catids as Iterable<String?>) {
       if (!uqcatid.contains(i)) {
         emptycatid.add(i);
         emptycatname.add(findcatname(i));
       } else {}
     }
     // final productlist = Provider.of<ProductData>(context).productlistbycatid;
-    List<String> catnamelist = [];
+    List<String?> catnamelist = [];
     if (catdata.length != 0) {
       for (var i in catdata) {
         if (i.id == 'otherid') {
@@ -117,7 +115,7 @@ class _CategoryGridSState extends State<CategoryGridS> {
       }
     }
 
-    void deletecat(String catidval) {
+    void deletecat(String? catidval) {
       emptycatname = List.from(emptycatname)
         ..firstWhere((e) => e == findcatname(catidval));
       emptycatid = List.from(emptycatid)..firstWhere((e) => e == catidval);
@@ -133,11 +131,9 @@ class _CategoryGridSState extends State<CategoryGridS> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                adwidget(false),
+                // adwidget(false),
                 Container(
-                  child: Image.asset('assets/emptybox.png'),
-                  width: 150
-                ),
+                    child: Image.asset('assets/emptybox.png'), width: 150),
                 Text('No Product Available Yet'),
                 SizedBox(height: 2),
                 Text('Start Adding Something OR Import Product Data',
@@ -149,7 +145,7 @@ class _CategoryGridSState extends State<CategoryGridS> {
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: [
-                adwidget(false),
+                // adwidget(false),
                 GridView.builder(
                   shrinkWrap: true,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

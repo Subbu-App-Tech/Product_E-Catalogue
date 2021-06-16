@@ -14,14 +14,14 @@ import 'dart:async';
 import 'dart:typed_data';
 import '../../Provider/VarietyDataP.dart';
 import '../PdfTools.dart';
-import 'package:flutter_plugin_pdf_viewer/flutter_plugin_pdf_viewer.dart';
-import '../../Auth/ViewAdtoDownload.dart';
+import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
+// import '../../Auth/ViewAdtoDownload.dart';
 import '../../Models/SecureStorage.dart';
-import 'package:firebase_admob/firebase_admob.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class PDFListviewone extends StatefulWidget {
   static const routeName = '/PDFListviewone';
-  const PDFListviewone({Key key}) : super(key: key);
+  const PDFListviewone({Key? key}) : super(key: key);
 
   @override
   _PDFListviewoneState createState() => _PDFListviewoneState();
@@ -30,31 +30,8 @@ class PDFListviewone extends StatefulWidget {
 class _PDFListviewoneState extends State<PDFListviewone> {
   @override
   void initState() {
+    Pdftools.createInterstitialAd();
     super.initState();
-    FirebaseAdMob.instance
-        .initialize(appId: 'ca-app-pub-9568938816087708~5406343573');
-  }
-
-  @override
-  void dispose() {
-    _interstitialAd?.dispose();
-    super.dispose();
-  }
-
-  MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
-    childDirected: true,
-    nonPersonalizedAds: true,
-    // testDevices: ['70986832EA2D276F6277A5461962A4EC'],
-  );
-  InterstitialAd _interstitialAd;
-  InterstitialAd createInterstitialAd() {
-    return InterstitialAd(
-      adUnitId: 'ca-app-pub-9568938816087708/7976666598',
-      targetingInfo: targetingInfo,
-      listener: (MobileAdEvent event) {
-        print("InterstitialAd event $event");
-      },
-    );
   }
 
   @override
@@ -68,14 +45,14 @@ class _PDFListviewoneState extends State<PDFListviewone> {
     List<ProcuctbasedModel> pbitems = [];
     Function findvardata = Provider.of<VarietyData>(context).findbyid;
     List<Brandcount> uqbrand = Provider.of<ProductData>(context).uqbrand();
-    PDFDocument _pdfdoc;
-    List frowd = ModalRoute.of(context).settings.arguments as List;
+    late PDFDocument _pdfdoc;
+    List frowd = ModalRoute.of(context)!.settings.arguments as List;
     Function findvarcount = Provider.of<VarietyData>(context).findvarietycount;
     String input = frowd[0];
     String sortby = frowd[1];
     bool ispaid = frowd[2];
 
-    List<ProductModel> pm;
+    List<ProductModel?> pm;
     if (input == 'brand') {
       for (Brandcount i in uqbrand) {
         pm = Provider.of<ProductData>(context).productlistbybrandname(i.name);
@@ -93,7 +70,7 @@ class _PDFListviewoneState extends State<PDFListviewone> {
                 list: pm, functofindvarietycount: findvarcount, type: sortby)));
       }
     } else if (input == 'all') {
-      List<ProductModel> pm = Provider.of<ProductData>(context).items;
+      List<ProductModel?> pm = Provider.of<ProductData>(context).items;
       pbitems.add(ProcuctbasedModel(
           basedon: 'All Product',
           productlist: pdftool.sortedlist(
@@ -104,21 +81,19 @@ class _PDFListviewoneState extends State<PDFListviewone> {
     String contactno;
     String companyname;
 
-    writeOnPdf() async {
+    Future writeOnPdf() async {
       currency = await storage.getcurrency();
       contactno = await storage.getcontactno();
       companyname = await storage.getcompanyname();
       ByteData bytes = await rootBundle.load('assets/productc.png');
       Uint8List logo = bytes.buffer.asUint8List();
-      PdfImage logoimage = PdfImage.file(
-        pdf.document,
-        bytes: logo,
-      );
+      PdfImage logoimage = PdfImage.file(pdf.document, bytes: logo);
 
       Future<pw.Widget> _list(ProductModel productdata) async {
-        if (pdftool.checkimagepath(productdata?.imagepathlist?.cast<String>()?? [])) {
+        if (pdftool
+            .checkimagepath(productdata.imagepathlist?.cast<String>() ?? [])) {
           list = await new File(
-                  '${pdftool.validimagepath(productdata?.imagepathlist?.cast<String>()?? [])[0]}')
+                  '${pdftool.validimagepath(productdata.imagepathlist?.cast<String>() ?? [])[0]}')
               .readAsBytes();
           image = PdfImage.file(
             pdf.document,
@@ -137,13 +112,14 @@ class _PDFListviewoneState extends State<PDFListviewone> {
             width: 575,
             padding: pw.EdgeInsets.all(2.5),
             foregroundDecoration: pw.BoxDecoration(
-                borderRadius: 2,
-                border: pw.BoxBorder(
-                    bottom: true,
-                    right: true,
-                    left: true,
-                    top: true,
-                    width: 1)),
+              borderRadius: pw.BorderRadius.all(pw.Radius.circular(5)),
+              // border: pw.BoxBorder(
+              //     bottom: true,
+              //     right: true,
+              //     left: true,
+              //     top: true,
+              //     width: 1)
+            ),
             child: pw.Row(
                 mainAxisSize: pw.MainAxisSize.max,
                 mainAxisAlignment: pw.MainAxisAlignment.start,
@@ -153,7 +129,8 @@ class _PDFListviewoneState extends State<PDFListviewone> {
                     alignment: pw.Alignment.center,
                     padding: pw.EdgeInsets.all(2.5),
                     width: 140,
-                    child: pw.Image(image, fit: pw.BoxFit.contain),
+                    child:
+                        pw.Image(pw.ImageProxy(image), fit: pw.BoxFit.contain),
                   ),
                   pw.SizedBox(width: 5),
                   pw.Container(
@@ -201,7 +178,7 @@ class _PDFListviewoneState extends State<PDFListviewone> {
                                                           pw.FontWeight.bold),
                                                   textAlign: pw.TextAlign.left),
                                           pw.SizedBox(height: 3),
-                                          (productdata.description.isEmpty)
+                                          (productdata.description!.isEmpty)
                                               ? pw.SizedBox.shrink()
                                               : pw.Container(
                                                   alignment:
@@ -210,7 +187,7 @@ class _PDFListviewoneState extends State<PDFListviewone> {
                                                       'Product Description',
                                                       style: pw.TextStyle(
                                                           fontSize: 12))),
-                                          (productdata.description.isEmpty)
+                                          (productdata.description!.isEmpty)
                                               ? pw.SizedBox.shrink()
                                               : pw.Container(
                                                   // color: PdfColors.grey200,
@@ -247,8 +224,8 @@ class _PDFListviewoneState extends State<PDFListviewone> {
 
       for (ProcuctbasedModel i in pbitems) {
         List<pw.Widget> _listview = [];
-        for (ProductModel j in i.productlist) {
-          _listview.add(await _list(j));
+        for (ProductModel? j in i.productlist!) {
+          _listview.add(await _list(j!));
         }
         pdf.addPage(
           pw.MultiPage(
@@ -256,7 +233,7 @@ class _PDFListviewoneState extends State<PDFListviewone> {
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               maxPages: 200,
               header: (pw.Context ctx) {
-                return pdftool.buildHeader(i.basedon, logoimage);
+                return pdftool.buildHeader(i.basedon!, logoimage);
               },
               footer: (pw.Context ctx) {
                 return pdftool.buildFooter(
@@ -278,27 +255,12 @@ class _PDFListviewoneState extends State<PDFListviewone> {
     }
 
     Future savePdf() async {
-      // await _interstitialAd?.dispose();
-      // _interstitialAd = createInterstitialAd();
-      // await _interstitialAd.load();
-      // await _interstitialAd?.show();
-      // await writeOnPdf();
-      // Directory documentDirectory = await getTemporaryDirectory();
-      // String documentPath = documentDirectory.path;
-      // filepath = "$documentPath/ProductCatalogue6.pdf";
-      // File file = File(filepath);
-      // await file.writeAsBytes(pdf.save(), flush: true, mode: FileMode.write);
-      // _pdfdoc = await PDFDocument.fromFile(file);
-      await _interstitialAd?.dispose();
-      _interstitialAd = createInterstitialAd();
-      await _interstitialAd.load();
-      await _interstitialAd?.show();
       await writeOnPdf();
       Directory documentDirectory = await getApplicationDocumentsDirectory();
       String documentPath = documentDirectory.path;
       filepath = "$documentPath/ProductCatalogue4.pdf";
       File file = File(filepath);
-      file.writeAsBytesSync(pdf.save());
+      file.writeAsBytesSync(await pdf.save());
       _pdfdoc = await PDFDocument.fromFile(File(filepath));
     }
 
@@ -313,12 +275,11 @@ class _PDFListviewoneState extends State<PDFListviewone> {
                   IconButton(
                     icon: Icon(Icons.print),
                     onPressed: () {
-                      _interstitialAd?.dispose();
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (ctx) => ViewAdToDownload(
-                                  filepath: filepath, ispaid: ispaid)));
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (ctx) => ViewAdToDownload(
+                      //             filepath: filepath, ispaid: ispaid)));
                     },
                   ),
                 ],

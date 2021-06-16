@@ -5,7 +5,7 @@ import '../Provider/CategoryDataP.dart';
 import '../Provider/ProductDataP.dart';
 import '../Provider/VarietyDataP.dart';
 import '../Auth/sign_in.dart';
-import '../main.dart';
+import '../Home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../Screens/Export.dart';
 import '../Screens/Settingscreen.dart';
@@ -14,7 +14,7 @@ import '../contact/Contactus.dart';
 import '../Models/SecureStorage.dart';
 
 class MyDrawer extends StatefulWidget {
-  const MyDrawer({Key key}) : super(key: key);
+  const MyDrawer({Key? key}) : super(key: key);
 
   @override
   _MyDrawerState createState() => _MyDrawerState();
@@ -22,10 +22,10 @@ class MyDrawer extends StatefulWidget {
 
 class _MyDrawerState extends State<MyDrawer> {
   SecureStorage storage = SecureStorage();
-  String loginstatus;
-  FirebaseUser user;
+  String? loginstatus;
+  User? user;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  String imageurl;
+  String? imageurl;
 
   @override
   void initState() {
@@ -34,9 +34,9 @@ class _MyDrawerState extends State<MyDrawer> {
   }
 
   initUser() async {
-    user = await _auth.currentUser();
+    user = _auth.currentUser;
     setState(() {
-      imageurl = user?.photoUrl;
+      imageurl = user?.photoURL;
     });
   }
 
@@ -49,6 +49,7 @@ class _MyDrawerState extends State<MyDrawer> {
         ),
         content: Text('Note: You can\'t redo it'),
         actions: [
+          // ignore: deprecated_member_use
           RaisedButton(
             child: Text(
               'Delete Data',
@@ -65,6 +66,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   MaterialPageRoute(builder: (ctx) => ProductCatalogue()));
             },
           ),
+          // ignore: deprecated_member_use
           RaisedButton(
             child: Text('Back'),
             color: Colors.blueAccent,
@@ -88,9 +90,10 @@ class _MyDrawerState extends State<MyDrawer> {
                 ? Text('You Can Login Here')
                 : Text("${user?.email}"),
             currentAccountPicture: CircleAvatar(
-              backgroundImage: (imageurl == null)
-                  ? AssetImage("assets/NoImage.png")
-                  : NetworkImage("${user?.photoUrl}"),
+              backgroundImage: ((imageurl == null)
+                      ? AssetImage("assets/NoImage.png")
+                      : NetworkImage("${user?.photoURL}"))
+                  as ImageProvider<Object>?,
               backgroundColor: Colors.white,
             ),
             onDetailsPressed: () {
@@ -176,14 +179,14 @@ class _MyDrawerState extends State<MyDrawer> {
                     leading: Icon(Icons.exit_to_app, color: Colors.red),
                     title: (user == null) ? Text('Exit') : Text('Sign out'),
                     onTap: () {
-                       setState(() {
-                      signOutGoogle();
-                      storage.setloginval('exited');
+                      setState(() {
+                        signOutGoogle();
+                        storage.setloginval('exited');
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                                 builder: (ctx) => ProductCatalogue()));
-                    });
+                      });
                     }),
               ],
             ),

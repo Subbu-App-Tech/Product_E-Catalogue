@@ -4,7 +4,7 @@ import '../Models/SecureStorage.dart';
 
 class SettingScreen extends StatefulWidget {
   static const routeName = '/settingscreen';
-  SettingScreen({Key key}) : super(key: key);
+  SettingScreen({Key? key}) : super(key: key);
 
   @override
   _SettingScreenState createState() => _SettingScreenState();
@@ -12,11 +12,11 @@ class SettingScreen extends StatefulWidget {
 
 class _SettingScreenState extends State<SettingScreen> {
   final GlobalKey<ScaffoldState> _scafkey = new GlobalKey<ScaffoldState>();
-  SnackBar snackBar;
+  SnackBar? snackBar;
   final _frm = GlobalKey<FormState>();
-  String currency;
-  String companyname;
-  String mobileno;
+  String? currency;
+  String? companyname;
+  String? mobileno;
   SecureStorage storage = SecureStorage();
   TextEditingController _textcontroller = TextEditingController();
   TextEditingController _companycontroller = TextEditingController();
@@ -26,9 +26,9 @@ class _SettingScreenState extends State<SettingScreen> {
     currency = await storage.getcurrency();
     companyname = await storage.getcompanyname();
     mobileno = await storage.getcontactno();
-    _textcontroller.text = currency;
-    _companycontroller.text = companyname;
-    _mobilenocontroller.text = mobileno;
+    _textcontroller.text = currency!;
+    _companycontroller.text = companyname!;
+    _mobilenocontroller.text = mobileno!;
     super.didChangeDependencies();
   }
 
@@ -68,7 +68,7 @@ class _SettingScreenState extends State<SettingScreen> {
                             labelText: 'Company Name',
                           ),
                           onSaved: (value) {
-                            _companycontroller.text = value;
+                            _companycontroller.text = value!;
                             setState(() {});
                           },
                         ),
@@ -78,7 +78,7 @@ class _SettingScreenState extends State<SettingScreen> {
                             labelText: 'Contact Number',
                           ),
                           onSaved: (value) {
-                            _mobilenocontroller.text = value;
+                            _mobilenocontroller.text = value!;
                             setState(() {});
                           },
                         ),
@@ -88,7 +88,7 @@ class _SettingScreenState extends State<SettingScreen> {
                             labelText: 'Currency',
                           ),
                           onSaved: (value) {
-                            _textcontroller.text = value;
+                            _textcontroller.text = value!;
                             setState(() {});
                           },
                         ),
@@ -104,12 +104,12 @@ class _SettingScreenState extends State<SettingScreen> {
                     ),
                   ),
                   onPressed: () {
-                    _frm.currentState.save();
+                    _frm.currentState!.save();
                     storage.savecurrency(_textcontroller.text);
                     storage.savecompanyname(_companycontroller.text);
                     storage.savecontactnumber(_mobilenocontroller.text);
                     setState(() {});
-                    _scafkey.currentState.showSnackBar(
+                    _scafkey.currentState!.showSnackBar(
                         SnackBar(content: Text('Saved Succesfully..!')));
                   },
                 ),

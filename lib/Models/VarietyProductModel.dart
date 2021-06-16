@@ -7,20 +7,20 @@ part 'VarietyProductModel.g.dart';
 @HiveType(typeId: 1)
 class VarietyProductM extends HiveObject {
   @HiveField(0)
-  final String productid;
+  final String? productid;
   @HiveField(1)
-  final String id;
+  final String? id;
   @HiveField(2)
-  String varityname;
+  String? varityname;
   @HiveField(3)
-  double price;
+  double? price;
   @HiveField(4)
-  double wsp;
+  double? wsp;
 
   VarietyProductM({
-    @required this.productid,
-    @required this.id,
-    @required this.varityname,
+    required this.productid,
+    required this.id,
+    required this.varityname,
     this.price = 0,
     this.wsp = 0,
   });

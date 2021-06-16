@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
 // import 'package:provider/provider.dart';
 import '../Models/CategoryModel.dart';
@@ -6,55 +7,48 @@ import 'package:hive/hive.dart';
 
 class CategoryData with ChangeNotifier {
   List<CategoryModel> _items = [];
-  Box<CategoryModel> _dbbox;
+  Box<CategoryModel>? _dbbox;
 
-  CategoryData(Box<CategoryModel> db) {
+  CategoryData(Box<CategoryModel>? db) {
     _dbbox = db;
-    _items = [..._dbbox.values];
+    _items = [..._dbbox!.values];
   }
-  List<CategoryModel> get items {
-    return [..._items];
-  }
+  List<CategoryModel> get items => [..._items];
 
-  List<String> itemid() {
-    List<String> _val = [];
+  List<String?> itemid() {
+    List<String?> _val = [];
     for (CategoryModel i in _items) {
       _val.add(i.id);
     }
     return _val;
   }
 
-  void delete(String catid) {
+  void delete(String? catid) {
     _items.removeWhere((ele) => ele.id == catid);
-    // DBHelper.delete('catdata', catid);
-    _dbbox.delete(catid);
+    _dbbox!.delete(catid);
   }
 
   void deleteall() {
     _items = [];
-    // DBHelper.deleteall('catdata');
-    _dbbox.deleteAll(_dbbox.keys);
+    _dbbox!.deleteAll(_dbbox!.keys);
     return null;
   }
 
-  String findcategorynamebyid(String id) {
+  String? findcategorynamebyid(String id) {
     return _items.firstWhere((element) => element.id == id).name;
   }
 
-  List<String> findcategorylist(List categorylist) {
+  List<String> findcategorylist(List<String?>? categorylist) {
     List<String> _lst = [];
-    String s;
+    String? s;
     categorylist == null ? categorylist = [] : categorylist
       ..remove('');
     if (categorylist.length > 0) {
-      for (String i in categorylist) {
+      for (String? i in categorylist) {
         if (i == 'otherid') {
           s = null;
         } else {
-          s = _items
-                  .firstWhere((cat) => cat.id == i, orElse: () => null)
-                  ?.name ??
-              '';
+          s = _items.firstWhereOrNull((cat) => cat.id == i)?.name ?? '';
         }
         s == null ? _lst = [] : _lst.add(s);
       }
@@ -65,15 +59,13 @@ class CategoryData with ChangeNotifier {
   }
 
   List<String> catnamelist() {
-    List<String> catnamelist = [];
-    for (var i in items) {
-      catnamelist.add(i.name);
-    }
-    return catnamelist;
+    List<String?> catnamelist = items.map((e) => e.name).toList();
+    catnamelist.removeWhere((e) => e == null);
+    return catnamelist as List<String>;
   }
 
-  List<String> findidlist(List<String> namelist) {
-    List<String> lst = [];
+  List<String?> findidlist(List<String> namelist) {
+    List<String?> lst = [];
     List<CategoryModel> modlist = [];
     for (String i in namelist) {
       modlist.addAll(_items.where((element) => element.name == i));
@@ -84,10 +76,10 @@ class CategoryData with ChangeNotifier {
     return lst;
   }
 
-  List<String> findcategoryidlist(List categoryvaluelist) {
+  List<String> findcategoryidlist(List<String?> categoryvaluelist) {
     List _lst = [];
-    for (var i in categoryvaluelist) {
-      String s = _items.firstWhere((cat) => cat.name == i).id;
+    for (String? i in categoryvaluelist) {
+      String? s = _items.firstWhere((cat) => cat.name == i).id;
       s == null ? _lst = [] : _lst.add(s);
     }
     return [..._lst];
@@ -95,12 +87,8 @@ class CategoryData with ChangeNotifier {
 
   void addallcategory(List<CategoryModel> list) {
     for (CategoryModel i in list) {
-      // DBHelper.insert('catdata', {
-      //   'id': i.id,
-      //   'name': i.name,
-      // });
       _items.add(i);
-      _dbbox.put(i.id.toString(), i);
+      _dbbox!.put(i.id.toString(), i);
     }
     notifyListeners();
   }
@@ -108,28 +96,17 @@ class CategoryData with ChangeNotifier {
   void addcategory(String categoryname) {
     String _id = UniqueKey().toString();
     final newcat = CategoryModel(id: _id, name: categoryname);
-    // DBHelper.insert('catdata', {
-    //   'id': _id,
-    //   'name': categoryname,
-    // });
-    _dbbox.put(newcat.id.toString(), newcat);
+    _dbbox!.put(newcat.id.toString(), newcat);
     _items.add(newcat);
   }
 
   Future<void> fetchcategory() async {
-    if (_dbbox.keys.length == 0) {
+    if (_dbbox!.keys.length == 0) {
       final dataList = await DBHelper.getData('catdata');
       _items = dataList
-          .map(
-            (item) => CategoryModel(
-              id: item['id'],
-              name: item['name'],
-            ),
-          )
+          .map((item) => CategoryModel(id: item['id'], name: item['name']))
           .toList();
-      _items.forEach((e) {
-        _dbbox.put(e.id.toString(), e);
-      });
+      _items.forEach((e) => _dbbox!.put(e.id.toString(), e));
     }
     _items = [];
     _items = [...(_dbbox?.values ?? [])];

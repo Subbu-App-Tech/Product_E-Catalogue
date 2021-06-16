@@ -15,7 +15,7 @@ class FavProductsList extends StatefulWidget {
 class _FavProductsListState extends State<FavProductsList> {
   TextEditingController controller = new TextEditingController();
   bool issortname = false;
-  String filter;
+  String? filter;
   bool issortprice = false;
   bool issortrank = false;
   @override
@@ -38,36 +38,36 @@ class _FavProductsListState extends State<FavProductsList> {
   Widget build(BuildContext context) {
     final varietypricerange = Provider.of<VarietyData>(context).minmaxvalue;
     // List<ProductModel> productlist = Provider.of<ProductData>(context).;
-    List<ProductModel> productlist =
+    List<ProductModel?> productlist =
         Provider.of<ProductData>(context).favoriteItems;
     // favproducts = favproductlist;
-    void sortbyname(List<ProductModel> list) {
+    void sortbyname(List<ProductModel?> list) {
       list
         ..sort((a, b) => issortname
-            ? b.name.toLowerCase().compareTo(a.name.toLowerCase())
-            : a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+            ? b!.name!.toLowerCase().compareTo(a!.name!.toLowerCase())
+            : a!.name!.toLowerCase().compareTo(b!.name!.toLowerCase()));
       issortname = !issortname;
       setState(() {});
     }
 
-    void sortbyprice(List<ProductModel> list) {
+    void sortbyprice(List<ProductModel?> list) {
       list
         ..sort((a, b) => issortprice
-            ? varietypricerange(b.id)[0].compareTo(varietypricerange(a.id)[0])
-            : varietypricerange(a.id)[0].compareTo(varietypricerange(b.id)[0]));
+            ? varietypricerange(b!.id)![0].compareTo(varietypricerange(a!.id)![0])
+            : varietypricerange(a!.id)![0].compareTo(varietypricerange(b!.id)![0]));
       issortprice = !issortprice;
       setState(() {});
     }
 
-    void sortbyrank(List<ProductModel> list) {
+    void sortbyrank(List<ProductModel?> list) {
       list
         ..sort((a, b) =>
-            issortrank ? (b.rank).compareTo(a.rank) : a.rank.compareTo(b.rank));
+            issortrank ? b!.rank!.compareTo(a!.rank!) : a!.rank!.compareTo(b!.rank!));
       issortrank = !issortrank;
       setState(() {});
     }
 
-    void sortbottomsheet(BuildContext context, List<ProductModel> productlist) {
+    void sortbottomsheet(BuildContext context, List<ProductModel?> productlist) {
       showModalBottomSheet(
           context: context,
           builder: (_) {
@@ -183,10 +183,10 @@ class _FavProductsListState extends State<FavProductsList> {
                           itemBuilder: (ctx, index) =>
                           filter == null || filter == ''
                                     ? ProductListBox(product:productlist[index])
-                                    : productlist[index]
-                                            .name
+                                    : productlist[index]!
+                                            .name!
                                             .toLowerCase()
-                                            .contains(filter.toLowerCase())
+                                            .contains(filter!.toLowerCase())
                                         ? ProductListBox(product:productlist[index])
                                         : SizedBox.shrink(),
                               // ProductListBox(productlist[index]),

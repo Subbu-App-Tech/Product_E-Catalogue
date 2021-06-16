@@ -7,18 +7,13 @@ import '../Provider/CategoryDataP.dart';
 import '../Provider/VarietyDataP.dart';
 import '../Provider/ProductDataP.dart';
 import 'dart:io';
-import 'package:carousel_pro/carousel_pro.dart';
-import '../main.dart';
+// import 'package:carousel_pro/carousel_pro.dart';
+import '../Widgets/Group/carousel_pro/carousel_pro.dart';
+import '../Home.dart';
 import '../Models/SecureStorage.dart';
 import 'package:wc_flutter_share/wc_flutter_share.dart';
 import '../Pdf/PdfTools.dart';
 import 'dart:typed_data';
-// import 'package:firebase_admob/firebase_admob.dart';
-import 'package:flutter_native_admob/native_admob_options.dart';
-import 'dart:async';
-import 'package:flutter_native_admob/flutter_native_admob.dart' as ad;
-import 'package:flutter_native_admob/native_admob_controller.dart';
-import 'package:toast/toast.dart';
 
 class ProductDetailsW extends StatefulWidget {
   final ProductModel product;
@@ -30,17 +25,17 @@ class ProductDetailsW extends StatefulWidget {
 
 class _ProductDetailsWState extends State<ProductDetailsW> {
   List<String> categorylist = [];
-  bool _sortAsc;
-  List<VarietyProductM> selectedvariety;
+  bool? _sortAsc;
+  late List<VarietyProductM> selectedvariety;
   List<VarietyProductM> varietylist = [];
-  int _sortColumnIndex;
-  bool _sortnameAsc;
-  bool _sortpriceAsc;
-  bool _sortwspAsc;
+  int? _sortColumnIndex;
+  bool? _sortnameAsc;
+  bool? _sortpriceAsc;
+  bool? _sortwspAsc;
   SecureStorage storage = SecureStorage();
-  String currency;
-  String varietydetails;
-  String text;
+  String? currency;
+  String? varietydetails;
+  String? text;
 
   @override
   void initState() {
@@ -52,27 +47,27 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
     _sortnameAsc = false;
     _sortwspAsc = false;
     currencyset();
-    _subscription = _nativeAdController.stateChanged.listen(_onStateChanged);
-    _nativeAdController.setAdUnitID(_adUnitID, numberAds: 2);
+    // _subscription = _nativeAdController.stateChanged.listen(_onStateChanged);
+    // _nativeAdController.setAdUnitID(_adUnitID, numberAds: 2);
     super.initState();
   }
 
-  void _onStateChanged(AdLoadState state) {
-    switch (state) {
-      case AdLoadState.loading:
-        setState(() {
-          _height = 0;
-        });
-        break;
-      case AdLoadState.loadCompleted:
-        setState(() {
-          _height = 125;
-        });
-        break;
-      default:
-        break;
-    }
-  }
+  // void _onStateChanged(AdLoadState state) {
+  //   switch (state) {
+  //     case AdLoadState.loading:
+  //       setState(() {
+  //         _height = 0;
+  //       });
+  //       break;
+  //     case AdLoadState.loadCompleted:
+  //       setState(() {
+  //         _height = 125;
+  //       });
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // }
 
   @override
   void didChangeDependencies() async {
@@ -82,49 +77,99 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
       categorylist = Provider.of<CategoryData>(context)
           .findcategorylist(widget.product.categorylist);
     }
-    varietylist =
-        Provider.of<VarietyData>(context).findbyid(widget.product?.id);
+    varietylist = Provider.of<VarietyData>(context).findbyid(widget.product.id);
     varietydetails =
-        Provider.of<VarietyData>(context).vartext(widget.product?.id);
+        Provider.of<VarietyData>(context).vartext(widget.product.id);
     currency = await storage.getcurrency();
     super.didChangeDependencies();
   }
 
   @override
   void dispose() {
-    _subscription.cancel();
-    _nativeAdController.dispose();
+    // _subscription.cancel();
+    // _nativeAdController.dispose();
     super.dispose();
   }
 
   static const _adUnitID = "ca-app-pub-9568938816087708/6044993041";
-  final _nativeAdController = NativeAdmobController();
-  double _height = 0;
-  StreamSubscription _subscription;
+  // final _nativeAdController = NativeAdmobController();
+  // double _height = 0;
+  // late StreamSubscription _subscription;
 
-  Widget get adwidget {
-    return Card(
-      child: Container(
-        height: _height,
-        padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-        child: ad.NativeAdmob(
-            adUnitID: _adUnitID,
-            error: Text('Error'),
-            numberAds: 2,
-            type: ad.NativeAdmobType.full,
-            controller: _nativeAdController,
-            options: NativeAdmobOptions(
-                priceTextStyle:
-                    NativeTextStyle(fontSize: 15, color: Colors.red),
-                bodyTextStyle:
-                    NativeTextStyle(fontSize: 14, color: Colors.black)),
-            loading: Text('Loading')),
-      ),
+  // Widget get adwidget {
+  //   return Card(
+  //     child: Container(
+  //       height: _height,
+  //       padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+  //       child: ad.NativeAdmob(
+  //           adUnitID: _adUnitID,
+  //           error: Text('Error'),
+  //           numberAds: 2,
+  //           type: ad.NativeAdmobType.full,
+  //           controller: _nativeAdController,
+  //           options: NativeAdmobOptions(
+  //               priceTextStyle:
+  //                   NativeTextStyle(fontSize: 15, color: Colors.red),
+  //               bodyTextStyle:
+  //                   NativeTextStyle(fontSize: 14, color: Colors.black)),
+  //           loading: Text('Loading')),
+  //     ),
+  //   );
+  // }
+
+  void currencyset() async => currency = await storage.getcurrency();
+  List<FileImage>? images = [];
+  Widget imageWid() {
+    return Carousel(
+        images: images,
+        dotSize: 4.0,
+        dotSpacing: 15.0,
+        dotColor: Colors.white,
+        indicatorBgPadding: 5.0,
+        dotBgColor: Colors.black12.withOpacity(0.1),
+        borderRadius: true,
+        boxFit: BoxFit.contain);
+  }
+
+  Widget imageDetails() {
+    images = imagefilelist(widget.product.imagepathlist?.cast<String>() ?? []);
+    return InkWell(
+      child: Hero(tag: '${widget.product.id}', child: imageWid()),
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ImageFullView(
+                    images: images ?? [], tag: '${widget.product.id}')));
+      },
     );
   }
 
-  void currencyset() async {
-    currency = await storage.getcurrency();
+  List<String> validimagepath(List<String> pathlist) {
+    List<String> valid = [];
+    for (String i in pathlist) {
+      if (File(i).existsSync()) {
+        valid.add(i);
+      }
+    }
+    return valid;
+  }
+
+  bool checkimagepath(List<String> imagelist) {
+    if (imagelist.length > 0) {
+      if (validimagepath(imagelist).length > 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  List<FileImage> imagefilelist(List<String> pathlist) {
+    List<FileImage> image = [];
+    for (String i in validimagepath(pathlist)) {
+      image.add(FileImage(File(i)));
+    }
+    return image;
   }
 
   @override
@@ -133,45 +178,13 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
     final varietypricerange =
         Provider.of<VarietyData>(context).minmaxvalue(widget.product.id);
 
-    List<String> validimagepath(List<String> pathlist) {
-      List<String> valid = [];
-      for (String i in pathlist) {
-        if (File(i).existsSync()) {
-          valid.add(i);
-        }
-      }
-      return valid;
-    }
-
-    bool checkimagepath(List<String> imagelist) {
-      if (imagelist == null) {
-        return false;
-      } else {
-        if (imagelist.length > 0) {
-          if (validimagepath(imagelist).length > 0) {
-            return true;
-          }
-        }
-        return false;
-      }
-    }
-
-    List imagefilelist(List<String> pathlist) {
-      List image = [];
-      for (String i in validimagepath(pathlist)) {
-        image.add(FileImage(File(i)));
-      }
-      return image;
-    }
-
     List<Widget> catlist(List list) {
       List<Widget> widlist = [];
-      for (String i in list) {
+      for (String i in list as Iterable<String>) {
         widlist.add(Container(
-          child: Text(i ?? ''),
-          padding: EdgeInsets.all(7),
-          color: Colors.lightBlue[300]
-        ));
+            child: Text(i),
+            padding: EdgeInsets.all(7),
+            color: Colors.lightBlue[300]));
       }
       return widlist;
     }
@@ -184,9 +197,9 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
         _sortColumnIndex = columnIndex;
         _sortAsc = _sortnameAsc;
       }
-      list.sort((a, b) => _sortAsc
-          ? b.varityname.compareTo(a.varityname)
-          : a.varityname.compareTo(b.varityname));
+      list.sort((a, b) => _sortAsc!
+          ? b.varityname!.compareTo(a.varityname!)
+          : a.varityname!.compareTo(b.varityname!));
       setState(() {});
     }
 
@@ -198,8 +211,9 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
         _sortColumnIndex = columnIndex;
         _sortAsc = _sortpriceAsc;
       }
-      list.sort((a, b) =>
-          _sortAsc ? b.price.compareTo(a.price) : a.price.compareTo(b.price));
+      list.sort((a, b) => _sortAsc!
+          ? b.price!.compareTo(a.price!)
+          : a.price!.compareTo(b.price!));
       setState(() {});
     }
 
@@ -212,7 +226,7 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
         _sortAsc = _sortwspAsc;
       }
       list.sort((a, b) =>
-          _sortAsc ? b.wsp.compareTo(a.price) : a.wsp.compareTo(b.price));
+          _sortAsc! ? b.wsp!.compareTo(a.price!) : a.wsp!.compareTo(b.price!));
       setState(() {});
     }
 
@@ -222,7 +236,7 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
         rowlist.add(DataRow(selected: selectedvariety.contains(i), cells: [
           DataCell(Text(i.varityname ?? '')),
           DataCell(Text((i.price ?? 0).toString())),
-          DataCell(Text((i?.wsp ?? 0).toString()))
+          DataCell(Text((i.wsp ?? 0).toString()))
         ]));
       }
       return rowlist;
@@ -230,12 +244,11 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
 
     Widget _deleteconfirmation(BuildContext context) {
       return AlertDialog(
-        title: Text(
-          'Do You Want to Delete this Product ?',
-          textAlign: TextAlign.center,
-        ),
+        title: Text('Do You Want to Delete this Product ?',
+            textAlign: TextAlign.center),
         content: Text('Note: You can\'t redo it'),
         actions: [
+          // ignore: deprecated_member_use
           RaisedButton(
             child: Text('Delete Data', style: TextStyle(color: Colors.white)),
             color: Colors.red,
@@ -252,6 +265,7 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
               //     context, ModalRoute.withName(Tabscreenwithdata.routeName));
             },
           ),
+          // ignore: deprecated_member_use
           RaisedButton(
             child: Text('Back'),
             color: Colors.blueAccent,
@@ -264,7 +278,7 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
     }
 
     if (widget.product.description == null ||
-        widget.product.description.trim() == '') {
+        widget.product.description!.trim() == '') {
       text = '''
 ${widget.product.name}
 
@@ -284,35 +298,35 @@ Created with Product E-Catalogue App''';
     }
 
     void _shareImageAndText() async {
-      try {
-        Uint8List bytes;
-        if (pdftool.checkimagepath(
-            widget.product.imagepathlist?.cast<String>() ?? [])) {
-          bytes = await File(
-                  '${pdftool.validimagepath(widget.product.imagepathlist).first}')
-              .readAsBytes();
-          String ext = pdftool
-              .validimagepath(widget.product.imagepathlist.cast<String>())[0]
-              .split('.')
-              .last;
-          await WcFlutterShare.share(
-              sharePopupTitle: 'share',
-              subject: '${widget.product.name}',
-              text: text,
-              fileName: '${widget.product.name}.png',
-              mimeType: 'image/$ext',
-              bytesOfFile: bytes.buffer.asUint8List());
-        } else {
-          await WcFlutterShare.share(
-              sharePopupTitle: 'share',
-              subject: '${widget.product.name}',
-              text: text,
-              mimeType: 'text/plain');
-        }
-      } catch (e) {
-        // print('error: $e');
-        Toast.show('Error Occurs :: $e', context);
+      // try {
+      Uint8List bytes;
+      if (pdftool
+          .checkimagepath(widget.product.imagepathlist?.cast<String>() ?? [])) {
+        bytes = await File(
+                pdftool.validimagepath(widget.product.imagepathlist).first)
+            .readAsBytes();
+        String ext = pdftool
+            .validimagepath(widget.product.imagepathlist!.cast<String>())[0]
+            .split('.')
+            .last;
+        await WcFlutterShare.share(
+            sharePopupTitle: 'share',
+            subject: '${widget.product.name}',
+            text: text,
+            fileName: '${widget.product.name}.png',
+            mimeType: 'image/$ext',
+            bytesOfFile: bytes.buffer.asUint8List());
+      } else {
+        await WcFlutterShare.share(
+            sharePopupTitle: 'share',
+            subject: '${widget.product.name}',
+            text: text,
+            mimeType: 'text/plain');
       }
+      // } catch (e) {
+      //   // print('error: $e');
+      //   Toast.show('Error Occurs :: $e', context);
+      // }
     }
 
     currency = currency ?? '';
@@ -330,20 +344,9 @@ Created with Product E-Catalogue App''';
                       width: double.infinity,
                       padding: EdgeInsets.all(8),
                       child: checkimagepath(
-                              widget.product?.imagepathlist?.cast<String>() ??
+                              widget.product.imagepathlist?.cast<String>() ??
                                   [])
-                          ? Carousel(
-                              images: imagefilelist(widget.product.imagepathlist
-                                      ?.cast<String>() ??
-                                  []),
-                              dotSize: 4.0,
-                              dotSpacing: 15.0,
-                              dotColor: Colors.white,
-                              indicatorBgPadding: 5.0,
-                              dotBgColor: Colors.black26,
-                              borderRadius: true,
-                              boxFit: BoxFit.contain,
-                            )
+                          ? imageDetails()
                           : Center(
                               child: Container(
                               height: 240,
@@ -365,7 +368,7 @@ Created with Product E-Catalogue App''';
                         splashColor: Colors.red,
                         elevation: 7,
                         shape: CircleBorder(),
-                        child: (widget?.product?.favourite ?? false)
+                        child: (widget.product.favourite ?? false)
                             ? Icon(Icons.favorite, color: Colors.red, size: 30)
                             : Icon(Icons.favorite_border, size: 30),
                         fillColor: Colors.white,
@@ -408,7 +411,8 @@ Created with Product E-Catalogue App''';
                             fontWeight: FontWeight.bold, fontSize: 25),
                       )
                     : Text(
-                        '$currency ${varietypricerange[0].toStringAsFixed(2)} - ${varietypricerange[1].toStringAsFixed(2)}',
+                        '$currency ${varietypricerange[0].toStringAsFixed(2)} - '
+                        '${varietypricerange[1].toStringAsFixed(2)}',
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 25),
                       ),
@@ -490,7 +494,7 @@ Created with Product E-Catalogue App''';
                             headingRowHeight: 50,
                             columnSpacing: 40,
                             dataRowHeight: 40,
-                            sortAscending: _sortAsc,
+                            sortAscending: _sortAsc!,
                             sortColumnIndex: _sortColumnIndex,
                             columns: [
                               DataColumn(
@@ -526,7 +530,7 @@ Created with Product E-Catalogue App''';
                 ? SizedBox(
                     height: 0.1,
                   )
-                : (widget.product.description.isEmpty)
+                : (widget.product.description!.isEmpty)
                     ? SizedBox(
                         height: 0.1,
                       )
@@ -548,13 +552,13 @@ Created with Product E-Catalogue App''';
                               width: double.infinity,
                               padding: EdgeInsets.all(15),
                               child: Text(
-                                (widget.product.description),
+                                widget.product.description!,
                                 textAlign: TextAlign.left,
                               ))
                         ],
                       ),
             SizedBox(height: 50),
-            adwidget,
+            // adwidget,
             SizedBox(height: 50),
             Container(
                 child: Text('Rank: ${widget.product.rank}',
@@ -610,5 +614,30 @@ Created with Product E-Catalogue App''';
         ),
       ),
     );
+  }
+}
+
+class ImageFullView extends StatelessWidget {
+  final List<FileImage> images;
+  final String tag;
+  const ImageFullView({Key? key, required this.tag, required this.images})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: InkWell(
+            child: Hero(
+                tag: tag,
+                child: Carousel(
+                    images: images,
+                    dotSize: 4.0,
+                    dotSpacing: 15.0,
+                    dotColor: Colors.white,
+                    indicatorBgPadding: 5.0,
+                    dotBgColor: Colors.black12.withOpacity(0.1),
+                    borderRadius: true,
+                    boxFit: BoxFit.contain)),
+            onTap: () => Navigator.pop(context)));
   }
 }

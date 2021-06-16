@@ -1,3 +1,4 @@
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:io';
@@ -5,23 +6,41 @@ import '../Models/ProductModel.dart';
 import '../Models/VarietyProductModel.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:ext_storage/ext_storage.dart';
+import 'package:external_path/external_path.dart';
 import 'package:flutter/services.dart';
 
 class ProcuctbasedModel {
-  String basedon;
-  List<ProductModel> productlist;
+  String? basedon;
+  List<ProductModel?>? productlist;
   ProcuctbasedModel({this.basedon, this.productlist});
 }
 
 class Pdftools {
+  static Future createInterstitialAd() async {
+    InterstitialAd? _interstitialAd;
+    await InterstitialAd.load(
+        adUnitId: InterstitialAd.testAdUnitId,
+        // adUnitId: 'ca-app-pub-9568938816087708/7976666598',
+        request: AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (InterstitialAd ad) async => await ad.show(),
+          onAdFailedToLoad: (LoadAdError error) {},
+        ));
+    if (_interstitialAd == null) {
+      print('Warning: attempt to show interstitial before loaded.');
+      return;
+    }
+  }
+
   pw.Widget buildFooter(
-      {pw.Context context, String companyname, String contactno}) {
+      {pw.Context? context, String? companyname, String? contactno}) {
     return pw.Container(
         padding: pw.EdgeInsets.all(5),
         color: PdfColors.blue,
         width: double.infinity,
-        foregroundDecoration: pw.BoxDecoration(borderRadius: 7),
+        foregroundDecoration: pw.BoxDecoration(
+          borderRadius: pw.BorderRadius.all(pw.Radius.circular(7)),
+        ),
         alignment: pw.Alignment.center,
         child: pw.Row(
             mainAxisSize: pw.MainAxisSize.max,
@@ -49,7 +68,9 @@ class Pdftools {
   pw.Widget buildHeader(String header, PdfImage logoimage) {
     return pw.Column(children: [
       pw.Container(
-          foregroundDecoration: pw.BoxDecoration(borderRadius: 7),
+          foregroundDecoration: pw.BoxDecoration(
+            borderRadius: pw.BorderRadius.all(pw.Radius.circular(7)),
+          ),
           padding: pw.EdgeInsets.all(15),
           alignment: pw.Alignment.center,
           color: PdfColors.blue,
@@ -65,7 +86,9 @@ class Pdftools {
                                 fontSize: 20,
                                 fontWeight: pw.FontWeight.bold)))),
                 (pw.Container(
-                    height: 40, width: 100, child: pw.Image(logoimage)))
+                    height: 40,
+                    width: 100,
+                    child: pw.Image(pw.ImageProxy(logoimage))))
               ],
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               mainAxisAlignment: pw.MainAxisAlignment.center)),
@@ -73,40 +96,34 @@ class Pdftools {
     ]);
   }
 
-  List<String> validimagepath(List<String> pathlist) {
+  List<String> validimagepath(List<String>? pathlist) {
     List<String> valid = [];
-    for (String i in pathlist) {
-      if (File(i).existsSync()) {
-        valid.add(i);
-      }
+    for (String i in (pathlist ?? [])) {
+      if (File(i).existsSync()) valid.add(i);
     }
     return valid;
   }
 
   bool checkimagepath(List<String> imagelist) {
-    if (imagelist == null || imagelist.length == 0) {
-      return false;
-    } else {
-      if (imagelist.length > 0) {
-        if (validimagepath(imagelist).length > 0) {
-          return true;
-        } else {
-          return false;
-        }
+    if (imagelist.length > 0) {
+      if (validimagepath(imagelist).length > 0) {
+        return true;
+      } else {
+        return false;
       }
-      return false;
     }
+    return false;
   }
 
   pw.Widget varietytable(
-      String productid,
+      String? productid,
       Function findvardatas,
       String currency,
       double tableonewidth,
       double tabletwowidth,
       int maxlistlen) {
-    String val;
-    List<VarietyProductM> varietylist;
+    String? val;
+    List<VarietyProductM>? varietylist;
     if (currency != '') {
       val = 'Price';
     } else {
@@ -114,19 +131,19 @@ class Pdftools {
     }
     final tableHeaders = ['Varietes', '$val'];
     varietylist = findvardatas(productid);
-    if (varietylist.length > maxlistlen) {
+    if (varietylist!.length > maxlistlen) {
       varietylist = varietylist.sublist(0, maxlistlen);
     }
     return pw.Table.fromTextArray(
         cellPadding: pw.EdgeInsets.all(2),
         border: pw.TableBorder(
-            color: PdfColors.grey200,
-            horizontalInside: false,
-            bottom: false,
-            left: false,
-            right: false,
-            verticalInside: true,
-            top: false),
+            // color: PdfColors.grey200,
+            horizontalInside: pw.BorderSide.none,
+            bottom: pw.BorderSide.none,
+            left: pw.BorderSide.none,
+            right: pw.BorderSide.none,
+            verticalInside: pw.BorderSide(),
+            top: pw.BorderSide.none),
         headerCount: 1,
         headers: List<String>.generate(
           tableHeaders.length,
@@ -138,7 +155,7 @@ class Pdftools {
             tableHeaders.length,
             (col) {
               // print(varietylist[row].varityname);
-              return varietylist[row].getIndex(col);
+              return varietylist![row].getIndex(col);
             },
           ),
         ),
@@ -170,8 +187,10 @@ class Pdftools {
   Future<void> download(BuildContext context, SnackBar snackBar,
       GlobalKey<ScaffoldState> _scaffoldkey) async {
     if (await Permission.storage.request().isGranted) {
-      var dir = await ExtStorage.getExternalStoragePublicDirectory(
-          ExtStorage.DIRECTORY_DOWNLOADS);
+      // var dir = await ExtStorage.getExternalStoragePublicDirectory(
+      // ExtStorage.DIRECTORY_DOWNLOADS);
+      var dir = await ExternalPath.getExternalStoragePublicDirectory(
+          ExternalPath.DIRECTORY_DOWNLOADS);
       File file = await new File("$dir/ProductDataTemplate.csv")
           .create(recursive: true);
       var isExist = await file.exists();
@@ -179,12 +198,12 @@ class Pdftools {
         snackBar = SnackBar(
             content:
                 Text('Template Downloaded Succesfully in Download folder..!'));
-        _scaffoldkey.currentState.showSnackBar(snackBar);
+        _scaffoldkey.currentState!.showSnackBar(snackBar);
         // return
       } else {
         snackBar =
             SnackBar(content: Text('Sorry, Error in Template Downloaded..!'));
-        _scaffoldkey.currentState.showSnackBar(snackBar);
+        _scaffoldkey.currentState!.showSnackBar(snackBar);
       }
     }
   }
@@ -194,8 +213,7 @@ class Pdftools {
         buildBackground: (pw.Context context) {
           return pw.FullPage(
             ignoreMargins: true,
-            child: pw.Watermark.text(
-                ispaid ? '' : 'Product E-Catalogue',
+            child: pw.Watermark.text(ispaid ? '' : 'Product E-Catalogue',
                 fit: pw.BoxFit.contain,
                 style: pw.TextStyle(
                     fontSize: 40,
@@ -228,22 +246,23 @@ class Pdftools {
             await rootBundle.load("assets/Open_Sans/OpenSans-Italic.ttf")));
   }
 
-  List<ProductModel> sortedlist(
-      {List<ProductModel> list, String type, Function functofindvarietycount}) {
-    if (type == 'rank') {
-      return list..sort((a, b) => a.rank.compareTo(b.rank));
+  List<ProductModel?>? sortedlist(
+      {List<ProductModel?>? list,
+      String? type,
+      Function? functofindvarietycount}) {
+    if (list != null) if (type == 'rank') {
+      return list..sort((a, b) => a!.rank!.compareTo(b!.rank!));
     } else if (type == 'variety') {
       return list
-        ..sort((a, b) => functofindvarietycount(a.id)
-            .compareTo(functofindvarietycount(b.id)));
+        ..sort((a, b) => functofindvarietycount!(a!.id)
+            .compareTo(functofindvarietycount(b!.id)));
     } else if (type == 'name') {
       return list
-        ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+        ..sort(
+            (a, b) => a!.name!.toLowerCase().compareTo(b!.name!.toLowerCase()));
     } else if (type == 'none') {
       return list;
     }
     return [];
   }
 }
-
-

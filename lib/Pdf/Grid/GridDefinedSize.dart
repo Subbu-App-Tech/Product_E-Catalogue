@@ -13,46 +13,26 @@ import 'dart:async';
 import 'dart:typed_data';
 import '../../Provider/VarietyDataP.dart';
 import '../PdfTools.dart';
-import 'package:flutter_plugin_pdf_viewer/flutter_plugin_pdf_viewer.dart';
+import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
 import '../../Auth/ViewAdtoDownload.dart';
 import '../../Models/SecureStorage.dart';
-import 'package:firebase_admob/firebase_admob.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class PDFGriddefinedsize extends StatefulWidget {
   static const routeName = '/PDFGriddefinedsize';
-  const PDFGriddefinedsize({Key key}) : super(key: key);
+  const PDFGriddefinedsize({Key? key}) : super(key: key);
 
   @override
   _PDFGriddefinedsizeState createState() => _PDFGriddefinedsizeState();
 }
 
 class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
-    @override
-  void initState() {
-    super.initState();
-    FirebaseAdMob.instance.initialize(appId: 'ca-app-pub-9568938816087708~5406343573');
-  }
-
   @override
-  void dispose() {
-    _interstitialAd?.dispose();
-    super.dispose();
-  }
-
-  MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
-    childDirected: true,
-    nonPersonalizedAds: true,
-    // testDevices: ['70986832EA2D276F6277A5461962A4EC'],
-  );
-  InterstitialAd _interstitialAd;
-  InterstitialAd createInterstitialAd() {
-    return InterstitialAd(
-      adUnitId: 'ca-app-pub-9568938816087708/7976666598',
-      targetingInfo: targetingInfo,
-      listener: (MobileAdEvent event) {
-        print("InterstitialAd event $event");
-      },
-    );
+  void initState() {
+    Pdftools.createInterstitialAd();
+    super.initState();
   }
 
   @override
@@ -69,14 +49,14 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
     List<Brandcount> uqbrand = Provider.of<ProductData>(context).uqbrand();
     SecureStorage storage = SecureStorage();
     String currency;
-    PDFDocument _pdfdoc;
-    List frowd = ModalRoute.of(context).settings.arguments as List;
+    late PDFDocument _pdfdoc;
+    List frowd = ModalRoute.of(context)!.settings.arguments as List;
     Function findvarcount = Provider.of<VarietyData>(context).findvarietycount;
     String input = frowd[0];
     String sortby = frowd[1];
     bool ispaid = frowd[2];
 
-    List<ProductModel> pm;
+    List<ProductModel?> pm;
     if (input == 'brand') {
       for (Brandcount i in uqbrand) {
         pm = Provider.of<ProductData>(context).productlistbybrandname(i.name);
@@ -94,7 +74,7 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
                 list: pm, functofindvarietycount: findvarcount, type: sortby)));
       }
     } else if (input == 'all') {
-      List<ProductModel> pm = Provider.of<ProductData>(context).items;
+      List<ProductModel?> pm = Provider.of<ProductData>(context).items;
       pbitems.add(ProcuctbasedModel(
           basedon: 'All Product',
           productlist: pdftool.sortedlist(
@@ -102,22 +82,19 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
     }
     String contactno;
     String companyname;
-    writeOnPdf() async {
+    Future writeOnPdf() async {
       currency = await storage.getcurrency();
       contactno = await storage.getcontactno();
       companyname = await storage.getcompanyname();
       String val = currency;
       ByteData bytes = await rootBundle.load('assets/productc.png');
       Uint8List logo = bytes.buffer.asUint8List();
-      PdfImage logoimage = PdfImage.file(
-        pdf.document,
-        bytes: logo,
-      );
+      PdfImage logoimage = PdfImage.file(pdf.document, bytes: logo);
 
       Future<pw.Widget> _list(ProductModel productdata) async {
-        final List<double> varietyrange = varietyrangefunc(productdata.id);
-        String priceA;
-        String priceB;
+        final List<double>? varietyrange = varietyrangefunc(productdata.id);
+        String? priceA;
+        String? priceB;
         if (varietyrange == null || varietyrange.length == 0) {
           priceA = '0';
           priceB = null;
@@ -128,9 +105,10 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
           priceA = varietyrange[0].toString();
           priceB = varietyrange[1].toString();
         }
-        if (pdftool.checkimagepath(productdata?.imagepathlist?.cast<String>()?? [])) {
+        if (pdftool
+            .checkimagepath(productdata.imagepathlist?.cast<String>() ?? [])) {
           list = await new File(
-                  '${pdftool.validimagepath(productdata?.imagepathlist?.cast<String>()?? [])[0]}')
+                  '${pdftool.validimagepath(productdata.imagepathlist?.cast<String>() ?? [])[0]}')
               .readAsBytes();
           image = PdfImage.file(
             pdf.document,
@@ -159,21 +137,18 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
                     width: 180,
                     height: 80,
                     foregroundDecoration: pw.BoxDecoration(
-                        borderRadius: 5,
-                        border: pw.BoxBorder(
-                            bottom: true,
-                            top: true,
-                            right: true,
-                            left: true,
-                            color: PdfColors.grey500)),
+                      borderRadius: pw.BorderRadius.all(pw.Radius.circular(5)),
+                      // border: pw.BoxBorder(
+                      //     bottom: true,
+                      //     top: true,
+                      //     right: true,
+                      //     left: true,
+                      //     color: PdfColors.grey500)
+                    ),
                     alignment: pw.Alignment.center,
                     padding: pw.EdgeInsets.all(1.5),
-                    child: pw.Image(
-                      image,
-                      fit: pw.BoxFit.contain,
-                      height: 80,
-                      width: 180,
-                    ),
+                    child: pw.Image(pw.ImageProxy(image),
+                        fit: pw.BoxFit.contain, height: 80, width: 180),
                   ),
                   pw.SizedBox(height: 0.5),
                   pw.Container(
@@ -255,20 +230,16 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
 
       for (ProcuctbasedModel i in pbitems) {
         List<pw.Widget> _listview = [];
-        for (ProductModel j in i.productlist) {
-          _listview.add(await _list(j));
+        for (ProductModel? j in i.productlist!) {
+          _listview.add(await _list(j!));
         }
         pdf.addPage(
           pw.MultiPage(
               pageTheme: await pdftool.pagetheam(3, ispaid),
-              // theme: await pdftool.theamdata(),
-              // pageFormat: PdfPageFormat.a4,
               crossAxisAlignment: pw.CrossAxisAlignment.center,
               maxPages: 200,
-              // margin: pw.EdgeInsets.all(3),
-              header: (pw.Context ctx) {
-                return pdftool.buildHeader(i.basedon, logoimage);
-              },
+              header: (pw.Context ctx) =>
+                  pdftool.buildHeader(i.basedon!, logoimage),
               footer: (pw.Context ctx) {
                 return pdftool.buildFooter(
                     context: ctx,
@@ -282,17 +253,12 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
     }
 
     Future savePdf() async {
-       await _interstitialAd?.dispose();
-      _interstitialAd = createInterstitialAd();
-      await _interstitialAd.load();
-      await _interstitialAd?.show();
-      await writeOnPdf();
       await writeOnPdf();
       Directory documentDirectory = await getApplicationDocumentsDirectory();
       String documentPath = documentDirectory.path;
       filepath = "$documentPath/ProductCatalogue1.pdf";
       File file = File(filepath);
-      file.writeAsBytesSync(pdf.save());
+      file.writeAsBytesSync(await pdf.save());
       _pdfdoc = await PDFDocument.fromFile(File(filepath));
     }
 
@@ -307,20 +273,16 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
                   IconButton(
                     icon: Icon(Icons.print),
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (ctx) => ViewAdToDownload(
-                                    filepath: filepath,ispaid: ispaid
-                                  )));
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (ctx) => ViewAdToDownload(
+                      //             filepath: filepath, ispaid: ispaid)));
                     },
                   )
                 ],
               ),
-              body: PDFViewer(
-                document: _pdfdoc,
-                showNavigation: true
-              ));
+              body: PDFViewer(document: _pdfdoc, showNavigation: true));
         } else {
           return Scaffold(
               body: Center(

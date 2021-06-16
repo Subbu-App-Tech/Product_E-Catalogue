@@ -6,9 +6,9 @@ part 'CategoryModel.g.dart';
 @HiveType(typeId: 3)
 class CategoryModel with ChangeNotifier {
   @HiveField(0)
-  final String id;
+  final String? id;
   @HiveField(1)
-  final String name;
+  final String? name;
   CategoryModel({
     this.id,
     this.name,
@@ -20,19 +20,19 @@ class CategoryModel with ChangeNotifier {
 }
 
 class Categorycount with ChangeNotifier {
-  final String id;
+  final String? id;
   final int count;
   Categorycount({
-    @required this.id,
-    @required this.count,
+    required this.id,
+    required this.count,
   });
 }
 
 class Brandcount with ChangeNotifier {
-  final String name;
+  final String? name;
   final int count;
   Brandcount({
-    @required this.name,
-    @required this.count,
+    required this.name,
+    required this.count,
   });
 }

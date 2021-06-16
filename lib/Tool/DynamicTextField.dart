@@ -6,7 +6,10 @@ class DynamicTextForm extends StatelessWidget {
   final VoidCallback delete;
   final GlobalKey<FormState> keyform;
   const DynamicTextForm(
-      {Key key, @required this.variety, @required this.delete, this.keyform})
+      {Key? key,
+      required this.variety,
+      required this.delete,
+      required this.keyform})
       : super(key: key);
 
   @override
@@ -14,15 +17,9 @@ class DynamicTextForm extends StatelessWidget {
     final TextEditingController ncont = TextEditingController();
     final TextEditingController pcont = TextEditingController();
     final TextEditingController qcont = TextEditingController();
-    if (this.variety.varityname != '') {
-      ncont.text = this.variety.varityname;
-    }
-    if (this.variety.price != 0) {
-      pcont.text = this.variety.price.toString();
-    }
-    if (this.variety.wsp != 0) {
-      qcont.text = this.variety.wsp.toString();
-    }
+    ncont.text = this.variety.varityname ?? '';
+    pcont.text = this.variety.price?.toString() ?? '0';
+    qcont.text = this.variety.wsp?.toString() ?? '0';
     return Row(
       children: [
         Expanded(
@@ -37,7 +34,7 @@ class DynamicTextForm extends StatelessWidget {
                       this.variety.updatename((val));
                     },
                     validator: (value) {
-                      if (value.isEmpty) {
+                      if (value!.isEmpty) {
                         return 'Please provide a value.';
                       }
                       return null;
@@ -54,9 +51,9 @@ class DynamicTextForm extends StatelessWidget {
                           decoration:
                               InputDecoration(labelText: 'Variety Price'),
                           controller: pcont,
-                          onChanged: (val) {
-                            this.variety.updateprice(double.parse(val));
-                          },
+                          onChanged: (val) => this
+                              .variety
+                              .updateprice(double.tryParse(val) ?? 0),
                         ),
                       ),
                       SizedBox(width: 5),
@@ -65,9 +62,8 @@ class DynamicTextForm extends StatelessWidget {
                           decoration: InputDecoration(labelText: 'Variety WSP'),
                           controller: qcont,
                           keyboardType: TextInputType.number,
-                          onChanged: (val) {
-                            this.variety.updatewsp(double.parse(val));
-                          },
+                          onChanged: (val) =>
+                              this.variety.updatewsp(double.tryParse(val) ?? 0),
                         ),
                       ),
                     ],
@@ -78,9 +74,7 @@ class DynamicTextForm extends StatelessWidget {
           ),
         ),
         IconButton(
-            color: Colors.red,
-            icon: Icon(Icons.close),
-            onPressed: this.delete),
+            color: Colors.red, icon: Icon(Icons.close), onPressed: this.delete),
       ],
     );
   }

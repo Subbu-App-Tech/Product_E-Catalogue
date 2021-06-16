@@ -8,7 +8,7 @@ import '../Pdf/ListView/Listviewone.dart';
 
 class PDFDicv extends StatelessWidget {
   final bool ispaid;
-  const PDFDicv({Key key, @required this.ispaid}) : super(key: key);
+  const PDFDicv({Key? key, required this.ispaid}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -57,12 +57,12 @@ class PDFDicv extends StatelessWidget {
 
 class PDFbrandscatlogue extends StatelessWidget {
   static const routeName = '/PDFbrandscatlogue';
-  const PDFbrandscatlogue({Key key}) : super(key: key);
+  const PDFbrandscatlogue({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    String sortby;
-    Future dialog(BuildContext context) {
+    String? sortby;
+    Future<String?> dialog(BuildContext context) {
       return showDialog(
         useRootNavigator: true,
         context: context,
@@ -77,6 +77,7 @@ class PDFbrandscatlogue extends StatelessWidget {
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.fromLTRB(15, 7, 15, 7),
+                // ignore: deprecated_member_use
                 child: RaisedButton(
                   child: Padding(
                     padding: const EdgeInsets.all(4),
@@ -91,6 +92,7 @@ class PDFbrandscatlogue extends StatelessWidget {
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.fromLTRB(15, 7, 15, 7),
+                // ignore: deprecated_member_use
                 child: RaisedButton(
                   child: Padding(
                     padding: const EdgeInsets.all(4),
@@ -105,6 +107,7 @@ class PDFbrandscatlogue extends StatelessWidget {
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.fromLTRB(15, 7, 15, 7),
+                // ignore: deprecated_member_use
                 child: RaisedButton(
                   child: Padding(
                     padding: const EdgeInsets.all(4),
@@ -118,6 +121,7 @@ class PDFbrandscatlogue extends StatelessWidget {
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.fromLTRB(15, 7, 15, 7),
+                // ignore: deprecated_member_use
                 child: RaisedButton(
                   child: Padding(
                     padding: const EdgeInsets.all(4),
@@ -132,6 +136,7 @@ class PDFbrandscatlogue extends StatelessWidget {
             ],
           ),
           actions: [
+            // ignore: deprecated_member_use
             RaisedButton(
               child: Text(
                 'Close',
@@ -147,7 +152,7 @@ class PDFbrandscatlogue extends StatelessWidget {
       );
     }
 
-    bool clicked(String value) {
+    bool clicked(String? value) {
       if (value == null) {
         return false;
       } else if (value == 'close') {
@@ -157,7 +162,7 @@ class PDFbrandscatlogue extends StatelessWidget {
       }
     }
 
-    List vallst = ModalRoute.of(context).settings.arguments as List;
+    List vallst = ModalRoute.of(context)!.settings.arguments as List;
     String value = '${vallst[0]}';
     bool ispaid = vallst[1];
     return Scaffold(

@@ -3,7 +3,7 @@ import '../Models/VarietyProductModel.dart';
 import 'package:flutter/services.dart';
 
 class AddVariety extends StatefulWidget {
-  AddVariety({Key key}) : super(key: key);
+  AddVariety({Key? key}) : super(key: key);
   static const routeName = '/add-variet';
 
   @override
@@ -19,6 +19,7 @@ class _AddVarietyState extends State<AddVariety> {
       appBar: AppBar(
         title: Text('Trail'),
         actions: <Widget>[
+          // ignore: deprecated_member_use
           RaisedButton(
             onPressed: () => null,
             child: Icon(Icons.add),
@@ -41,7 +42,8 @@ class _AddVarietyState extends State<AddVariety> {
                   });
             },
             shrinkWrap: true,
-          ),
+          ),          
+          // ignore: deprecated_member_use
           RaisedButton(
             onPressed: () {
               setState(() {
@@ -66,12 +68,12 @@ class DynamicTextField extends StatelessWidget {
   final TextEditingController pcont = TextEditingController();
   final VarietyProductM variety;
   final Function delete;
-  DynamicTextField({Key key, @required this.variety, @required this.delete})
+  DynamicTextField({Key? key, required this.variety, required this.delete})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
     if (variety.varityname != '') {
-      ncont.text = variety.varityname;
+      ncont.text = variety.varityname!;
     }
     if (variety.price != 0) {
       pcont.text = variety.price.toString();
@@ -100,7 +102,9 @@ class DynamicTextField extends StatelessWidget {
           ),
         ),
         IconButton(
-            color: Colors.amber, icon: Icon(Icons.close), onPressed: delete),
+            color: Colors.amber,
+            icon: Icon(Icons.close),
+            onPressed: delete as void Function()?),
       ],
     );
   }

@@ -4,7 +4,7 @@ import '../Provider/ProductDataP.dart';
 import '../Widgets/ProductDetailsW.dart';
 
 class ProductDetails extends StatelessWidget {
-  final String productid;
+  final String? productid;
   ProductDetails(this.productid);
   @override
   Widget build(BuildContext context) {

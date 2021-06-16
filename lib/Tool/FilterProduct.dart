@@ -3,16 +3,19 @@ import '../Models/ProductModel.dart';
 import '../Provider/ProductDataP.dart';
 import 'package:provider/provider.dart';
 import '../Screens/TabScreen.dart';
-import 'package:flutter_xlider/flutter_xlider.dart';
-import 'package:multiselectchipgroup/multiselectchipgroup.dart';
+// import 'package:flutter_xlider/flutter_xlider.dart';
+// import 'package:multiselectchipgroup/multiselectchipgroup.dart';
 import '../Provider/CategoryDataP.dart';
-import 'package:grouped_checkbox/grouped_checkbox.dart';
+// import 'package:grouped_checkbox/grouped_checkbox.dart';
+import '../Widgets/Group/grouped_checkbox.dart';
+import '../Widgets/Group/flutter_xlider.dart';
+import '../Widgets/Group/multiselectchipgroup.dart';
 import '../Provider/VarietyDataP.dart';
 
 class FilterProduct extends StatefulWidget {
   static const routeName = '/filtertool';
-  final Filterdata filterdata;
-  FilterProduct({Key key, this.filterdata}) : super(key: key);
+  final Filterdata? filterdata;
+  FilterProduct({Key? key, this.filterdata}) : super(key: key);
 
   @override
   _FilterProductState createState() => _FilterProductState();
@@ -21,20 +24,20 @@ class FilterProduct extends StatefulWidget {
 class _FilterProductState extends State<FilterProduct> {
   bool isExpanded = false;
   Filtertool filtertool = Filtertool();
-  List<double> price = [];
-  List<ProductModel> productlist;
-  List<String> catnamelist;
-  List<String> brandlist = [];
-  Function findidlist;
-  List<String> checkedItemList;
-  List<String> checkedbrandlist;
-  Function varietyrangefunc;
-  Filterdata filterdata;
-  RangeValues _values;
+  List<double?> price = [];
+  List<ProductModel?>? productlist;
+  late List<String> catnamelist;
+  List<String?> brandlist = [];
+  late Function findidlist;
+  late List<String> checkedItemList;
+  List<String>? checkedbrandlist;
+  Function? varietyrangefunc;
+  late Filterdata filterdata;
+  RangeValues? _values;
 
   @override
   void initState() {
-    filterdata = widget.filterdata;
+    filterdata = widget.filterdata ?? Filterdata();
     setState(() {});
     super.initState();
   }
@@ -42,8 +45,8 @@ class _FilterProductState extends State<FilterProduct> {
   @override
   void didChangeDependencies() {
     productlist = Provider.of<ProductData>(context).items;
-    for (ProductModel i in productlist) {
-      if (i.brand != null || i.brand != ' ' || i.brand != '') {
+    for (ProductModel? i in productlist!) {
+      if (i!.brand != null || i.brand != ' ' || i.brand != '') {
         brandlist.add(i.brand);
       }
     }
@@ -58,7 +61,7 @@ class _FilterProductState extends State<FilterProduct> {
     if (filterdata.rangeofprice != null) {
       _values = filterdata.rangeofprice;
     } else {
-      _values = RangeValues(0, price.last);
+      _values = RangeValues(0, price.last!);
     }
     if (filterdata.categorylist != null) {
       checkedItemList = Provider.of<CategoryData>(context)
@@ -88,10 +91,10 @@ class _FilterProductState extends State<FilterProduct> {
               child: ExpansionTile(
                 title: Text('Price Range'),
                 trailing: (filterdata.rangeofprice != null)
-                    ? Text('${_values.start} - ${_values.end} ')
+                    ? Text('${_values?.start} - ${_values?.end} ')
                     : null,
                 children: [
-                  (_values.start == 0 && _values.end == 0)
+                  (_values?.start == 0 && _values?.end == 0)
                       ? Padding(
                           padding: const EdgeInsets.all(25),
                           child: Text('No Product Variety Price Available'),
@@ -103,12 +106,15 @@ class _FilterProductState extends State<FilterProduct> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text('Range: ${_values.start} - ${_values.end}',
+                              Text('Range: ${_values?.start} - ${_values?.end}',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(fontSize: 17)),
                               SizedBox(height: 10),
                               FlutterSlider(
-                                values: [_values.start, _values.end],
+                                values: [
+                                  _values?.start ?? 0,
+                                  _values?.end ?? 0
+                                ],
                                 min: 0,
                                 rangeSlider: true,
                                 max: price.last,
@@ -130,9 +136,7 @@ class _FilterProductState extends State<FilterProduct> {
                                     reverseCurve: Curves.bounceIn,
                                     duration: Duration(milliseconds: 500),
                                     scale: 1.5),
-                                tooltip: FlutterSliderTooltip(
-                                  disabled: true,
-                                ),
+                                tooltip: FlutterSliderTooltip(disabled: true),
                                 onDragCompleted:
                                     (handlerIndex, lowerValue, upperValue) {
                                   if (upperValue > price.last) {
@@ -167,8 +171,7 @@ class _FilterProductState extends State<FilterProduct> {
                 (catnamelist.length == 0)
                     ? Padding(
                         padding: const EdgeInsets.all(25),
-                        child: Text('No Category Available'),
-                      )
+                        child: Text('No Category Available'))
                     : GroupedCheckbox(
                         itemList: catnamelist.toSet().toList(),
                         checkedItemList: checkedItemList,
@@ -191,9 +194,9 @@ class _FilterProductState extends State<FilterProduct> {
             Card(
               child: ExpansionTile(
                 title: Text('Select Brand'),
-                trailing: checkedbrandlist.length == 0
+                trailing: checkedbrandlist!.length == 0
                     ? null
-                    : Text('${checkedbrandlist.length} Brands Selected'),
+                    : Text('${checkedbrandlist!.length} Brands Selected'),
                 children: <Widget>[
                   (brandlist.length == 0)
                       ? Padding(
@@ -232,7 +235,7 @@ class _FilterProductState extends State<FilterProduct> {
                         brandlist: null,
                         categorylist: null,
                         rangeofprice: null);
-                    _values = RangeValues(0, price.last);
+                    _values = RangeValues(0, price.last!);
                     checkedbrandlist = [];
                     setState(() {});
                     Navigator.pushReplacement(
@@ -270,26 +273,26 @@ class _FilterProductState extends State<FilterProduct> {
 }
 
 class Filtertool {
-  List<ProductModel> filteredproduct(List<ProductModel> productlistmodel,
-      Filterdata filterdata, Function func) {
+  List<ProductModel?>? filteredproduct(List<ProductModel?>? productlistmodel,
+      Filterdata filterdata, Function? func) {
     if (filterdata.rangeofprice != null) {
-      RangeValues rangeofprice = filterdata.rangeofprice;
+      RangeValues? rangeofprice = filterdata.rangeofprice;
       // var func = VarietyData().minmaxvalue;
       // for (ProductModel i in productlistmodel){
 
       // }
       bool trval(ProductModel prdmodel) {
-        if (func(prdmodel.id) == null || func(prdmodel.id).length == 0) {
+        if (func!(prdmodel.id) == null || func(prdmodel.id).length == 0) {
           return true;
         } else if (func(prdmodel.id).length == 1) {
-          if (func(prdmodel.id)[0] >= rangeofprice.start &&
+          if (func(prdmodel.id)[0] >= rangeofprice!.start &&
               func(prdmodel.id)[0] <= rangeofprice.end) {
             return true;
           } else {
             return false;
           }
         } else if (func(prdmodel.id).length == 2) {
-          if ((func(prdmodel.id)[0] >= rangeofprice.start &&
+          if ((func(prdmodel.id)[0] >= rangeofprice!.start &&
                   func(prdmodel.id)[1] <= rangeofprice.end) ||
               (func(prdmodel.id)[1] >= rangeofprice.start &&
                   func(prdmodel.id)[0] <= rangeofprice.end)) {
@@ -302,26 +305,26 @@ class Filtertool {
         }
       }
 
-      productlistmodel = [...productlistmodel.where((ele) => (trval(ele)))];
+      productlistmodel = [...productlistmodel!.where((ele) => (trval(ele!)))];
       // productlistmodel = [
       //   ...productlistmodel.where((ele) =>
       //       (ele.price >= rangeofprice.start && ele.price <= rangeofprice.end))
       // ];
     }
     if (filterdata.categorylist != null) {
-      if (filterdata.categorylist.length > 0) {
-        List<String> categorylist = filterdata.categorylist;
+      if (filterdata.categorylist!.length > 0) {
+        List<String>? categorylist = filterdata.categorylist;
         productlistmodel = [
-          ...productlistmodel.where((ele) =>
-              ele.categorylist.any((element) => categorylist.contains(element)))
+          ...productlistmodel!.where((ele) => ele!.categorylist!
+              .any((element) => categorylist!.contains(element)))
         ];
       }
     }
     if (filterdata.brandlist != null) {
-      if (filterdata.brandlist.length > 0) {
-        List<String> brandlist = filterdata.brandlist;
+      if (filterdata.brandlist!.length > 0) {
+        List<String>? brandlist = filterdata.brandlist;
         productlistmodel = [
-          ...productlistmodel.where((ele) => brandlist.contains(ele.brand))
+          ...productlistmodel!.where((ele) => brandlist!.contains(ele!.brand))
         ];
         // for (String i in brandlist) {
         //   productlistmodel = [
@@ -335,9 +338,9 @@ class Filtertool {
 }
 
 class Filterdata {
-  RangeValues rangeofprice;
-  List<String> categorylist;
-  List<String> brandlist;
+  RangeValues? rangeofprice;
+  List<String>? categorylist;
+  List<String>? brandlist;
 
   Filterdata({this.rangeofprice, this.brandlist, this.categorylist});
 }

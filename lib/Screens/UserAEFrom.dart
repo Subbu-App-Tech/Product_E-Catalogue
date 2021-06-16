@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productcatalogue/Models/CategoryModel.dart';
 import '../Tool/DynamicTextField.dart';
 import '../Provider/CategoryDataP.dart';
 import 'package:provider/provider.dart';
@@ -10,14 +11,12 @@ import '../Provider/VarietyDataP.dart';
 import 'dart:io';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:path/path.dart' as path;
-// import 'package:path_provider/path_provider.dart' as pPath;
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 // import 'dart:typed_data';
-import 'package:ext_storage/ext_storage.dart';
+import 'package:external_path/external_path.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
-// import 'dart:ui' as ui;
 
 class UserAEForm extends StatefulWidget {
   static const routeName = '/user-AE-Form';
@@ -30,7 +29,7 @@ class _UserAEFormState extends State<UserAEForm> {
   String currentText = "";
   GlobalKey key = new GlobalKey();
   List<String> _imagefiles = [];
-  SnackBar snackBar;
+  late SnackBar snackBar;
   final picker = ImagePicker;
   final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
   TextEditingController _textcontroller = TextEditingController();
@@ -38,14 +37,14 @@ class _UserAEFormState extends State<UserAEForm> {
   TextEditingController _rankcontroller = TextEditingController();
   TextEditingController _desccontroller = TextEditingController();
   TextEditingController _brandcontroller = TextEditingController();
-  List<String> suggestions;
+  late List<String?> suggestions;
   var edit = false;
   final form = GlobalKey<FormState>();
   var _init = true;
   List<VarietyProductM> varietymodel = [];
   List<String> categoryselected = [];
   String uq = UniqueKey().toString();
-  ProductModel _product;
+  ProductModel? _product;
 
   @override
   void didChangeDependencies() {
@@ -57,28 +56,25 @@ class _UserAEFormState extends State<UserAEForm> {
         description: null,
         categorylist: null);
     if (_init) {
-      final _prodid = ModalRoute.of(context).settings.arguments as String;
+      final _prodid = ModalRoute.of(context)!.settings.arguments as String?;
       if (_prodid != null) {
         edit = true;
         _product = Provider.of<ProductData>(context).findbyid(_prodid);
         varietymodel = Provider.of<VarietyData>(context).findbyid(_prodid);
         categoryselected = Provider.of<CategoryData>(context)
-            .findcategorylist(_product.categorylist);
-        _namecontroller.text = _product.name;
-        _rankcontroller.text = _product.rank.toString();
-        _imagefiles = _product.imagepathlist?.cast<String>() ?? [];
-        _desccontroller.text = _product.description;
-        _brandcontroller.text = _product.brand;
+            .findcategorylist(_product!.categorylist);
+        _namecontroller.text = _product!.name!;
+        _rankcontroller.text = _product!.rank.toString();
+        _imagefiles = _product!.imagepathlist?.cast<String>() ?? [];
+        _desccontroller.text = _product!.description!;
+        _brandcontroller.text = _product!.brand!;
       }
-    }
-    if (_imagefiles == null) {
-      _imagefiles = [];
     }
     _init = false;
     suggestions = Provider.of<ProductData>(context).brandlist();
     if (varietymodel.length == 0) {
       varietymodel.add(VarietyProductM(
-          productid: _product.id,
+          productid: _product!.id,
           id: null,
           varityname: null,
           price: 0,
@@ -93,52 +89,43 @@ class _UserAEFormState extends State<UserAEForm> {
         'Atleast Add One Variety',
       ),
       actions: [
+        // ignore: deprecated_member_use
         RaisedButton(
           child: Text(
             'OK',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           color: Colors.blueAccent,
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         )
       ],
     );
   }
 
   void _saveform(BuildContext context) {
-    final isValid = form.currentState.validate();
-    print(_product.id.runtimeType);
+    final isValid = form.currentState!.validate();
+    print(_product!.id.runtimeType);
     if (varietymodel.length <= 0) {
       showDialog(
           context: context,
           builder: (BuildContext context) => _exitwithoutvariety(context));
     } else {
-      if (!isValid) {
-        return;
-      }
+      if (!isValid) return;
       for (var i in varietymodel) {
-        if (i.price.isNaN || i.price == null) {
-          i.price = 0;
-        }
-        if (i.wsp.isNaN || i.wsp == null) {
-          i.wsp = 0;
-        }
+        if (i.price!.isNaN || i.price == null) i.price = 0;
+        if (i.wsp!.isNaN || i.wsp == null) i.wsp = 0;
       }
-      form.currentState.save();
-      // key.currentState.
-      if (_product.categorylist == null || _product.categorylist == []) {
-        _product.categorylist = ['otherid'];
-      }
+      form.currentState!.save();
+      if (_product!.categorylist == null || _product!.categorylist == [])
+        _product!.categorylist = ['otherid'];
       if (edit) {
         Provider.of<ProductData>(context, listen: false)
-            .editproduct(_product.id, _product);
+            .editproduct(_product!.id, _product);
         Provider.of<VarietyData>(context, listen: false)
             .editvariety(varietymodel);
         edit = false;
       } else {
-        Provider.of<ProductData>(context, listen: false).addproduct(_product);
+        Provider.of<ProductData>(context, listen: false).addproduct(_product!);
         Provider.of<VarietyData>(context, listen: false)
             .addvariety(varietymodel);
       }
@@ -147,16 +134,12 @@ class _UserAEFormState extends State<UserAEForm> {
   }
 
   void deletewidget(int index) {
-    setState(() {
-      varietymodel = List.from(varietymodel)..removeAt(index);
-    });
+    setState(() => varietymodel = List.from(varietymodel)..removeAt(index));
   }
 
   void _submitdata() {
     setState(() {
-      if (_textcontroller.text.isEmpty) {
-        return;
-      }
+      if (_textcontroller.text.isEmpty) return;
       Provider.of<CategoryData>(context, listen: false)
           .addcategory(_textcontroller.text);
       Navigator.pop(context, true);
@@ -177,6 +160,7 @@ class _UserAEFormState extends State<UserAEForm> {
                   controller: _textcontroller,
                   onSubmitted: (_) => _submitdata,
                 ),
+                // ignore: deprecated_member_use
                 RaisedButton(
                     onPressed: _submitdata, child: Text('Add New Category')),
               ],
@@ -188,40 +172,40 @@ class _UserAEFormState extends State<UserAEForm> {
   List<String> validimagepath(List<String> pathlist) {
     List<String> valid = [];
     for (String i in pathlist) {
-      if (File(i).existsSync()) {
-        valid.add(i);
-      }
+      if (File(i).existsSync()) valid.add(i);
     }
     return valid;
   }
 
   bool checkimagepath(List<String> imagelist) {
-    if (imagelist == null) {
-      return false;
-    } else {
-      if (imagelist.length > 0) {
-        if (validimagepath(imagelist).length > 0) {
-          return true;
-        }
-      }
-      return false;
+    if (imagelist.length > 0) {
+      if (validimagepath(imagelist).length > 0) return true;
     }
+    return false;
   }
 
-  Directory appDir;
-  String fileName;
-  File savedImage;
-  Directory imagedir;
-  String appDirs;
+  Directory? appDir;
+  String? fileName;
+  late File savedImage;
+  late Directory imagedir;
+  String? appDirs;
   Future getImage(ImageSource imagesource) async {
-    appDirs = await ExtStorage.getExternalStorageDirectory();
+    showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              content: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [CircularProgressIndicator()]),
+            ));
+    appDirs = await ExternalPath.getExternalStoragePublicDirectory(
+        ExternalPath.DIRECTORY_DOWNLOADS);
     var status = await Permission.storage.status;
     if (!status.isGranted) await Permission.storage.request();
     imagedir = await Directory('$appDirs/Product E-catalogue/Product Pictures')
         .create(recursive: true);
     final pickedFile = await ImagePicker().getImage(source: imagesource);
     if (pickedFile != null) {
-      File croppedFile = await ImageCropper.cropImage(
+      File? croppedFile = await (ImageCropper.cropImage(
         sourcePath: pickedFile.path,
         aspectRatioPresets: [
           CropAspectRatioPreset.square,
@@ -236,18 +220,23 @@ class _UserAEFormState extends State<UserAEForm> {
             toolbarWidgetColor: Colors.white,
             initAspectRatio: CropAspectRatioPreset.original,
             lockAspectRatio: false),
-      );
-      fileName = path.basename(croppedFile.path);
+      ));
+      print('-');
+      fileName = path.basename(croppedFile!.path);
       File file = File(croppedFile.path);
+      print('0');
       savedImage = await file.copy('${imagedir.path}/$fileName');
+      print('1');
       _imagefiles.add(savedImage.path);
-      _product.updateimageurl(_imagefiles);
+      _product!.updateimageurl(_imagefiles);
+      Navigator.pop(context);
       snackBar = SnackBar(content: Text('Image Uploaded Succesfully..!'));
     } else {
       snackBar = SnackBar(content: Text('No Image Selected Yet..!'));
     }
     setState(() {});
-    _scaffoldkey.currentState.showSnackBar(snackBar);
+    // ignore: deprecated_member_use
+    _scaffoldkey.currentState!.showSnackBar(snackBar);
   }
 
   void chooseimage(BuildContext context) {
@@ -263,13 +252,11 @@ class _UserAEFormState extends State<UserAEForm> {
                 Container(
                   height: 150,
                   width: 150,
+                  // ignore: deprecated_member_use
                   child: FlatButton(
                     child: Column(
                       children: [
-                        Image.asset(
-                          'assets/camera.png',
-                          fit: BoxFit.fill,
-                        ),
+                        Image.asset('assets/camera.png', fit: BoxFit.fill),
                         Text('Camera')
                       ],
                     ),
@@ -282,6 +269,7 @@ class _UserAEFormState extends State<UserAEForm> {
                 Container(
                   height: 150,
                   width: 150,
+                  // ignore: deprecated_member_use
                   child: FlatButton(
                     child: Column(
                       children: [
@@ -303,12 +291,12 @@ class _UserAEFormState extends State<UserAEForm> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> categorylist = [];
-    final categoryitems =
+    List<CategoryModel> categoryitems =
         Provider.of<CategoryData>(context, listen: true).items;
-    for (var i in categoryitems) {
-      categorylist.add(i.name);
-    }
+    List<String?> categorylist = categoryitems.map((e) => e.name).toList();
+    // for (var i in categoryitems) {
+    //   categorylist.add(i.name);
+    // }
 
     return Scaffold(
       key: _scaffoldkey,
@@ -332,7 +320,7 @@ class _UserAEFormState extends State<UserAEForm> {
                 children: [
                   checkimagepath(_imagefiles)
                       ? Expanded(
-                          flex: (_imagefiles == null) ? 0 : 3,
+                          flex: (_imagefiles.length == 0) ? 0 : 3,
                           child: Container(
                             padding: EdgeInsets.all(1),
                             color: Colors.white,
@@ -346,9 +334,9 @@ class _UserAEFormState extends State<UserAEForm> {
                                     Container(
                                       padding: EdgeInsets.all(1),
                                       child: Image.file(
-                                        File(validimagepath(_imagefiles)[idx]),
-                                        fit: BoxFit.contain,
-                                      ),
+                                          File(
+                                              validimagepath(_imagefiles)[idx]),
+                                          fit: BoxFit.contain),
                                     ),
                                     Positioned(
                                       top: 5,
@@ -362,10 +350,8 @@ class _UserAEFormState extends State<UserAEForm> {
                                             padding: EdgeInsets.all(.1),
                                             icon: Icon(Icons.close,
                                                 size: 15, color: Colors.white),
-                                            onPressed: () {
-                                              _imagefiles.removeAt(idx);
-                                              setState(() {});
-                                            },
+                                            onPressed: () => setState(() =>
+                                                _imagefiles.removeAt(idx)),
                                           ),
                                         ),
                                         decoration: BoxDecoration(
@@ -381,6 +367,7 @@ class _UserAEFormState extends State<UserAEForm> {
                           ),
                         )
                       : SizedBox.shrink(),
+                  // ignore: deprecated_member_use
                   FlatButton(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -389,57 +376,36 @@ class _UserAEFormState extends State<UserAEForm> {
                         Container(
                           height: 50,
                           width: 50,
-                          child: Image.asset(
-                            'assets/add-image.png',
-                            fit: BoxFit.fill,
-                          ),
+                          child: Image.asset('assets/add-image.png',
+                              fit: BoxFit.fill),
                         ),
-                        (_imagefiles == null)
-                            ? Text('Add Product Image')
-                            : (_imagefiles.length > 0)
-                                ? Text(
-                                    'Add Image',
-                                    textAlign: TextAlign.center,
-                                  )
-                                : Text('Add Product Image')
+                        (_imagefiles.length > 0)
+                            ? Text('Add Product Image',
+                                textAlign: TextAlign.center)
+                            : Text('Add Product Image')
                       ],
                     ),
-                    onPressed: () {
-                      chooseimage(context);
-                      setState(() {});
-                    },
+                    onPressed: () => setState(() => chooseimage(context)),
                   ),
-                  // ),
                 ],
               ),
             ),
             TextFormField(
-              controller: _namecontroller,
-              decoration: InputDecoration(
-                labelText: 'Product Name *',
-              ),
-              textInputAction: TextInputAction.next,
-              // onFieldSubmitted: (_) {},
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please provide a value.';
-                }
-                return null;
-              },
-              onChanged: (value) {
-                _product.updatename(value);
-              },
-            ),
+                controller: _namecontroller,
+                decoration: InputDecoration(labelText: 'Product Name *'),
+                textInputAction: TextInputAction.next,
+                validator: (value) {
+                  if (value!.isEmpty) return 'Please provide a value.';
+                  return null;
+                },
+                onChanged: (value) => _product!.updatename(value)),
             TextFormField(
               controller: _desccontroller,
               decoration: InputDecoration(labelText: 'Product Details'),
               maxLines: null,
               textInputAction: TextInputAction.newline,
               keyboardType: TextInputType.multiline,
-              // onFieldSubmitted: (_) {},
-              onChanged: (value) {
-                _product.updatedescription(value);
-              },
+              onChanged: (value) => _product!.updatedescription(value),
             ),
             Container(
               child: Row(
@@ -451,61 +417,41 @@ class _UserAEFormState extends State<UserAEForm> {
                     child: TypeAheadField(
                       key: key,
                       textFieldConfiguration: TextFieldConfiguration(
-                          onChanged:
-                              // onSubmitted:
-                              (value) {
-                            _product.updatebrand(value);
-                          },
+                          onChanged: (value) => _product!.updatebrand(value),
                           controller: _brandcontroller,
                           decoration: InputDecoration(labelText: 'Brand Name')),
-                      suggestionsCallback: (pattern) {
-                        return suggestions.where((s) =>
-                            s.toLowerCase().contains(pattern.toLowerCase()));
-                      },
-                      itemBuilder: (context, suggestion) {
+                      suggestionsCallback: (pattern) => suggestions.where((s) =>
+                          s!.toLowerCase().contains(pattern.toLowerCase())),
+                      itemBuilder: (context, dynamic suggestion) {
                         return Container(
-                          child: Text(
-                            suggestion,
-                            style: TextStyle(color: Colors.black, fontSize: 17),
-                          ),
-                          padding: EdgeInsets.fromLTRB(10, 7, 10, 7),
-                          color: Colors.white,
-                        );
+                            child: Text(
+                              suggestion,
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 17),
+                            ),
+                            padding: EdgeInsets.fromLTRB(10, 7, 10, 7),
+                            color: Colors.white);
                       },
                       hideSuggestionsOnKeyboardHide: true,
                       getImmediateSuggestions: true,
-                      onSuggestionSelected: (suggestion) {
-                        _brandcontroller.text = suggestion;
-                        _product.updatebrand(_brandcontroller.text);
+                      onSuggestionSelected: (String? suggestion) {
+                        _brandcontroller.text = suggestion ?? '';
+                        _product!.updatebrand(_brandcontroller.text);
                         print(_brandcontroller.text);
                       },
                     ),
-                    //     TextFormField(
-                    //   controller: _brandcontroller,
-                    //   decoration: InputDecoration(
-                    //     labelText: 'Brand',
-                    //   ),
-                    //   textInputAction: TextInputAction.next,
-                    //   onFieldSubmitted: (_) {},
-                    //   onChanged: (value) {
-                    //     _product.updatebrand(value);
-                    //   },
-                    // ),
                   ),
                   SizedBox(width: 5),
                   Expanded(
                     flex: 1,
                     child: TextFormField(
                       controller: _rankcontroller,
-                      decoration: InputDecoration(
-                        labelText: 'Rank',
-                      ),
+                      decoration: InputDecoration(labelText: 'Rank'),
                       keyboardType: TextInputType.number,
                       textInputAction: TextInputAction.next,
                       // onFieldSubmitted: (_) {},
-                      onChanged: (value) {
-                        _product.updaterank(int.parse(value));
-                      },
+                      onChanged: (value) =>
+                          _product!.updaterank(int.parse(value)),
                     ),
                   ),
                 ],
@@ -528,21 +474,21 @@ class _UserAEFormState extends State<UserAEForm> {
                     child: MultiSelectChip(categorylist, categoryselected,
                         onSelectionChanged: (value) {
                       _product = ProductModel(
-                        id: _product.id,
-                        name: _product.name,
-                        imagepathlist: _product.imagepathlist,
-                        brand: _product.brand,
-                        description: _product.description,
+                        id: _product!.id,
+                        name: _product!.name,
+                        imagepathlist: _product!.imagepathlist,
+                        brand: _product!.brand,
+                        description: _product!.description,
                         categorylist:
                             Provider.of<CategoryData>(context, listen: false)
                                 .findcategoryidlist(value),
                       );
                     }),
                   ),
+                  // ignore: deprecated_member_use
                   RaisedButton(
-                    onPressed: () => _startaddingcat(context),
-                    child: Text('Add New Category'),
-                  )
+                      onPressed: () => _startaddingcat(context),
+                      child: Text('Add New Category'))
                 ],
               ),
             ),
@@ -567,19 +513,19 @@ class _UserAEFormState extends State<UserAEForm> {
                 itemCount: varietymodel.length,
                 itemBuilder: (build, index) {
                   return DynamicTextForm(
-                    variety: varietymodel[index],
-                    delete: () => deletewidget(index),
-                    keyform: form,
-                  );
+                      variety: varietymodel[index],
+                      delete: () => deletewidget(index),
+                      keyform: form);
                 },
                 shrinkWrap: true,
               ),
             ),
+            // ignore: deprecated_member_use
             RaisedButton(
               onPressed: () {
                 setState(() {
                   varietymodel.add(VarietyProductM(
-                      productid: _product.id,
+                      productid: _product!.id,
                       id: null,
                       varityname: null,
                       price: 0,

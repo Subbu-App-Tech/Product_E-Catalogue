@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import '../Screens/FilteredProductList.dart';
 
 class GridViewW extends StatelessWidget {
-  final String title;
-  final int count;
-  final String catid;
-  final String brand;
+  final String? title;
+  final int? count;
+  final String? catid;
+  final String? brand;
   // final String catid;
-  final VoidCallback delete;
+  final VoidCallback? delete;
   // final List<ProductModel> productlist;
   GridViewW(
-      {@required this.title, this.count, this.brand, this.catid, this.delete});
+      {required this.title, this.count, this.brand, this.catid, this.delete});
 
   @override
   Widget build(BuildContext context) {

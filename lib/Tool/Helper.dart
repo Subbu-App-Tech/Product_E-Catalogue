@@ -2,7 +2,7 @@
 import '../Models/ProductModel.dart';
 
 class Helper {
-  double doubleval(var input) {
+  double? doubleval(var input) {
     if (input == null || input == '') {
       return 1.0;
     } else if (input.runtimeType == double) {
@@ -43,7 +43,7 @@ class Helper {
     return true;
   }
 
-  String stringval(var input) {
+  String? stringval(var input) {
     if (input == null || input.trim() == '') {
       return '';
     } else {
