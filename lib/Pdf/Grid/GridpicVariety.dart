@@ -2,6 +2,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:productcatalogue/UPI_Transaction.dart';
 import '../../Provider/ProductDataP.dart';
 import '../../Models/ProductModel.dart';
 import '../../Models/CategoryModel.dart';
@@ -28,20 +29,20 @@ class PDFGridpicVarietyVertical extends StatefulWidget {
 }
 
 class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
-
   @override
   void initState() {
     Pdftools.createInterstitialAd();
     super.initState();
   }
 
+  String filepath = '';
+  String currency = '';
 
   @override
   Widget build(BuildContext context) {
     final pdf = pw.Document();
     PdfImage image;
     Uint8List list;
-    String filepath;
     PDFDocument? pdfdoc;
     Pdftools pdftool = Pdftools();
     List<CategoryModel> category = Provider.of<CategoryData>(context).items;
@@ -50,7 +51,6 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
     Function findvardata = Provider.of<VarietyData>(context).findbyid;
     List<Brandcount> uqbrand = Provider.of<ProductData>(context).uqbrand();
     SecureStorage storage = SecureStorage();
-    String currency;
     List frowd = ModalRoute.of(context)!.settings.arguments as List;
     Function findvarcount = Provider.of<VarietyData>(context).findvarietycount;
     String input = frowd[0];
@@ -226,14 +226,9 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
         pdf.addPage(
           pw.MultiPage(
               pageTheme: await pdftool.pagetheam(5, ispaid),
-              // theme: await pdftool.theamdata(),
-              // pageFormat: PdfPageFormat.a4,
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               maxPages: 200,
-              // margin: pw.EdgeInsets.all(5),
-              header: (pw.Context ctx) {
-                return pdftool.buildHeader(i.basedon!, logoimage);
-              },
+              header: (pw.Context ctx) => pdftool.buildHeader(i.basedon!, logoimage),
               footer: (pw.Context ctx) {
                 return pdftool.buildFooter(
                     context: ctx,
@@ -241,9 +236,6 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
                     companyname: companyname);
               },
               build: (context) => [
-                    // pw.Padding(
-                    //     padding: pw.EdgeInsets.only(left: 15, right: 15),
-                    //     child:
                     pw.Wrap(
                         children: _listview,
                         spacing: 5,
@@ -282,13 +274,11 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
                   IconButton(
                     icon: Icon(Icons.print),
                     onPressed: () {
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (ctx) => ViewAdToDownload(
-                      //               filepath: filepath,
-                      //               ispaid: ispaid,
-                      //             )));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (ctx) => Upitransactionpage(
+                                  filepath: filepath, ispaid: ispaid)));
                     },
                   )
                 ],

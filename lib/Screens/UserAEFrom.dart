@@ -193,10 +193,9 @@ class _UserAEFormState extends State<UserAEForm> {
     showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-              content: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [CircularProgressIndicator()]),
-            ));
+            content: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [CircularProgressIndicator()])));
     appDirs = await ExternalPath.getExternalStoragePublicDirectory(
         ExternalPath.DIRECTORY_DOWNLOADS);
     var status = await Permission.storage.status;
@@ -229,11 +228,11 @@ class _UserAEFormState extends State<UserAEForm> {
       print('1');
       _imagefiles.add(savedImage.path);
       _product!.updateimageurl(_imagefiles);
-      Navigator.pop(context);
       snackBar = SnackBar(content: Text('Image Uploaded Succesfully..!'));
     } else {
       snackBar = SnackBar(content: Text('No Image Selected Yet..!'));
     }
+    Navigator.pop(context);
     setState(() {});
     // ignore: deprecated_member_use
     _scaffoldkey.currentState!.showSnackBar(snackBar);

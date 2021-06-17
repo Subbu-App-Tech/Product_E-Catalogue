@@ -61,17 +61,17 @@ class CategoryData with ChangeNotifier {
   List<String> catnamelist() {
     List<String?> catnamelist = items.map((e) => e.name).toList();
     catnamelist.removeWhere((e) => e == null);
-    return catnamelist as List<String>;
+    return catnamelist.map((e) => e!).toList();
   }
 
-  List<String?> findidlist(List<String> namelist) {
-    List<String?> lst = [];
+  List<String> findidlist(List<String> namelist) {
+    List<String> lst = [];
     List<CategoryModel> modlist = [];
     for (String i in namelist) {
       modlist.addAll(_items.where((element) => element.name == i));
     }
     for (CategoryModel i in modlist) {
-      lst.add(i.id);
+      if (i.id != null) lst.add(i.id!);
     }
     return lst;
   }

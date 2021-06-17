@@ -123,7 +123,7 @@ Future savedata(String filepath) async {
                     }
                   }
                   _catid.removeWhere((e) => e == null);
-                  return _catid as List<String>;
+                  return _catid.map((e) => e!).toList();
                 }
               }
 

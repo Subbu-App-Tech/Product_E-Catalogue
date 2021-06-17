@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:productcatalogue/Models/VarietyProductModel.dart';
+import 'package:productcatalogue/main.dart';
 import 'package:provider/provider.dart';
 import '../Screens/UserAEFrom.dart';
 import '../Models/ProductModel.dart';
@@ -47,27 +48,8 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
     _sortnameAsc = false;
     _sortwspAsc = false;
     currencyset();
-    // _subscription = _nativeAdController.stateChanged.listen(_onStateChanged);
-    // _nativeAdController.setAdUnitID(_adUnitID, numberAds: 2);
     super.initState();
   }
-
-  // void _onStateChanged(AdLoadState state) {
-  //   switch (state) {
-  //     case AdLoadState.loading:
-  //       setState(() {
-  //         _height = 0;
-  //       });
-  //       break;
-  //     case AdLoadState.loadCompleted:
-  //       setState(() {
-  //         _height = 125;
-  //       });
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // }
 
   @override
   void didChangeDependencies() async {
@@ -83,39 +65,6 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
     currency = await storage.getcurrency();
     super.didChangeDependencies();
   }
-
-  @override
-  void dispose() {
-    // _subscription.cancel();
-    // _nativeAdController.dispose();
-    super.dispose();
-  }
-
-  static const _adUnitID = "ca-app-pub-9568938816087708/6044993041";
-  // final _nativeAdController = NativeAdmobController();
-  // double _height = 0;
-  // late StreamSubscription _subscription;
-
-  // Widget get adwidget {
-  //   return Card(
-  //     child: Container(
-  //       height: _height,
-  //       padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-  //       child: ad.NativeAdmob(
-  //           adUnitID: _adUnitID,
-  //           error: Text('Error'),
-  //           numberAds: 2,
-  //           type: ad.NativeAdmobType.full,
-  //           controller: _nativeAdController,
-  //           options: NativeAdmobOptions(
-  //               priceTextStyle:
-  //                   NativeTextStyle(fontSize: 15, color: Colors.red),
-  //               bodyTextStyle:
-  //                   NativeTextStyle(fontSize: 14, color: Colors.black)),
-  //           loading: Text('Loading')),
-  //     ),
-  //   );
-  // }
 
   void currencyset() async => currency = await storage.getcurrency();
   List<FileImage>? images = [];
@@ -261,8 +210,6 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
               Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (ctx) => ProductCatalogue()))
                   .whenComplete(() => setState(() {}));
-              // Navigator.popUntil(
-              //     context, ModalRoute.withName(Tabscreenwithdata.routeName));
             },
           ),
           // ignore: deprecated_member_use
@@ -527,34 +474,24 @@ Created with Product E-Catalogue App''';
                   ),
             Divider(),
             (widget.product.description == null)
-                ? SizedBox(
-                    height: 0.1,
-                  )
+                ? SizedBox(height: 0.1)
                 : (widget.product.description!.isEmpty)
-                    ? SizedBox(
-                        height: 0.1,
-                      )
+                    ? SizedBox(height: 0.1)
                     : Column(
                         children: [
                           Container(
                             width: double.infinity,
                             padding: EdgeInsets.all(8),
-                            child: Text(
-                              'Product Description',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
+                            child: Text('Product Description',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16),
+                                textAlign: TextAlign.left),
                           ),
                           Container(
                               width: double.infinity,
                               padding: EdgeInsets.all(15),
-                              child: Text(
-                                widget.product.description!,
-                                textAlign: TextAlign.left,
-                              ))
+                              child: Text(widget.product.description!,
+                                  textAlign: TextAlign.left))
                         ],
                       ),
             SizedBox(height: 50),
@@ -564,55 +501,64 @@ Created with Product E-Catalogue App''';
                 child: Text('Rank: ${widget.product.rank}',
                     style: TextStyle(fontSize: 14))),
             SizedBox(height: 3),
-            RaisedButton.icon(
-              elevation: 3,
-              padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
-              color: Colors.red,
-              icon: Icon(Icons.delete),
-              label: Text(
-                'Delete Product',
-                style: TextStyle(color: Colors.white),
-              ),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) =>
-                      _deleteconfirmation(context),
-                );
-              },
-            ),
+            appSetting.isViewMode
+                ? SizedBox()
+                // ignore: deprecated_member_use
+                : RaisedButton.icon(
+                    elevation: 3,
+                    padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
+                    color: Colors.red,
+                    icon: Icon(Icons.delete),
+                    label: Text(
+                      'Delete Product',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) =>
+                            _deleteconfirmation(context),
+                      );
+                    },
+                  ),
             SizedBox(height: 25),
           ],
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Container(
-        padding: EdgeInsets.all(7),
-        width: double.infinity,
-        child: Row(
-          children: [
-            FloatingActionButton.extended(
-              heroTag: null,
-              label: Text('Edit'),
-              icon: Icon(Icons.edit),
-              onPressed: () {
-                Navigator.pushNamed(context, UserAEForm.routeName,
-                    arguments: widget.product.id);
-              },
-            ),
-            Spacer(flex: 1),
-            FloatingActionButton.extended(
+      floatingActionButton: appSetting.isViewMode
+          ? FloatingActionButton.extended(
               heroTag: null,
               backgroundColor: Colors.green,
               label: Text('Share'),
               icon: Icon(Icons.share, color: Colors.white),
-              onPressed: () {
-                _shareImageAndText();
-              },
+              onPressed: () => _shareImageAndText(),
+            )
+          : Container(
+              padding: EdgeInsets.all(7),
+              width: double.infinity,
+              child: Row(
+                children: [
+                  FloatingActionButton.extended(
+                    heroTag: null,
+                    label: Text('Edit'),
+                    icon: Icon(Icons.edit),
+                    onPressed: () {
+                      Navigator.pushNamed(context, UserAEForm.routeName,
+                          arguments: widget.product.id);
+                    },
+                  ),
+                  Spacer(flex: 1),
+                  FloatingActionButton.extended(
+                    heroTag: null,
+                    backgroundColor: Colors.green,
+                    label: Text('Share'),
+                    icon: Icon(Icons.share, color: Colors.white),
+                    onPressed: () => _shareImageAndText(),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }

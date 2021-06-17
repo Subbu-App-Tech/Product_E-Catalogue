@@ -2,6 +2,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:productcatalogue/UPI_Transaction.dart';
 import '../../Provider/ProductDataP.dart';
 import '../../Models/ProductModel.dart';
 import '../../Models/CategoryModel.dart';
@@ -14,11 +15,7 @@ import 'dart:typed_data';
 import '../../Provider/VarietyDataP.dart';
 import '../PdfTools.dart';
 import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
-import '../../Auth/ViewAdtoDownload.dart';
 import '../../Models/SecureStorage.dart';
-// import 'package:google_mobile_ads/google_mobile_ads.dart';
-
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class PDFGriddefinedsize extends StatefulWidget {
   static const routeName = '/PDFGriddefinedsize';
@@ -35,12 +32,13 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
     super.initState();
   }
 
+  String filepath = '';
+  pw.Document pdf = pw.Document();
+
   @override
   Widget build(BuildContext context) {
-    final pdf = pw.Document();
     PdfImage image;
     Uint8List list;
-    String filepath;
     Pdftools pdftool = Pdftools();
     List<CategoryModel> category = Provider.of<CategoryData>(context).items;
     List<ProcuctbasedModel> pbitems = [];
@@ -137,14 +135,9 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
                     width: 180,
                     height: 80,
                     foregroundDecoration: pw.BoxDecoration(
-                      borderRadius: pw.BorderRadius.all(pw.Radius.circular(5)),
-                      // border: pw.BoxBorder(
-                      //     bottom: true,
-                      //     top: true,
-                      //     right: true,
-                      //     left: true,
-                      //     color: PdfColors.grey500)
-                    ),
+                        borderRadius:
+                            pw.BorderRadius.all(pw.Radius.circular(5)),
+                        border: pw.Border.all(color: PdfColors.grey500)),
                     alignment: pw.Alignment.center,
                     padding: pw.EdgeInsets.all(1.5),
                     child: pw.Image(pw.ImageProxy(image),
@@ -155,9 +148,7 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
                     padding: pw.EdgeInsets.all(2),
                     child: pw.Text('${productdata.name}',
                         style: pw.TextStyle(
-                          fontSize: 15,
-                          fontWeight: pw.FontWeight.bold,
-                        )),
+                            fontSize: 15, fontWeight: pw.FontWeight.bold)),
                   ),
                   pw.SizedBox(height: 0.5),
                   (productdata.brand == null || productdata.brand == '')
@@ -166,9 +157,7 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
                           alignment: pw.Alignment.centerLeft,
                           child: pw.Text(
                             'Brand :-  ${productdata.brand}',
-                            style: pw.TextStyle(
-                              fontSize: 10,
-                            ),
+                            style: pw.TextStyle(fontSize: 10),
                           )),
                   (findvardata(productdata.id).length == 0)
                       ? pw.SizedBox(height: 0.5)
@@ -176,9 +165,7 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
                           alignment: pw.Alignment.centerLeft,
                           child: pw.Text(
                             'No of variety: ${findvardata(productdata.id).length}',
-                            style: pw.TextStyle(
-                              fontSize: 12,
-                            ),
+                            style: pw.TextStyle(fontSize: 12),
                           )),
                   pw.SizedBox(height: 0.5),
                   pw.Container(
@@ -188,9 +175,7 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
                           pw.Row(mainAxisSize: pw.MainAxisSize.min, children: [
                         pw.Text((priceB == null) ? 'Price' : 'Price Range',
                             style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                              fontSize: 10,
-                            )),
+                                fontWeight: pw.FontWeight.bold, fontSize: 10)),
                         pw.Expanded(
                             child: (priceB == null)
                                 ? pw.FittedBox(
@@ -204,13 +189,11 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
                                 : pw.FittedBox(
                                     alignment: pw.Alignment.centerRight,
                                     fit: pw.BoxFit.contain,
-                                    child: pw.Text(
-                                      '  $val $priceA - $priceB',
-                                      style: pw.TextStyle(
-                                          fontWeight: pw.FontWeight.bold,
-                                          color: PdfColors.red400),
-                                      maxLines: 1,
-                                    )))
+                                    child: pw.Text('  $val $priceA - $priceB',
+                                        style: pw.TextStyle(
+                                            fontWeight: pw.FontWeight.bold,
+                                            color: PdfColors.red400),
+                                        maxLines: 1)))
                       ])),
                   pw.Container(
                       height: 78,
@@ -273,11 +256,11 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
                   IconButton(
                     icon: Icon(Icons.print),
                     onPressed: () {
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (ctx) => ViewAdToDownload(
-                      //             filepath: filepath, ispaid: ispaid)));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (ctx) => Upitransactionpage(
+                                  filepath: filepath, ispaid: ispaid)));
                     },
                   )
                 ],

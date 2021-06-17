@@ -62,7 +62,6 @@ class _ProductsListState extends State<ProductsList> {
   // static const _adUnitID = "ca-app-pub-3940256099942544/2247696110";
   //-> native sample
 
-
   @override
   void didChangeDependencies() {
     findcategorynamebyid =
@@ -92,8 +91,10 @@ class _ProductsListState extends State<ProductsList> {
     void sortbyname(List<ProductModel?> list) {
       list
         ..sort((a, b) => issortname
-            ? (b!.name?.toLowerCase() ?? '').compareTo((a!.name?.toLowerCase() ?? ''))
-            : (a!.name?.toLowerCase() ?? '').compareTo((b!.name?.toLowerCase() ?? '')));
+            ? (b!.name?.toLowerCase() ?? '')
+                .compareTo((a!.name?.toLowerCase() ?? ''))
+            : (a!.name?.toLowerCase() ?? '')
+                .compareTo((b!.name?.toLowerCase() ?? '')));
       issortname = !issortname;
       setState(() {});
     }
@@ -102,20 +103,23 @@ class _ProductsListState extends State<ProductsList> {
       list
         ..sort((a, b) => issortprice
             ? varietyrangefunc!(b!.id)[0].compareTo(varietyrangefunc!(a!.id)[0])
-            : varietyrangefunc!(a!.id)[1].compareTo(varietyrangefunc!(b!.id)[1]));
+            : varietyrangefunc!(a!.id)[1]
+                .compareTo(varietyrangefunc!(b!.id)[1]));
       issortprice = !issortprice;
       setState(() {});
     }
 
     void sortbyrank(List<ProductModel?> list) {
       list
-        ..sort((a, b) =>
-            issortrank ? b!.rank!.compareTo(a!.rank!) : a!.rank!.compareTo(b!.rank!));
+        ..sort((a, b) => issortrank
+            ? b!.rank!.compareTo(a!.rank!)
+            : a!.rank!.compareTo(b!.rank!));
       issortrank = !issortrank;
       setState(() {});
     }
 
-    void sortbottomsheet(BuildContext context, List<ProductModel?>? productlist) {
+    void sortbottomsheet(
+        BuildContext context, List<ProductModel?>? productlist) {
       showModalBottomSheet(
           context: context,
           builder: (_) {
@@ -199,7 +203,9 @@ class _ProductsListState extends State<ProductsList> {
                                   categorylist: filterdata?.categorylist,
                                   rangeofprice: null);
                               productlist = filtertool.filteredproduct(
-                                  allproductlist, filterdata!, varietyrangefunc);
+                                  allproductlist,
+                                  filterdata!,
+                                  varietyrangefunc);
                               setState(() {});
                             }),
                       ),
@@ -222,7 +228,8 @@ class _ProductsListState extends State<ProductsList> {
                                       filterdata!.brandlist!.removeAt(idx);
                                       filterdata = Filterdata(
                                           brandlist:
-                                              (filterdata!.brandlist!.length == 0)
+                                              (filterdata!.brandlist!.length ==
+                                                      0)
                                                   ? null
                                                   : filterdata?.brandlist,
                                           categorylist:
@@ -261,11 +268,11 @@ class _ProductsListState extends State<ProductsList> {
                                       filterdata!.categorylist!.removeAt(idx);
                                       filterdata = Filterdata(
                                           brandlist: filterdata?.brandlist,
-                                          categorylist:
-                                              (filterdata!.categorylist!.length ==
-                                                      0)
-                                                  ? null
-                                                  : filterdata?.categorylist,
+                                          categorylist: (filterdata!
+                                                      .categorylist!.length ==
+                                                  0)
+                                              ? null
+                                              : filterdata?.categorylist,
                                           rangeofprice:
                                               filterdata?.rangeofprice);
                                       productlist = filtertool.filteredproduct(
@@ -288,14 +295,12 @@ class _ProductsListState extends State<ProductsList> {
       }
     }
 
-    if (productlist == null) {
-      productlist = [];
-    }
+    if (productlist == null) productlist = [];
     List<int> ints = List<int>.generate(5, (i) => i * 7);
     ints.remove(0);
     productlist = productlist!
-        .where(
-            (e) => (e!.name?.toLowerCase() ?? '').contains(filter?.toLowerCase() ?? ''))
+        .where((e) => (e!.name?.toLowerCase() ?? '')
+            .contains(filter?.toLowerCase() ?? ''))
         .toList();
     return (allproductlist == null)
         ? CircularProgressIndicator()
@@ -345,7 +350,9 @@ class _ProductsListState extends State<ProductsList> {
                             if (fdata != null) {
                               filterdata = fdata;
                               productlist = filtertool.filteredproduct(
-                                  allproductlist, filterdata!, varietyrangefunc);
+                                  allproductlist,
+                                  filterdata!,
+                                  varietyrangefunc);
                               setState(() {});
                             }
                           })
@@ -354,38 +361,29 @@ class _ProductsListState extends State<ProductsList> {
                   (productlist!.length == 0)
                       ? Center(
                           child: Text('No Product Available At your Filter',
-                              textAlign: TextAlign.center),
-                        )
+                              textAlign: TextAlign.center))
                       : Flexible(
                           child: Container(
-                            child: ListView.separated(
-                              separatorBuilder: (context, idx) {
-                                return 
-                                // ints.contains(idx)
-                                //     ? adwidget
-                                //     :
-                                     SizedBox.shrink();
-                              },
-                              itemBuilder: (ctx, index) {
-                                return ProductListBox(
-                                    product: productlist![index]);
-                              },
-                              itemCount: productlist!.length,
-                              shrinkWrap: true,
-                            ),
+                            child: ListView.builder(
+                                itemBuilder: (ctx, index) {
+                                  return ProductListBox(
+                                      product: productlist![index]);
+                                },
+                                itemCount: productlist!.length,
+                                shrinkWrap: true),
                           ),
                         )
                 ],
               );
   }
 
-  List<ProductModel> searchbox(List<ProductModel> product, String keyword) {
-    if (keyword.trim() == '' || keyword == null) {
-      return product;
-    } else {
-      return product;
-    }
-  }
+  // List<ProductModel> searchbox(List<ProductModel> product, String keyword) {
+  //   if (keyword.trim() == '') {
+  //     return product;
+  //   } else {
+  //     return product;
+  //   }
+  // }
 }
 
 class NoItems extends StatelessWidget {

@@ -137,7 +137,7 @@ class ExportD extends StatelessWidget {
         rank.add(output(prod.rank));
         brand.add(output(prod.brand));
         category.add(output(catstr(prod.categorylist)));
-        imagefilename.add(filenamelist(prod.imagepathlist as List<String>?));
+        imagefilename.add(filenamelist(prod.imagepathlist));
       }
 
       for (VarietyProductM i in vardata) {

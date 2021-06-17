@@ -3,6 +3,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:productcatalogue/UPI_Transaction.dart';
 import '../../Provider/ProductDataP.dart';
 import '../../Models/ProductModel.dart';
 import '../../Models/CategoryModel.dart';
@@ -34,6 +35,7 @@ class _PDFGridPicDecsState extends State<PDFGridPicDecs> {
     super.initState();
   }
 
+  String filepath = '';
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +43,6 @@ class _PDFGridPicDecsState extends State<PDFGridPicDecs> {
     PdfImage image;
     PDFDocument? pdfdoc;
     Uint8List list;
-    String filepath;
     Pdftools pdftool = Pdftools();
     List<CategoryModel> category = Provider.of<CategoryData>(context).items;
     List<ProcuctbasedModel> pbitems = [];
@@ -261,13 +262,11 @@ class _PDFGridPicDecsState extends State<PDFGridPicDecs> {
                   IconButton(
                     icon: Icon(Icons.print),
                     onPressed: () {
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (ctx) => ViewAdToDownload(
-                      //               filepath: filepath,
-                      //               ispaid: ispaid,
-                      //             )));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (ctx) => Upitransactionpage(
+                                  filepath: filepath, ispaid: ispaid)));
                     },
                   )
                 ],

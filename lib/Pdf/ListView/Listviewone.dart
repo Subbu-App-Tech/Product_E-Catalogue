@@ -2,6 +2,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:productcatalogue/UPI_Transaction.dart';
 import '../../Provider/ProductDataP.dart';
 import '../../Models/ProductModel.dart';
 import '../../Models/CategoryModel.dart';
@@ -15,9 +16,7 @@ import 'dart:typed_data';
 import '../../Provider/VarietyDataP.dart';
 import '../PdfTools.dart';
 import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
-// import '../../Auth/ViewAdtoDownload.dart';
 import '../../Models/SecureStorage.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class PDFListviewone extends StatefulWidget {
   static const routeName = '/PDFListviewone';
@@ -39,7 +38,7 @@ class _PDFListviewoneState extends State<PDFListviewone> {
     final pdf = pw.Document();
     PdfImage image;
     Uint8List list;
-    String filepath;
+    String filepath = '';
     Pdftools pdftool = Pdftools();
     List<CategoryModel> category = Provider.of<CategoryData>(context).items;
     List<ProcuctbasedModel> pbitems = [];
@@ -112,14 +111,8 @@ class _PDFListviewoneState extends State<PDFListviewone> {
             width: 575,
             padding: pw.EdgeInsets.all(2.5),
             foregroundDecoration: pw.BoxDecoration(
-              borderRadius: pw.BorderRadius.all(pw.Radius.circular(5)),
-              // border: pw.BoxBorder(
-              //     bottom: true,
-              //     right: true,
-              //     left: true,
-              //     top: true,
-              //     width: 1)
-            ),
+                borderRadius: pw.BorderRadius.all(pw.Radius.circular(5)),
+                border: pw.Border.all(width: 1)),
             child: pw.Row(
                 mainAxisSize: pw.MainAxisSize.max,
                 mainAxisAlignment: pw.MainAxisAlignment.start,
@@ -275,11 +268,11 @@ class _PDFListviewoneState extends State<PDFListviewone> {
                   IconButton(
                     icon: Icon(Icons.print),
                     onPressed: () {
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (ctx) => ViewAdToDownload(
-                      //             filepath: filepath, ispaid: ispaid)));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (ctx) => Upitransactionpage(
+                                  filepath: filepath, ispaid: ispaid)));
                     },
                   ),
                 ],

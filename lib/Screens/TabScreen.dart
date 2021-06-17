@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productcatalogue/main.dart';
 import 'package:provider/provider.dart';
 import '../Models/ProductModel.dart';
 import '../Screens/ProductsList.dart';
@@ -93,17 +94,6 @@ class _TabScreenState extends State<TabScreen> {
   }
 
   @override
-  void dispose() {
-    // _subscription.cancel();
-    super.dispose();
-  }
-
-//static const _adUnitID = ca-app-pub-9568938816087708~5406343573
-  // static const _adUnitID = "ca-app-pub-9568938816087708/6044993041";
-  // double _height = 0;
-  // late StreamSubscription _subscription;
-
-  @override
   void didChangeDependencies() {
     if (_isInit) {
       setState(() => _isLoading = true);
@@ -187,29 +177,27 @@ class _TabScreenState extends State<TabScreen> {
               body: _isLoading
                   ? Center(child: CircularProgressIndicator())
                   : _pages[_selectedPageIndex]['page'] as Widget?,
-              floatingActionButton: FloatingActionButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(UserAEForm.routeName);
-                },
-                child: Icon(Icons.add),
-              ),
+              floatingActionButton: appSetting.isViewMode
+                  ? SizedBox()
+                  : FloatingActionButton(
+                      onPressed: () =>
+                          Navigator.of(context).pushNamed(UserAEForm.routeName),
+                      child: Icon(Icons.add)),
               bottomNavigationBar: BottomNavigationBar(
-                onTap: _selectPage,
-                items: [
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.apps), label: ('Product')),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.category), label: ('Category')),
-                  BottomNavigationBarItem(
-                      icon: Icon(Icons.branding_watermark), label: ('Brand')),
-                ],
-                showSelectedLabels: true,
-                elevation: 7,
-                currentIndex: _selectedPageIndex,
-              ),
+                  onTap: _selectPage,
+                  items: [
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.apps), label: ('Product')),
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.category), label: ('Category')),
+                    BottomNavigationBarItem(
+                        icon: Icon(Icons.branding_watermark), label: ('Brand')),
+                  ],
+                  showSelectedLabels: true,
+                  elevation: 7,
+                  currentIndex: _selectedPageIndex),
             ),
           ),
-          // adwidget
         ],
       ),
     );

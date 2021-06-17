@@ -28,7 +28,7 @@ class _FilterProductState extends State<FilterProduct> {
   List<ProductModel?>? productlist;
   late List<String> catnamelist;
   List<String?> brandlist = [];
-  late Function findidlist;
+  late List<String> Function(List<String>) findidlist;
   late List<String> checkedItemList;
   List<String>? checkedbrandlist;
   Function? varietyrangefunc;
@@ -255,11 +255,6 @@ class _FilterProductState extends State<FilterProduct> {
                           rangeofprice: filterdata.rangeofprice);
                     });
                     Navigator.pop(context, filterdata);
-                    // Navigator.pushReplacement(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //         builder: (ctx) =>
-                    //             TabScreen(filterdata: filterdata)));
                   },
                   child: Text('Apply Filter'),
                 )
@@ -306,10 +301,6 @@ class Filtertool {
       }
 
       productlistmodel = [...productlistmodel!.where((ele) => (trval(ele!)))];
-      // productlistmodel = [
-      //   ...productlistmodel.where((ele) =>
-      //       (ele.price >= rangeofprice.start && ele.price <= rangeofprice.end))
-      // ];
     }
     if (filterdata.categorylist != null) {
       if (filterdata.categorylist!.length > 0) {
@@ -326,11 +317,6 @@ class Filtertool {
         productlistmodel = [
           ...productlistmodel!.where((ele) => brandlist!.contains(ele!.brand))
         ];
-        // for (String i in brandlist) {
-        //   productlistmodel = [
-        //     ...productlistmodel.where((ele) => ele.brand == i)
-        //   ];
-        // }
       }
     }
     return productlistmodel;

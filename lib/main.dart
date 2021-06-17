@@ -2,6 +2,7 @@ import 'package:external_path/external_path.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:productcatalogue/Models/Settings.dart';
 import 'Provider/ProductDataP.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'Models/ProductModel.dart';
@@ -20,7 +21,6 @@ void main() async {
   app.setAutomaticDataCollectionEnabled(true);
   app.setAutomaticResourceManagementEnabled(true);
   MobileAds.instance.initialize();
-  // FirebaseAuth.instance.setSettings();
   Box<ProductModel> pbox;
   Box<VarietyProductM> vbox;
   Box<CategoryModel> cbox;
@@ -30,13 +30,18 @@ void main() async {
     Hive.registerAdapter(ProductModelAdapter());
     Hive.registerAdapter(VarietyProductMAdapter());
     Hive.registerAdapter(CategoryModelAdapter());
+    Hive.registerAdapter(AppSettingAdapter());
   }
   pbox = await Hive.openBox<ProductModel>('ProductModel');
   vbox = await Hive.openBox<VarietyProductM>('VarietyProductM');
   cbox = await Hive.openBox<CategoryModel>('CategoryModel');
+  await Hive.openBox<AppSetting>('AppSetting');
   // await testing();
   runApp(HomePage(cbox: cbox, pbox: pbox, vbox: vbox));
 }
+
+Box<AppSetting> settingBox = Hive.box<AppSetting>('AppSetting');
+AppSetting appSetting = settingBox.get('key') ?? AppSetting();
 
 Future testing() async {
   try {

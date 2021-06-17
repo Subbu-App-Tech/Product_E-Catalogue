@@ -64,7 +64,7 @@ dependencies:
   rate_my_app: ^1.1.0+1
   sqflite: ^2.0.0+3
   # toast: ^0.1.5
-  # upi_india: ^3.0.1
+  upi_india: ^3.0.1
   wc_flutter_share: ^0.4.0
   collection: ^1.15.0-nullsafety.4
 

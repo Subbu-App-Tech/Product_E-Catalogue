@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:productcatalogue/Models/Settings.dart';
+import 'package:productcatalogue/Pdf/PdfTools.dart';
+import 'package:productcatalogue/main.dart';
 import '../Widgets/Drawer.dart';
 import '../Models/SecureStorage.dart';
 
@@ -22,6 +25,12 @@ class _SettingScreenState extends State<SettingScreen> {
   TextEditingController _companycontroller = TextEditingController();
   TextEditingController _mobilenocontroller = TextEditingController();
   @override
+  void initState() {
+    Pdftools.createInterstitialAd();
+    super.initState();
+  }
+
+  @override
   void didChangeDependencies() async {
     currency = await storage.getcurrency();
     companyname = await storage.getcompanyname();
@@ -32,14 +41,14 @@ class _SettingScreenState extends State<SettingScreen> {
     super.didChangeDependencies();
   }
 
+  late bool viewMode;
   @override
   Widget build(BuildContext context) {
+    viewMode = appSetting.isViewMode;
     return Scaffold(
       key: _scafkey,
       drawer: MyDrawer(),
-      appBar: AppBar(
-        title: Text('Setting'),
-      ),
+      appBar: AppBar(title: Text('Setting')),
       body: SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.all(10),
@@ -50,13 +59,13 @@ class _SettingScreenState extends State<SettingScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  child: Text(
-                    'Profile Details',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                  padding: EdgeInsets.fromLTRB(15, 30, 15, 15),
-                ),
+                    child: Text(
+                      'Profile Details',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                    padding: EdgeInsets.fromLTRB(15, 30, 15, 15)),
                 Container(
                   padding: EdgeInsets.all(25),
                   child: Form(
@@ -64,9 +73,8 @@ class _SettingScreenState extends State<SettingScreen> {
                       child: Column(children: <Widget>[
                         TextFormField(
                           controller: _companycontroller,
-                          decoration: InputDecoration(
-                            labelText: 'Company Name',
-                          ),
+                          decoration:
+                              InputDecoration(labelText: 'Company Name'),
                           onSaved: (value) {
                             _companycontroller.text = value!;
                             setState(() {});
@@ -74,9 +82,8 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
                         TextFormField(
                           controller: _mobilenocontroller,
-                          decoration: InputDecoration(
-                            labelText: 'Contact Number',
-                          ),
+                          decoration:
+                              InputDecoration(labelText: 'Contact Number'),
                           onSaved: (value) {
                             _mobilenocontroller.text = value!;
                             setState(() {});
@@ -84,16 +91,25 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
                         TextFormField(
                           controller: _textcontroller,
-                          decoration: InputDecoration(
-                            labelText: 'Currency',
-                          ),
+                          decoration: InputDecoration(labelText: 'Currency'),
                           onSaved: (value) {
                             _textcontroller.text = value!;
                             setState(() {});
                           },
                         ),
+                        SwitchListTile(
+                            value: viewMode,
+                            title: Text('Catalogue View Mode'),
+                            onChanged: (bol) async {
+                              viewMode = bol;
+                              AppSetting sett = appSetting;
+                              sett.setViewMode = bol;
+                              await settingBox.put('key', sett);
+                              setState(() {});
+                            })
                       ])),
                 ),
+                // ignore: deprecated_member_use
                 RaisedButton(
                   color: Colors.green,
                   child: Padding(
@@ -109,6 +125,7 @@ class _SettingScreenState extends State<SettingScreen> {
                     storage.savecompanyname(_companycontroller.text);
                     storage.savecontactnumber(_mobilenocontroller.text);
                     setState(() {});
+                    // ignore: deprecated_member_use
                     _scafkey.currentState!.showSnackBar(
                         SnackBar(content: Text('Saved Succesfully..!')));
                   },

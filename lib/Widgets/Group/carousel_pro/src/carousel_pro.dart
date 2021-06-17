@@ -169,7 +169,7 @@ class CarouselState extends State<Carousel> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget?> listImages = (widget.images != null &&
+    final List<Widget> listImages = (widget.images != null &&
             widget.images!.isNotEmpty)
         ? widget.images!.map<Widget>(
             (netImage) {
@@ -314,7 +314,7 @@ class CarouselState extends State<Carousel> {
               Widget pageView = PageView(
                 physics: AlwaysScrollableScrollPhysics(),
                 controller: _controller,
-                children: listImages as List<Widget>,
+                children: listImages ,
                 onPageChanged: (currentPage) {
                   if (widget.onImageChange != null) {
                     widget.onImageChange!(_currentImageIndex, currentPage);

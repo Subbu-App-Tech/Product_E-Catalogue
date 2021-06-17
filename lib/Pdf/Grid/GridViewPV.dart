@@ -2,6 +2,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:productcatalogue/UPI_Transaction.dart';
 import '../../Provider/ProductDataP.dart';
 import '../../Models/ProductModel.dart';
 import '../../Models/CategoryModel.dart';
@@ -34,12 +35,13 @@ class _PDFGridViewPVState extends State<PDFGridViewPV> {
     super.initState();
   }
 
+  String filepath = '';
+
   @override
   Widget build(BuildContext context) {
     final pdf = pw.Document();
     PdfImage image;
     Uint8List list;
-    String filepath;
     Pdftools pdftool = Pdftools();
     SecureStorage storage = SecureStorage();
     String currency;
@@ -104,14 +106,8 @@ class _PDFGridViewPVState extends State<PDFGridViewPV> {
             width: 285,
             padding: pw.EdgeInsets.all(2.5),
             foregroundDecoration: pw.BoxDecoration(
-              borderRadius: pw.BorderRadius.all(pw.Radius.circular(5)),
-              // border: pw.BoxBorder(
-              //     bottom: true,
-              //     right: true,
-              //     left: true,
-              //     top: true,
-              //     width: 1)
-            ),
+                borderRadius: pw.BorderRadius.all(pw.Radius.circular(5)),
+                border: pw.Border.all(width: 1)),
             child: pw.Column(
                 mainAxisSize: pw.MainAxisSize.min,
                 mainAxisAlignment: pw.MainAxisAlignment.start,
@@ -235,14 +231,13 @@ class _PDFGridViewPVState extends State<PDFGridViewPV> {
                   IconButton(
                     icon: Icon(Icons.print),
                     onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder:  (ctx) => ViewAdToDownload(
-                      //       filepath: filepath,
-                      //       ispaid: ispaid),
-                      //   ),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (ctx) => Upitransactionpage(
+                              filepath: filepath, ispaid: ispaid),
+                        ),
+                      );
                     },
                   )
                 ],

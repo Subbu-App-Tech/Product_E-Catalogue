@@ -128,10 +128,7 @@ class _ProductListBoxState extends State<ProductListBox> {
                                       dotBgColor: Colors.black26,
                                       borderRadius: true,
                                       boxFit: BoxFit.contain,
-                                    )
-                                    // Image.file(File(validimagepath(
-                                    //     widget.product.imagepathlist)[0]))
-                                    )
+                                    ))
                                 : Container(
                                     decoration: BoxDecoration(
                                         color: Colors.grey,
@@ -178,10 +175,9 @@ class _ProductListBoxState extends State<ProductListBox> {
                                       ? Text(
                                           '${currency.toUpperCase()} 0',
                                           style: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.red,
-                                            fontWeight: FontWeight.bold
-                                          ),
+                                              fontSize: 16,
+                                              color: Colors.red,
+                                              fontWeight: FontWeight.bold),
                                         )
                                       : (varietyrange[0] == varietyrange[1])
                                           ? Text(
@@ -190,8 +186,7 @@ class _ProductListBoxState extends State<ProductListBox> {
                                                 fontSize: 16,
                                                 color: Colors.red,
                                                 fontWeight: FontWeight.bold,
-                                              )
-                                            )
+                                              ))
                                           : Text(
                                               '${currency.toUpperCase()} ${varietyrange[0].toStringAsFixed(2)} - '
                                               '${varietyrange[1].toStringAsFixed(2)}',
