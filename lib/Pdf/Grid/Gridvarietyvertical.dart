@@ -15,9 +15,9 @@ import 'dart:typed_data';
 import '../../Provider/VarietyDataP.dart';
 import '../PdfTools.dart';
 import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
-// import '../../Auth/ViewAdtoDownload.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:productcatalogue/Widgets/Group/Toast.dart';
 import '../../Models/SecureStorage.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class PDFGridpicVarietyonly extends StatefulWidget {
   static const routeName = '/PDFGridpicVarietyonly';
@@ -90,23 +90,16 @@ class _PDFGridpicVarietyonlyState extends State<PDFGridpicVarietyonly> {
       PdfImage logoimage = PdfImage.file(pdf.document, bytes: logo);
 
       Future<pw.Widget> _list(ProductModel productdata) async {
-        if (pdftool
-            .checkimagepath(productdata.imagepathlist?.cast<String>() ?? [])) {
-          list = await new File(
-                  '${pdftool.validimagepath(productdata.imagepathlist?.cast<String>() ?? [])[0]}')
-              .readAsBytes();
-          image = PdfImage.file(
-            pdf.document,
-            bytes: list,
-          );
+        List<String> pathlist = pdftool
+            .validimagepath(productdata.imagepathlist?.cast<String>() ?? []);
+        if (pathlist.length > 0) {
+          list = await new File(pathlist[0]).readAsBytes();
+          image = PdfImage.file(pdf.document, bytes: list);
         } else {
           ByteData bytes = await rootBundle.load('assets/NoImage.png');
           list = bytes.buffer.asUint8List();
         }
-        image = PdfImage.file(
-          pdf.document,
-          bytes: list
-        );
+        image = PdfImage.file(pdf.document, bytes: list);
 
         return pw.Container(
             width: 280,
@@ -177,6 +170,13 @@ class _PDFGridpicVarietyonlyState extends State<PDFGridpicVarietyonly> {
 
     Future savePdf() async {
       try {
+        if (await Permission.storage.isDenied) {
+          PermissionStatus status = await Permission.storage.request();
+          if (status.isDenied) {
+            Toast.show('Permission Denied Cant able to create file', context);
+            return;
+          }
+        }
         await writeOnPdf();
         Directory documentDirectory = await getTemporaryDirectory();
         String documentPath = documentDirectory.path;

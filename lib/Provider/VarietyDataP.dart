@@ -124,13 +124,13 @@ class VarietyData with ChangeNotifier {
     notifyListeners();
   }
 
-  void editvariety(List<VarietyProductM> varietylist) {
+  void editvariety(List<VarietyProductM> varietylist) async {
     if (varietylist.length > 0) {
-      List<String?> delids = _items
+      List<String> delids = _items
           .where((ele) => ele.productid == varietylist[0].productid)
-          .map((e) => e.id)
+          .map((e) => e.id ?? '')
           .toList();
-      _dbbox!.deleteAll(delids);
+      await _dbbox?.deleteAll(delids);
       _items.removeWhere((e) => delids.contains(e.id));
       addvariety(varietylist);
     }

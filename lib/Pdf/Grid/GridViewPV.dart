@@ -2,6 +2,8 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:productcatalogue/Widgets/Group/Toast.dart';
 import 'package:productcatalogue/UPI_Transaction.dart';
 import '../../Provider/ProductDataP.dart';
 import '../../Models/ProductModel.dart';
@@ -12,11 +14,12 @@ import '../../Provider/CategoryDataP.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:typed_data';
+import 'dart:collection';
 import '../../Provider/VarietyDataP.dart';
 import '../PdfTools.dart';
 import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
 // import '../../Auth/ViewAdtoDownload.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../Models/SecureStorage.dart';
 
@@ -90,11 +93,10 @@ class _PDFGridViewPVState extends State<PDFGridViewPV> {
       Uint8List logo = bytes.buffer.asUint8List();
       PdfImage logoimage = PdfImage.file(pdf.document, bytes: logo);
       Future<pw.Widget> _list(ProductModel productdata) async {
-        if (pdftool
-            .checkimagepath(productdata.imagepathlist?.cast<String>() ?? [])) {
-          list = await new File(
-                  '${pdftool.validimagepath(productdata.imagepathlist?.cast<String>() ?? [])}')
-              .readAsBytes();
+        List<String> pathlist = pdftool
+            .validimagepath(productdata.imagepathlist?.cast<String>() ?? []);
+        if (pathlist.length > 0) {
+          list = await new File(pathlist[0]).readAsBytes();
           image = PdfImage.file(pdf.document, bytes: list);
         } else {
           ByteData bytes = await rootBundle.load('assets/NoImage.png');
@@ -211,6 +213,13 @@ class _PDFGridViewPVState extends State<PDFGridViewPV> {
     }
 
     Future savePdf() async {
+      if (await Permission.storage.isDenied) {
+        PermissionStatus status = await Permission.storage.request();
+        if (status.isDenied) {
+          Toast.show('Permission Denied Cant able to create file', context);
+          return;
+        }
+      }
       await writeOnPdf();
       Directory documentDirectory = await getApplicationDocumentsDirectory();
       String documentPath = documentDirectory.path;

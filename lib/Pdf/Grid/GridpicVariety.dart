@@ -17,7 +17,8 @@ import '../../Provider/VarietyDataP.dart';
 import '../PdfTools.dart';
 import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
 import '../../Models/SecureStorage.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:productcatalogue/Widgets/Group/Toast.dart';
 
 class PDFGridpicVarietyVertical extends StatefulWidget {
   static const routeName = '/PDFGridpicVarietyVertical';
@@ -108,15 +109,11 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
           priceA = varietyrange[0].toString();
           priceB = varietyrange[1].toString();
         }
-        if (pdftool
-            .checkimagepath(productdata.imagepathlist?.cast<String>() ?? [])) {
-          list = await new File(
-                  '${pdftool.validimagepath(productdata.imagepathlist?.cast<String>() ?? [])[0]}')
-              .readAsBytes();
-          image = PdfImage.file(
-            pdf.document,
-            bytes: list,
-          );
+        List<String> pathlist = pdftool
+            .validimagepath(productdata.imagepathlist?.cast<String>() ?? []);
+        if (pathlist.length > 0) {
+          list = await new File(pathlist[0]).readAsBytes();
+          image = PdfImage.file(pdf.document, bytes: list);
         } else {
           ByteData bytes = await rootBundle.load('assets/NoImage.png');
           list = bytes.buffer.asUint8List();
@@ -228,29 +225,29 @@ class _PDFGridpicVarietyVerticalState extends State<PDFGridpicVarietyVertical> {
               pageTheme: await pdftool.pagetheam(5, ispaid),
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               maxPages: 200,
-              header: (pw.Context ctx) => pdftool.buildHeader(i.basedon!, logoimage),
+              header: (pw.Context ctx) =>
+                  pdftool.buildHeader(i.basedon!, logoimage),
               footer: (pw.Context ctx) {
                 return pdftool.buildFooter(
                     context: ctx,
                     contactno: contactno,
                     companyname: companyname);
               },
-              build: (context) => [
-                    pw.Wrap(
-                        children: _listview,
-                        spacing: 5,
-                        // alignment: pw.WrapAlignment.start,
-                        // crossAxisAlignment: pw.WrapCrossAlignment.start,
-                        // runAlignment: pw.WrapAlignment.spaceBetween,
-                        runSpacing: 5)
-                    // )
-                  ]),
+              build: (context) =>
+                  [pw.Wrap(children: _listview, spacing: 5, runSpacing: 5)]),
         );
       }
     }
 
     Future savePdf() async {
       try {
+        if (await Permission.storage.isDenied) {
+          PermissionStatus status = await Permission.storage.request();
+          if (status.isDenied) {
+            Toast.show('Permission Denied Cant able to create file', context);
+            return;
+          }
+        }
         await writeOnPdf();
         Directory documentDirectory = await getApplicationDocumentsDirectory();
         String documentPath = documentDirectory.path;

@@ -16,6 +16,8 @@ import '../../Provider/VarietyDataP.dart';
 import '../PdfTools.dart';
 import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
 import '../../Models/SecureStorage.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:productcatalogue/Widgets/Group/Toast.dart';
 
 class PDFGriddefinedsize extends StatefulWidget {
   static const routeName = '/PDFGriddefinedsize';
@@ -103,23 +105,16 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
           priceA = varietyrange[0].toString();
           priceB = varietyrange[1].toString();
         }
-        if (pdftool
-            .checkimagepath(productdata.imagepathlist?.cast<String>() ?? [])) {
-          list = await new File(
-                  '${pdftool.validimagepath(productdata.imagepathlist?.cast<String>() ?? [])[0]}')
-              .readAsBytes();
-          image = PdfImage.file(
-            pdf.document,
-            bytes: list,
-          );
+        List<String> pathlist = pdftool
+            .validimagepath(productdata.imagepathlist?.cast<String>() ?? []);
+        if (pathlist.length > 0) {
+          list = await new File(pathlist[0]).readAsBytes();
+          image = PdfImage.file(pdf.document, bytes: list);
         } else {
           ByteData bytes = await rootBundle.load('assets/NoImage.png');
           list = bytes.buffer.asUint8List();
         }
-        image = PdfImage.file(
-          pdf.document,
-          bytes: list,
-        );
+        image = PdfImage.file(pdf.document, bytes: list);
 
         return pw.Container(
             alignment: pw.Alignment.center,
@@ -236,6 +231,13 @@ class _PDFGriddefinedsizeState extends State<PDFGriddefinedsize> {
     }
 
     Future savePdf() async {
+      if (await Permission.storage.isDenied) {
+        PermissionStatus status = await Permission.storage.request();
+        if (status.isDenied) {
+          Toast.show('Permission Denied Cant able to create file', context);
+          return;
+        }
+      }
       await writeOnPdf();
       Directory documentDirectory = await getApplicationDocumentsDirectory();
       String documentPath = documentDirectory.path;

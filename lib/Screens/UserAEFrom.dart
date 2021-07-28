@@ -63,11 +63,11 @@ class _UserAEFormState extends State<UserAEForm> {
         varietymodel = Provider.of<VarietyData>(context).findbyid(_prodid);
         categoryselected = Provider.of<CategoryData>(context)
             .findcategorylist(_product!.categorylist);
-        _namecontroller.text = _product!.name!;
+        _namecontroller.text = _product!.name??'';
         _rankcontroller.text = _product!.rank.toString();
         _imagefiles = _product!.imagepathlist?.cast<String>() ?? [];
-        _desccontroller.text = _product!.description!;
-        _brandcontroller.text = _product!.brand!;
+        _desccontroller.text = _product!.description??'';
+        _brandcontroller.text = _product!.brand ??'';
       }
     }
     _init = false;
