@@ -63,11 +63,11 @@ class _UserAEFormState extends State<UserAEForm> {
         varietymodel = Provider.of<VarietyData>(context).findbyid(_prodid);
         categoryselected = Provider.of<CategoryData>(context)
             .findcategorylist(_product!.categorylist);
-        _namecontroller.text = _product!.name??'';
+        _namecontroller.text = _product!.name ?? '';
         _rankcontroller.text = _product!.rank.toString();
         _imagefiles = _product!.imagepathlist?.cast<String>() ?? [];
-        _desccontroller.text = _product!.description??'';
-        _brandcontroller.text = _product!.brand ??'';
+        _desccontroller.text = _product!.description ?? '';
+        _brandcontroller.text = _product!.brand ?? '';
       }
     }
     _init = false;
@@ -85,9 +85,7 @@ class _UserAEFormState extends State<UserAEForm> {
 
   Widget _exitwithoutvariety(BuildContext context) {
     return AlertDialog(
-      title: Text(
-        'Atleast Add One Variety',
-      ),
+      title: Text('Atleast Add One Variety'),
       actions: [
         // ignore: deprecated_member_use
         RaisedButton(
@@ -220,22 +218,19 @@ class _UserAEFormState extends State<UserAEForm> {
             initAspectRatio: CropAspectRatioPreset.original,
             lockAspectRatio: false),
       ));
-      print('-');
       fileName = path.basename(croppedFile!.path);
       File file = File(croppedFile.path);
-      print('0');
       savedImage = await file.copy('${imagedir.path}/$fileName');
-      print('1');
       _imagefiles.add(savedImage.path);
       _product!.updateimageurl(_imagefiles);
       snackBar = SnackBar(content: Text('Image Uploaded Succesfully..!'));
     } else {
       snackBar = SnackBar(content: Text('No Image Selected Yet..!'));
     }
-    Navigator.pop(context);
     setState(() {});
     // ignore: deprecated_member_use
     _scaffoldkey.currentState!.showSnackBar(snackBar);
+    Navigator.pop(context);
   }
 
   void chooseimage(BuildContext context) {
