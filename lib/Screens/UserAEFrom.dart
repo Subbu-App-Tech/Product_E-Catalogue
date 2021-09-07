@@ -102,7 +102,6 @@ class _UserAEFormState extends State<UserAEForm> {
 
   void _saveform(BuildContext context) {
     final isValid = form.currentState!.validate();
-    print(_product!.id.runtimeType);
     if (varietymodel.length <= 0) {
       showDialog(
           context: context,

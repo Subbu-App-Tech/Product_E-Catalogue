@@ -15,7 +15,7 @@ class ProductData with ChangeNotifier {
   }
 
   void deleteall() {
-    DBHelper.deleteall('product_data');
+    // DBHelper.deleteall('product_data');
     _items = [];
     _dbbox!.deleteAll(_dbbox!.keys);
     return null;
@@ -90,7 +90,7 @@ class ProductData with ChangeNotifier {
 
   void deleteproduct(String? id) {
     _items.removeWhere((p) => p!.id == id);
-    DBHelper.delete('product_data', id);
+    // DBHelper.delete('product_data', id);
     _dbbox!.delete(id);
     notifyListeners();
   }
@@ -214,25 +214,25 @@ class ProductData with ChangeNotifier {
   }
 
   Future<void> fetchproduct() async {
-    if (_dbbox!.keys.length == 0) {
-      final dataList = await DBHelper.getData('product_data');
-      _items = dataList
-          .map(
-            (item) => ProductModel(
-                id: item['id'],
-                name: item['name'],
-                description: item['description'],
-                imagepathlist: stringtolist(item['imageurl']),
-                rank: item['rank'],
-                brand: item['brand'],
-                favourite: bolval(item['fav']),
-                categorylist: stringtolist(item['catlist'])),
-          )
-          .toList();
-      _items.forEach((e) {
-        _dbbox!.put(e!.id.toString(), e);
-      });
-    }
+    // if (_dbbox!.keys.length == 0) {
+    //   final dataList = await DBHelper.getData('product_data');
+    //   _items = dataList
+    //       .map(
+    //         (item) => ProductModel(
+    //             id: item['id'],
+    //             name: item['name'],
+    //             description: item['description'],
+    //             imagepathlist: stringtolist(item['imageurl']),
+    //             rank: item['rank'],
+    //             brand: item['brand'],
+    //             favourite: bolval(item['fav']),
+    //             categorylist: stringtolist(item['catlist'])),
+    //       )
+    //       .toList();
+    //   _items.forEach((e) {
+    //     _dbbox!.put(e!.id.toString(), e);
+    //   });
+    // }
     _items = [];
     _items = [...(_dbbox?.values ?? [])];
     // notifyListeners();

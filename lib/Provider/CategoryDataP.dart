@@ -1,8 +1,6 @@
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/material.dart';
-// import 'package:provider/provider.dart';
 import '../Models/CategoryModel.dart';
-import '../Tool/DB_Helper.dart';
 import 'package:hive/hive.dart';
 
 class CategoryData with ChangeNotifier {
@@ -101,13 +99,6 @@ class CategoryData with ChangeNotifier {
   }
 
   Future<void> fetchcategory() async {
-    if (_dbbox!.keys.length == 0) {
-      final dataList = await DBHelper.getData('catdata');
-      _items = dataList
-          .map((item) => CategoryModel(id: item['id'], name: item['name']))
-          .toList();
-      _items.forEach((e) => _dbbox!.put(e.id.toString(), e));
-    }
     _items = [];
     _items = [...(_dbbox?.values ?? [])];
     notifyListeners();

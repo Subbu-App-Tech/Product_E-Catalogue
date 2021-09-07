@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../Models/VarietyProductModel.dart';
-import '../Tool/DB_Helper.dart';
 import 'package:hive/hive.dart';
 
 class VarietyData with ChangeNotifier {
@@ -16,7 +15,7 @@ class VarietyData with ChangeNotifier {
   }
 
   void deleteall() {
-    DBHelper.deleteall('varietydata');
+    // DBHelper.deleteall('varietydata');
     _items = [];
     _dbbox!.deleteAll(_dbbox!.keys);
     return null;
@@ -84,18 +83,35 @@ class VarietyData with ChangeNotifier {
     notifyListeners();
   }
 
-  void addvariety(List<VarietyProductM> varietylist) {
+  void addvariety(List<VarietyProductM> varietylist) async {
+    List<String> prodIds = varietylist.map((e) => e.productid!).toList();
+    List<String?> toDelIds = _items
+        .where((e) => prodIds.contains(e.productid))
+        .map((e) => '${e.id}')
+        .toList();
+    print('$prodIds | To Del :: $toDelIds');
+    await _dbbox!.deleteAll(toDelIds);
+    _items.removeWhere((e) => toDelIds.contains('${e.id}'));
     if (varietylist.length > 0) {
+      int ii = 0;
       for (VarietyProductM i in varietylist) {
+        ii++;
         if (i.varityname != null) {
-          String id = i.id.toString();
-          _items.add(VarietyProductM(
+          String ke = UniqueKey().toString().substring(2, 6);
+          print('>>>>---${i.id} ---->>>');
+          String id = i.id?.toString() ??
+              '${DateTime.now().millisecondsSinceEpoch}_$ii$ke';
+          id.replaceAll('#', '');
+          id.replaceAll('[', '');
+          id.replaceAll(']', '');
+          VarietyProductM varit = VarietyProductM(
               productid: i.productid,
               id: id,
               varityname: i.varityname,
               price: i.price,
-              wsp: i.wsp));
-          _dbbox!.put(id, i);
+              wsp: i.wsp);
+          _items.add(varit);
+          await _dbbox!.put(id, varit);
         }
       }
     }
@@ -103,22 +119,6 @@ class VarietyData with ChangeNotifier {
   }
 
   Future<void> fetchvariety() async {
-    if (_dbbox!.keys.length == 0) {
-      final dataList = await DBHelper.getData('varietydata');
-      _items = dataList
-          .map(
-            (item) => VarietyProductM(
-                id: item['id'],
-                productid: item['productid'],
-                varityname: item['name'],
-                price: item['price'],
-                wsp: item['wsp']),
-          )
-          .toList();
-      _items.forEach((e) {
-        _dbbox!.put(e.id.toString(), e);
-      });
-    }
     _items = [];
     _items = [...(_dbbox?.values ?? [])];
     notifyListeners();
