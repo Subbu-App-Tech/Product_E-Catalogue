@@ -14,10 +14,9 @@ import '../../Provider/CategoryDataP.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:typed_data';
-import 'dart:collection';
 import '../../Provider/VarietyDataP.dart';
 import '../PdfTools.dart';
-import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
+import 'package:advance_pdf_viewer_fork/advance_pdf_viewer_fork.dart';
 // import '../../Auth/ViewAdtoDownload.dart';
 // import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -255,7 +254,7 @@ class _PDFGridViewPVState extends State<PDFGridViewPV> {
                   document: _pdfdoc,
                   showNavigation: true,
                   lazyLoad: true,
-                  progressIndicator: CircularProgressIndicator()));
+                  showIndicator: true));
         } else {
           return Scaffold(
               body: Center(

@@ -39,12 +39,12 @@ class _CategoryGridSState extends State<CategoryGridS> {
   }
 
 // ca-app-pub-9568938816087708~5406343573
-  static const _adUnitID = "ca-app-pub-9568938816087708/6044993041";
+  // static const _adUnitID = "ca-app-pub-9568938816087708/6044993041";
   // static const _adUnitID = "ca-app-pub-3940256099942544/2247696110";
   //-> native sample
   // final _nativeAdController = NativeAdmobController();
-  double _height = 0;
-  double _height2 = 0;
+  // double _height = 0;
+  // double _height2 = 0;
   late StreamSubscription _subscription;
 
   // void _onStateChanged(AdLoadState state) {

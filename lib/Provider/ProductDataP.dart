@@ -1,7 +1,7 @@
 import '../Models/ProductModel.dart';
 import 'package:flutter/material.dart';
 import '../Models/CategoryModel.dart';
-import '../Tool/DB_Helper.dart';
+// import '../Tool/DB_Helper.dart';
 export '../Models/ProductModel.dart';
 // import 'dart:io';
 import 'package:hive/hive.dart';
@@ -197,42 +197,13 @@ class ProductData with ChangeNotifier {
   }
 
   Future<void> addproduct(ProductModel data) async {
+    print(data.toMap());
     _items.add(data);
     _dbbox!.put(data.id.toString(), data);
-    // DBHelper.insert('product_data', {
-    //   'id': data.id,
-    //   'name': data.name,
-    //   'description': data.description,
-    //   'imageurl': lsttostring(data.imagepathlist),
-    //   'rank': data.rank,
-    //   // 'wsp': data.wsp,
-    //   'catlist': lsttostring(data.categorylist),
-    //   'brand': data.brand,
-    //   'fav': data.favourite.toString()
-    // });
     notifyListeners();
   }
 
   Future<void> fetchproduct() async {
-    // if (_dbbox!.keys.length == 0) {
-    //   final dataList = await DBHelper.getData('product_data');
-    //   _items = dataList
-    //       .map(
-    //         (item) => ProductModel(
-    //             id: item['id'],
-    //             name: item['name'],
-    //             description: item['description'],
-    //             imagepathlist: stringtolist(item['imageurl']),
-    //             rank: item['rank'],
-    //             brand: item['brand'],
-    //             favourite: bolval(item['fav']),
-    //             categorylist: stringtolist(item['catlist'])),
-    //       )
-    //       .toList();
-    //   _items.forEach((e) {
-    //     _dbbox!.put(e!.id.toString(), e);
-    //   });
-    // }
     _items = [];
     _items = [...(_dbbox?.values ?? [])];
     // notifyListeners();

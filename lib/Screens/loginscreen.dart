@@ -119,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
                         ]),
                   ),
                   Spacer(),
-                  FlatButton(
+                  TextButton(
                     onPressed: () {
                       storage.setloginval('Skiped_login');
                       Navigator.of(context).pushReplacement(

@@ -261,34 +261,34 @@ class _ImportExportState extends State<ImportExport> {
     _scaffoldkey.currentState!.showSnackBar(snackBar);
   }
 
-  Widget _errorondownload(BuildContext context, String url) {
-    return AlertDialog(
-      title: Text('Error Downloading'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('Sorry, Some Error Occurs.'
-              '\nDownload it Manually by copy & paste the link to your browser'),
-          SizedBox(height: 7),
-          // ignore: deprecated_member_use
-          RaisedButton(
-            color: Colors.green,
-            child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: Text('Click Here to Copy Download Link',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white)),
-            ),
-            onPressed: () {
-              print('copy');
-              Clipboard.setData(new ClipboardData(text: url));
-              Navigator.of(context).pop('copied');
-            },
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _errorondownload(BuildContext context, String url) {
+  //   return AlertDialog(
+  //     title: Text('Error Downloading'),
+  //     content: Column(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         Text('Sorry, Some Error Occurs.'
+  //             '\nDownload it Manually by copy & paste the link to your browser'),
+  //         SizedBox(height: 7),
+  //         // ignore: deprecated_member_use
+  //         RaisedButton(
+  //           color: Colors.green,
+  //           child: Padding(
+  //             padding: const EdgeInsets.all(5),
+  //             child: Text('Click Here to Copy Download Link',
+  //                 textAlign: TextAlign.center,
+  //                 style: TextStyle(color: Colors.white)),
+  //           ),
+  //           onPressed: () {
+  //             print('copy');
+  //             Clipboard.setData(new ClipboardData(text: url));
+  //             Navigator.of(context).pop('copied');
+  //           },
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Future<void> downloadwithdata(BuildContext context) async {
     String result = '';
@@ -370,6 +370,7 @@ class _ImportExportState extends State<ImportExport> {
               Container(
                 padding: EdgeInsets.fromLTRB(30, 10, 30, 5),
                 alignment: Alignment.center,
+                // ignore: deprecated_member_use
                 child: RaisedButton(
                   color: Colors.blue,
                   elevation: 5,
@@ -389,6 +390,7 @@ class _ImportExportState extends State<ImportExport> {
               Container(
                 padding: EdgeInsets.fromLTRB(30, 5, 30, 10),
                 alignment: Alignment.center,
+                // ignore: deprecated_member_use
                 child: RaisedButton(
                   color: Colors.blue,
                   elevation: 5,

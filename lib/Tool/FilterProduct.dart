@@ -229,6 +229,7 @@ class _FilterProductState extends State<FilterProduct> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                // ignore: deprecated_member_use
                 RaisedButton(
                   onPressed: () {
                     filterdata = Filterdata(
@@ -246,6 +247,7 @@ class _FilterProductState extends State<FilterProduct> {
                   },
                   child: Text('Reset Filter'),
                 ),
+                // ignore: deprecated_member_use
                 RaisedButton(
                   onPressed: () {
                     setState(() {

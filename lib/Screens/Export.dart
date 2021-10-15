@@ -101,7 +101,7 @@ class ExportD extends StatelessWidget {
       String catstr(var categorylist) {
         List catnamelist = Provider.of<CategoryData>(context, listen: false)
             .findcategorylist(categorylist);
-        if (catnamelist == null || catnamelist.length == 0) {
+        if (catnamelist.length == 0) {
           return '';
         } else if (catnamelist.length == 1) {
           return catnamelist[0];
@@ -120,11 +120,11 @@ class ExportD extends StatelessWidget {
           for (String i in list) {
             // print(i);
             // print(basename(i));
-            if (i != null) {
+            // if (i != null) {
+            // }
               if (basename(i) != '') {
                 filename.add(basename(i));
               }
-            }
           }
           return filename.join(',');
         }
@@ -218,6 +218,7 @@ class ExportD extends StatelessWidget {
             snackBar = SnackBar(
                 content: Text(
                     'Data Exported Succesfully to Product E-catalogue folder..!'));
+            // ignore: deprecated_member_use
             _scaffoldkey.currentState!.showSnackBar(snackBar);
             return f.writeAsString(csv);
           }
@@ -242,6 +243,7 @@ class ExportD extends StatelessWidget {
               String csv = const ListToCsvConverter().convert(rows);
               snackBar =
                   SnackBar(content: Text('CSV exported to App Directory..!'));
+              // ignore: deprecated_member_use
               _scaffoldkey.currentState!.showSnackBar(snackBar);
               return file.writeAsString(csv);
             } else {
@@ -256,7 +258,8 @@ class ExportD extends StatelessWidget {
           print('>>> $ee');
           snackBar = SnackBar(content: Text('Sorry, Error -> $ee'));
         }
-        print(snackBar);
+        // print(snackBar);
+        // ignore: deprecated_member_use
         _scaffoldkey.currentState!.showSnackBar(snackBar);
       }
     }

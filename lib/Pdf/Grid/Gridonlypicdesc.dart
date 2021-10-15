@@ -1,4 +1,4 @@
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:io';
@@ -16,7 +16,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import '../PdfTools.dart';
 import '../../Provider/VarietyDataP.dart';
-import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
+import 'package:advance_pdf_viewer_fork/advance_pdf_viewer_fork.dart';
 // import '../../Auth/ViewAdtoDownload.dart';
 import '../../Models/SecureStorage.dart';
 import 'package:permission_handler/permission_handler.dart';

@@ -53,6 +53,7 @@ class _ContactUsState extends State<ContactUs> {
     }
 
     if (!mounted) return;
+    // ignore: deprecated_member_use
     _scaffoldKey.currentState!.showSnackBar(SnackBar(
       content: Text(platformResponse),
     ));
@@ -160,7 +161,7 @@ class _ContactUsState extends State<ContactUs> {
                 Container(
                   height: 150,
                   width: 150,
-                  child: FlatButton(
+                  child: TextButton(
                     child: Column(
                       children: [
                         Image.asset(
@@ -183,7 +184,7 @@ class _ContactUsState extends State<ContactUs> {
                 Container(
                   height: 150,
                   width: 150,
-                  child: FlatButton(
+                  child: TextButton(
                     child: Column(
                       children: [
                         Image.asset(

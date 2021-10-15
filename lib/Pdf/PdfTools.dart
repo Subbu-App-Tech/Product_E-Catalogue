@@ -198,11 +198,13 @@ class Pdftools {
         snackBar = SnackBar(
             content:
                 Text('Template Downloaded Succesfully in Download folder..!'));
+        // ignore: deprecated_member_use
         _scaffoldkey.currentState!.showSnackBar(snackBar);
         // return
       } else {
         snackBar =
             SnackBar(content: Text('Sorry, Error in Template Downloaded..!'));
+        // ignore: deprecated_member_use
         _scaffoldkey.currentState!.showSnackBar(snackBar);
       }
     }

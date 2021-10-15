@@ -64,7 +64,7 @@ class _TabScreenState extends State<TabScreen> {
                 'It really helps us and it shouldn\'t take you more than one minute.',
             actionsBuilder: (_, stars) {
               return [
-                FlatButton(
+                TextButton(
                   child: Text('OK'),
                   onPressed: () async {
                     if (stars != null && (stars > 2)) {

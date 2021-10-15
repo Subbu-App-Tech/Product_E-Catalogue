@@ -15,7 +15,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import '../../Provider/VarietyDataP.dart';
 import '../PdfTools.dart';
-import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
+import 'package:advance_pdf_viewer_fork/advance_pdf_viewer_fork.dart';
 import '../../Models/SecureStorage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:productcatalogue/Widgets/Group/Toast.dart';

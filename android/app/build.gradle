@@ -44,7 +44,7 @@ def keystoreProperties = new Properties()
 
     defaultConfig {
         applicationId "com.subbu.productcatalogue"
-        minSdkVersion 19 // 16 
+        minSdkVersion 21 // 16 
         targetSdkVersion 30  // 28  
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

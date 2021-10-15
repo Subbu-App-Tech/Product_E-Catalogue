@@ -43,18 +43,13 @@ class _UserAEFormState extends State<UserAEForm> {
   var _init = true;
   List<VarietyProductM> varietymodel = [];
   List<String> categoryselected = [];
-  String uq = UniqueKey().toString();
+  String uq = '${DateTime.now().millisecondsSinceEpoch}${UniqueKey().toString().substring(2,6)}';
   ProductModel? _product;
 
   @override
   void didChangeDependencies() {
     _product = ProductModel(
-        id: uq,
-        name: null,
-        imagepathlist: null,
-        brand: null,
-        description: null,
-        categorylist: null);
+        id: uq,name: '');
     if (_init) {
       final _prodid = ModalRoute.of(context)!.settings.arguments as String?;
       if (_prodid != null) {
@@ -187,12 +182,6 @@ class _UserAEFormState extends State<UserAEForm> {
   late Directory imagedir;
   String? appDirs;
   Future getImage(ImageSource imagesource) async {
-    showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-            content: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [CircularProgressIndicator()])));
     appDirs = await ExternalPath.getExternalStoragePublicDirectory(
         ExternalPath.DIRECTORY_DOWNLOADS);
     var status = await Permission.storage.status;
@@ -226,10 +215,9 @@ class _UserAEFormState extends State<UserAEForm> {
     } else {
       snackBar = SnackBar(content: Text('No Image Selected Yet..!'));
     }
-    setState(() {});
     // ignore: deprecated_member_use
     _scaffoldkey.currentState!.showSnackBar(snackBar);
-    Navigator.pop(context);
+    setState(() {});
   }
 
   void chooseimage(BuildContext context) {
@@ -245,35 +233,27 @@ class _UserAEFormState extends State<UserAEForm> {
                 Container(
                   height: 150,
                   width: 150,
-                  // ignore: deprecated_member_use
-                  child: FlatButton(
+                  child: TextButton(
                     child: Column(
                       children: [
                         Image.asset('assets/camera.png', fit: BoxFit.fill),
                         Text('Camera')
                       ],
                     ),
-                    onPressed: () {
-                      getImage(ImageSource.camera);
-                      Navigator.pop(context);
-                    },
+                    onPressed: () => getImage(ImageSource.camera),
                   ),
                 ),
                 Container(
                   height: 150,
                   width: 150,
-                  // ignore: deprecated_member_use
-                  child: FlatButton(
+                  child: TextButton(
                     child: Column(
                       children: [
                         Image.asset('assets/gallery.png', fit: BoxFit.fill),
                         Text('Gallery')
                       ],
                     ),
-                    onPressed: () {
-                      getImage(ImageSource.gallery);
-                      Navigator.pop(context);
-                    },
+                    onPressed: () => getImage(ImageSource.gallery),
                   ),
                 )
               ],
@@ -287,15 +267,10 @@ class _UserAEFormState extends State<UserAEForm> {
     List<CategoryModel> categoryitems =
         Provider.of<CategoryData>(context, listen: true).items;
     List<String?> categorylist = categoryitems.map((e) => e.name).toList();
-    // for (var i in categoryitems) {
-    //   categorylist.add(i.name);
-    // }
-
     return Scaffold(
       key: _scaffoldkey,
-      appBar: AppBar(
-        title: (edit) ? Text('Edit Product') : Text("Add Product"),
-      ),
+      appBar:
+          AppBar(title: (edit) ? Text('Edit Product') : Text("Add Product")),
       body: Form(
         key: form,
         child: ListView(
@@ -360,8 +335,7 @@ class _UserAEFormState extends State<UserAEForm> {
                           ),
                         )
                       : SizedBox.shrink(),
-                  // ignore: deprecated_member_use
-                  FlatButton(
+                  TextButton(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,

@@ -6,7 +6,7 @@ import '../Provider/VarietyDataP.dart';
 import '../Provider/ProductDataP.dart';
 import 'package:provider/provider.dart';
 // import 'package:flutter_native_admob/native_admob_options.dart';
-import 'dart:async';
+// import 'dart:async';
 // import 'package:flutter_native_admob/flutter_native_admob.dart' as ad;
 // import 'package:flutter_native_admob/native_admob_controller.dart';
 
