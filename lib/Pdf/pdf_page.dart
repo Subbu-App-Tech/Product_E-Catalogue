@@ -10,10 +10,13 @@ import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class PDFPage extends StatefulWidget {
-  final Function(List<ProcuctbasedModel>,bool) getDataFunc;
+  final Function(List<ProcuctbasedModel>, bool) getDataFunc;
+  final String input;
+  final String sortby;
   final bool ispaid;
   static const routeName = '/PDFListviewone';
-  const PDFPage({Key? key, required this.getDataFunc, required this.ispaid}) : super(key: key);
+  const PDFPage({Key? key, required this.getDataFunc, required this.ispaid, required this.input, required this.sortby})
+      : super(key: key);
 
   @override
   _PDFPageState createState() => _PDFPageState();
@@ -34,10 +37,9 @@ class _PDFPageState extends State<PDFPage> {
     List<Count> uqbrand = Provider.of<ProductData>(context).uqBrand;
     List<ProcuctbasedModel> pbitems = [];
     late PDFDocument _pdfdoc;
-    List frowd = ModalRoute.of(context)!.settings.arguments as List;
-    String input = frowd[0];
-    String sortby = frowd[1];
-    bool ispaid = frowd[2];
+    String input = widget.input;
+    String sortby = widget.sortby;
+    bool ispaid = widget.ispaid;
 
     List<Product> pm;
     if (input == 'brand') {
@@ -69,8 +71,7 @@ class _PDFPageState extends State<PDFPage> {
           return;
         }
       }
-      Uint8List list =
-      await widget.getDataFunc(pbitems,widget.ispaid );
+      Uint8List list = await widget.getDataFunc(pbitems, widget.ispaid);
 
       Directory documentDirectory = await getApplicationDocumentsDirectory();
       String documentPath = documentDirectory.path;

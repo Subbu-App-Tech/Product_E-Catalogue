@@ -14,6 +14,11 @@ class PDFDicv extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void navidateTo(String parm) {
+      Navigator.pushNamed(context, PDFbrandscatlogue.routeName,
+          arguments: [parm, ispaid]);
+    }
+
     return Column(
       children: [
         SizedBox(height: 10),
@@ -23,10 +28,7 @@ class PDFDicv extends StatelessWidget {
                 child: ListTile(
               title: Text('Create Product Catalogue for All Product'),
               subtitle: Text('Create Product Catalogue as PDF'),
-              onTap: () {
-                Navigator.pushNamed(context, PDFbrandscatlogue.routeName,
-                    arguments: ['all', ispaid]);
-              },
+              onTap: () => navidateTo('all'),
             ))),
         Divider(),
         Container(
@@ -35,10 +37,7 @@ class PDFDicv extends StatelessWidget {
                 child: ListTile(
               title: Text('Create Product Catalogue by Brand'),
               subtitle: Text('Create Product Catalogue as PDF'),
-              onTap: () {
-                Navigator.pushNamed(context, PDFbrandscatlogue.routeName,
-                    arguments: ['brand', ispaid]);
-              },
+              onTap: () => navidateTo('brand'),
             ))),
         Divider(),
         Container(
@@ -47,10 +46,7 @@ class PDFDicv extends StatelessWidget {
                 child: ListTile(
               title: Text('Create Product Catalogue by Category'),
               subtitle: Text('Create Product Catalogue as PDF'),
-              onTap: () {
-                Navigator.pushNamed(context, PDFbrandscatlogue.routeName,
-                    arguments: ['cat', ispaid]);
-              },
+              onTap: () => navidateTo('cat'),
             ))),
       ],
     );
@@ -155,24 +151,21 @@ class PDFbrandscatlogue extends StatelessWidget {
     }
 
     bool clicked(String? value) {
-      if (value == null) {
-        return false;
-      } else if (value == 'close') {
-        return false;
-      } else {
-        return true;
-      }
+      return value?.isNotEmpty ?? false;
     }
 
     List vallst = ModalRoute.of(context)!.settings.arguments as List;
-    // String value = '${vallst[0]}';
+    String value = '${vallst[0]}';
     bool ispaid = vallst[1];
-    void navigateTo(Function(List<ProcuctbasedModel>, bool) getDataFunc) {
+    void navigateTo(
+        Function(List<ProcuctbasedModel>, bool) getDataFunc, String sortby) {
       Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                PDFPage(getDataFunc: getDataFunc, ispaid: ispaid),
+            builder: (context) => PDFPage(
+                getDataFunc: getDataFunc,
+                ispaid: ispaid,input: value,
+                sortby: sortby),
           ));
     }
 
@@ -191,7 +184,7 @@ class PDFbrandscatlogue extends StatelessWidget {
                   onTap: () async {
                     sortby = await dialog(context);
                     if (clicked(sortby)) {
-                      navigateTo(gridViewPv);
+                      navigateTo(gridViewPv, sortby!);
                     }
                   },
                 ))),
@@ -206,7 +199,7 @@ class PDFbrandscatlogue extends StatelessWidget {
                   onTap: () async {
                     sortby = await dialog(context);
                     if (clicked(sortby)) {
-                      navigateTo(gridOnlyPicDesc);
+                      navigateTo(gridOnlyPicDesc, sortby!);
                     }
                   },
                 ))),
@@ -220,7 +213,7 @@ class PDFbrandscatlogue extends StatelessWidget {
                   onTap: () async {
                     sortby = await dialog(context);
                     if (clicked(sortby)) {
-                      navigateTo(gridVarietyVertPv);
+                      navigateTo(gridVarietyVertPv, sortby!);
                     }
                   },
                 ))),
@@ -234,7 +227,7 @@ class PDFbrandscatlogue extends StatelessWidget {
                   onTap: () async {
                     sortby = await dialog(context);
                     if (clicked(sortby)) {
-                      navigateTo(gridDefineSize);
+                      navigateTo(gridDefineSize, sortby!);
                     }
                   },
                 ))),
@@ -249,7 +242,7 @@ class PDFbrandscatlogue extends StatelessWidget {
                   onTap: () async {
                     sortby = await dialog(context);
                     if (clicked(sortby)) {
-                      navigateTo(gridPicVariety);
+                      navigateTo(gridPicVariety, sortby!);
                     }
                   },
                 ))),
@@ -263,7 +256,7 @@ class PDFbrandscatlogue extends StatelessWidget {
                   onTap: () async {
                     sortby = await dialog(context);
                     if (clicked(sortby)) {
-                      navigateTo(listViewOne);
+                      navigateTo(listViewOne, sortby!);
                     }
                   },
                 ))),

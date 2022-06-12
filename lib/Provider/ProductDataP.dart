@@ -59,7 +59,7 @@ class ProductData with ChangeNotifier {
     final prodindex = _items.indexWhere((p) => p.id == product.id);
     _items[prodindex] = product;
     await _dbbox.put(product.id.toString(), product);
-    notifyListeners();
+    product.notify();
   }
 
   Future deleteproduct(String? id) async {
@@ -86,10 +86,11 @@ class ProductData with ChangeNotifier {
 
   List<Count> get uqBrand {
     List<Count> rst = [];
-    List<String?> totalbrand = _items.map((e) => e.brand).toList();
+    List<String?> totalbrand =
+        _items.map((e) => (e.brand?.isEmpty ?? true) ? null : e.brand).toList();
     List<String?> uniqval = totalbrand.toSet().toList();
     for (String? i in uniqval) {
-      rst.add(Count(count: totalbrand.where((f) => f == i).length));
+      rst.add(Count(name: i, count: totalbrand.where((f) => f == i).length));
     }
     return rst;
   }

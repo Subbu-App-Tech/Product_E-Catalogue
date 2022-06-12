@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productcatalogue/Screens/Form/image_handle.dart';
 import 'package:productcatalogue/main.dart';
 import '../Screens/Form/product_form.dart';
 import '../Provider/ProductDataP.dart';
@@ -63,7 +64,7 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
   }
 
   Widget imageDetails() {
-    images = imagefilelist(widget.product.imagepathlist);
+    images = haldler.imagefilelist(widget.product.imagepathlist);
     return InkWell(
       child: Hero(tag: '${widget.product.id}', child: imageWid()),
       onTap: () {
@@ -76,33 +77,6 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
     );
   }
 
-  List<String> validimagepath(List<String> pathlist) {
-    List<String> valid = [];
-    for (String i in pathlist) {
-      if (File(i).existsSync()) {
-        valid.add(i);
-      }
-    }
-    return valid;
-  }
-
-  bool checkimagepath(List<String> imagelist) {
-    if (imagelist.length > 0) {
-      if (validimagepath(imagelist).length > 0) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  List<FileImage> imagefilelist(List<String> pathlist) {
-    List<FileImage> image = [];
-    for (String i in validimagepath(pathlist)) {
-      image.add(FileImage(File(i)));
-    }
-    return image;
-  }
-
   List<Widget> catlist(List<String> list) {
     return list
         .map((e) => Container(
@@ -112,11 +86,37 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
         .toList();
   }
 
+  String get vatText => widget.product.varieties
+      .map((e) => '${e.name} - ${e.price} - ${e.wsp}')
+      .join('\n');
+  void updateTxt() {
+    if (widget.product.description == null ||
+        widget.product.description!.trim() == '') {
+      text = '''
+${widget.product.name}
+
+Varieties:
+  $vatText
+            
+Created & Shared By Product E-Catalogue App''';
+    } else {
+      text = '''
+${widget.product.name}
+Description:
+  ${widget.product.description}
+Varieties:
+  $vatText
+            
+Created with Product E-Catalogue App''';
+    }
+  }
+
+  ImageHandler haldler = ImageHandler();
   @override
   Widget build(BuildContext context) {
     Pdftools pdftool = Pdftools();
     final varPriceRange = widget.product.minMaxPrice;
-
+    updateTxt();
     onSortnameColum(
         int columnIndex, bool ascending, List<VarietyProductM> list) {
       if (columnIndex == _sortColumnIndex) {
@@ -139,7 +139,7 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
         _sortAsc = _sortpriceAsc;
       }
       list.sort((a, b) =>
-          _sortAsc? b.price.compareTo(a.price) : a.price.compareTo(b.price));
+          _sortAsc ? b.price.compareTo(a.price) : a.price.compareTo(b.price));
       setState(() {});
     }
 
@@ -152,7 +152,7 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
         _sortAsc = _sortwspAsc;
       }
       list.sort((a, b) =>
-          _sortAsc? b.wsp.compareTo(a.price) : a.wsp.compareTo(b.price));
+          _sortAsc ? b.wsp.compareTo(a.price) : a.wsp.compareTo(b.price));
       setState(() {});
     }
 
@@ -188,29 +188,6 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
               child: Text('Back'), onPressed: () => Navigator.pop(context))
         ],
       );
-    }
-
-    String vatText = widget.product.varieties
-        .map((e) => '${e.name} - ${e.price} - ${e.wsp}')
-        .join('\n');
-    if (widget.product.description == null ||
-        widget.product.description!.trim() == '') {
-      text = '''
-${widget.product.name}
-
-Varieties:
-  $vatText
-            
-Created & Shared By Product E-Catalogue App''';
-    } else {
-      text = '''
-${widget.product.name}
-Description:
-  ${widget.product.description}
-Varieties:
-  $vatText
-            
-Created with Product E-Catalogue App''';
     }
 
     void _shareImageAndText() async {
@@ -257,40 +234,43 @@ Created with Product E-Catalogue App''';
                       height: 250,
                       width: double.infinity,
                       padding: EdgeInsets.all(8),
-                      child: checkimagepath(widget.product.imagepathlist)
-                          ? imageDetails()
-                          : Center(
-                              child: Container(
-                              height: 240,
-                              width: 240,
-                              color: Colors.grey[400],
-                              alignment: Alignment.center,
-                              child: Text(
-                                'No Image',
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ))),
+                      child:
+                          haldler.checkimagepath(widget.product.imagepathlist)
+                              ? imageDetails()
+                              : Center(
+                                  child: Container(
+                                  height: 240,
+                                  width: 240,
+                                  color: Colors.grey[400],
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'No Image',
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ))),
                   Positioned(
                     bottom: 10,
                     right: 10,
-                    child: RawMaterialButton(
-                        splashColor: Colors.red,
-                        elevation: 7,
-                        shape: CircleBorder(),
-                        child: (widget.product.favourite)
-                            ? Icon(Icons.favorite, color: Colors.red, size: 30)
-                            : Icon(Icons.favorite_border, size: 30),
-                        fillColor: Colors.white,
-                        padding: EdgeInsets.all(8),
-                        onPressed: () {
-                          widget.product.toggleFavoriteStatus();
-                          Provider.of<ProductData>(context, listen: false)
-                              .toggleFavoriteStatus(widget.product);
-                          setState(() {});
-                        }),
+                    child: StatefulBuilder(builder: (context, setState) {
+                      return RawMaterialButton(
+                          splashColor: Colors.red,
+                          elevation: 7,
+                          shape: CircleBorder(),
+                          child: (widget.product.favourite)
+                              ? Icon(Icons.favorite,
+                                  color: Colors.red, size: 30)
+                              : Icon(Icons.favorite_border, size: 30),
+                          fillColor: Colors.white,
+                          padding: EdgeInsets.all(8),
+                          onPressed: () {
+                            Provider.of<ProductData>(context, listen: false)
+                                .toggleFavoriteStatus(widget.product);
+                            setState(() {});
+                          });
+                    }),
                   ),
                 ],
               ),

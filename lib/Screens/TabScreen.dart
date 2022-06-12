@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:productcatalogue/main.dart';
 import '../Screens/ProductsList.dart';
-import '../Screens/CategoryGridS.dart';
-import '../Screens/BrandGridS.dart';
+import 'product_groups.dart';
 import 'Form/product_form.dart';
 import '../Provider/ProductDataP.dart';
 import '../Widgets/Drawer.dart';
@@ -40,6 +39,7 @@ class _TabScreenState extends State<TabScreen> {
     super.initState();
   }
 
+  Filterdata filter = Filterdata(brandlist: [], categorylist: []);
   @override
   void didChangeDependencies() {
     SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -47,9 +47,26 @@ class _TabScreenState extends State<TabScreen> {
     });
     favproducts = Provider.of<ProductData>(context).favoriteItems;
     _pages = [
-      {'page': ProductsList(), 'title': 'Products'},
-      {'page': CategoryGridS(), 'title': 'Categories'},
-      {'page': BrandListS(), 'title': 'Brands'},
+      {'page': ProductsList(filterdata: () => filter), 'title': 'Products'},
+      {
+        'page': GridListTiles(
+            isCateg: true,
+            onTap: (str) {
+              filter = Filterdata(
+                  brandlist: [], categorylist: str == null ? [] : [str]);
+              _selectPage(0);
+            }),
+        'title': 'Categories'
+      },
+      {
+        'page': GridListTiles(
+            isCateg: false,
+            onTap: (str) {
+              filter = Filterdata(brandlist: [str], categorylist: []);
+              _selectPage(0);
+            }),
+        'title': 'Brands'
+      },
     ];
     super.didChangeDependencies();
   }
@@ -61,63 +78,53 @@ class _TabScreenState extends State<TabScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: Scaffold(
-              drawer: MyDrawer(),
-              appBar: AppBar(
-                title: Text(_pages[_selectedPageIndex]['title'] as String),
-                actions: <Widget>[
-                  IconButton(
-                      icon: Icon(Icons.shopping_bag),
-                      onPressed: () {
-                        Navigator.pushNamed(context, ContactUs.routeName,
-                            arguments: true);
-                      }),
-                  SizedBox(width: 5),
-                  Badge(
-                    child: IconButton(
-                      icon: Icon(Icons.favorite, size: 27),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const ProductsList(isFavOnly: true),
-                            ));
-                        // Navigator.pushNamed(context, FavProductsList.routeName);
-                      },
-                    ),
-                    badgeContent: Text('${favproducts.length}'),
-                    showBadge: favproducts.length > 0,
-                  ),
-                ],
-              ),
-              body: _pages[_selectedPageIndex]['page'] as Widget,
-              floatingActionButton: appSetting.isViewMode
-                  ? SizedBox()
-                  : FloatingActionButton(
-                      onPressed: () =>
-                          Navigator.of(context).pushNamed(UserAEForm.routeName),
-                      child: Icon(Icons.add)),
-              bottomNavigationBar: BottomNavigationBar(
-                  onTap: _selectPage,
-                  items: [
-                    BottomNavigationBarItem(
-                        icon: Icon(Icons.apps), label: ('Product')),
-                    BottomNavigationBarItem(
-                        icon: Icon(Icons.category), label: ('Category')),
-                    BottomNavigationBarItem(
-                        icon: Icon(Icons.branding_watermark), label: ('Brand')),
-                  ],
-                  showSelectedLabels: true,
-                  elevation: 7,
-                  currentIndex: _selectedPageIndex),
+      drawer: MyDrawer(),
+      appBar: AppBar(
+        title: Text(_pages[_selectedPageIndex]['title'] as String),
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.shopping_bag),
+              onPressed: () {
+                Navigator.pushNamed(context, ContactUs.routeName,
+                    arguments: true);
+              }),
+          SizedBox(width: 5),
+          Badge(
+            child: IconButton(
+              icon: Icon(Icons.favorite, size: 27),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          const ProductListPg(isFavOnly: true),
+                    ));
+              },
             ),
+            badgeContent: Text('${favproducts.length}'),
+            showBadge: favproducts.length > 0,
           ),
         ],
       ),
+      body: _pages[_selectedPageIndex]['page'] as Widget,
+      floatingActionButton: appSetting.isViewMode
+          ? SizedBox()
+          : FloatingActionButton(
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(UserAEForm.routeName),
+              child: Icon(Icons.add)),
+      bottomNavigationBar: BottomNavigationBar(
+          onTap: _selectPage,
+          items: [
+            BottomNavigationBarItem(icon: Icon(Icons.apps), label: ('Product')),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.category), label: ('Category')),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.branding_watermark), label: ('Brand')),
+          ],
+          showSelectedLabels: true,
+          elevation: 7,
+          currentIndex: _selectedPageIndex),
     );
   }
 }

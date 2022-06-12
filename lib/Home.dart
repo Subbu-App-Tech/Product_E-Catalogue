@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:productcatalogue/Pdf/PDFhomepage.dart';
 import 'Provider/ProductDataP.dart';
 import 'Screens/Form/product_form.dart';
-import 'Screens/CategoryGridS.dart';
-import 'Screens/BrandGridS.dart';
 import 'Screens/TabScreen.dart';
 import 'Screens/Import.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -46,9 +45,9 @@ class _ProductCatalogueState extends State<ProductCatalogue> {
   Widget get homeScreen {
     return FutureBuilder<User?>(
       future: getData(),
-      builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
+      builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return Scaffold(body: Center(child: CircularProgressIndicator()));
         }
         if (snapshot.hasData) {
           return Tabscreenwithdata();
@@ -74,8 +73,6 @@ class _ProductCatalogueState extends State<ProductCatalogue> {
         navigatorObservers: [BotToastNavigatorObserver()],
         home: homeScreen,
         routes: {
-          CategoryGridS.routeName: (ctx) => CategoryGridS(),
-          BrandListS.routeName: (ctx) => BrandListS(),
           ImportExport.routeName: (ctx) => ImportExport(),
           FilterProduct.routeName: (ctx) => FilterProduct(),
           UserAEForm.routeName: (ctx) => UserAEForm(),
@@ -84,6 +81,7 @@ class _ProductCatalogueState extends State<ProductCatalogue> {
           ContactUs.routeName: (ctx) => ContactUs(),
           AboutUs.routeName: (ctx) => AboutUs(),
           Tabscreenwithdata.routeName: (ctx) => Tabscreenwithdata(),
+          PDFbrandscatlogue.routeName: (ctx)=>PDFbrandscatlogue(),
         },
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../Provider/ProductDataP.dart';
 import '../Screens/TabScreen.dart';
 import '../Widgets/Group/grouped_checkbox.dart';
@@ -16,7 +17,7 @@ class _FilterProductState extends State<FilterProduct> {
   bool isExpanded = false;
   Filtertool filtertool = Filtertool();
   List<String> catNameList = [];
-  List<String?> brandlist = [];
+  List<String> brandlist = [];
   late Filterdata filterdata;
 
   @override
@@ -78,24 +79,11 @@ class _FilterProductState extends State<FilterProduct> {
                           child: Text('No Brand Available'))
                       : BrandSelectionChip(
                           brandlist: brandlist,
+                          selecBrandlist: () => filterdata.brandlist,
                           onBrandChange: (valuelist) {
                             filterdata.brandlist = valuelist;
                           },
                         )
-                  // : MultiSelectChipGroup(
-                  //     items: brandlist,
-                  //     preSelectedItems: filterdata.brandlist,
-                  //     disabledColor: Colors.grey[250],
-                  //     selectedColor: Colors.blue,
-                  //     horizontalChipSpacing: 10,
-                  //     labelDisabledColor: Colors.black,
-                  //     labelSelectedColor: Colors.white,
-                  //     labelFontSize: 12,
-                  //     onSelectionChanged: (valuelist) {
-                  //       filterdata.brandlist = valuelist;
-                  //       setState(() {});
-                  //     },
-                  //   )
                 ],
               ),
             ),
@@ -137,10 +125,12 @@ class Filtertool {
   List<Product> filteredproduct(
       List<Product> productlistmodel, Filterdata filterdata) {
     if (filterdata.categorylist.isNotEmpty) {
-      productlistmodel.removeWhere((e) => !filterdata.categorylist.contains(e));
+      productlistmodel.removeWhere(
+          (e) => !filterdata.categorylist.any((a) => e.categories.contains(a)));
     }
     if (filterdata.brandlist.isNotEmpty) {
-      productlistmodel.removeWhere((e) => !filterdata.brandlist.contains(e));
+      productlistmodel
+          .removeWhere((e) => !filterdata.brandlist.contains(e.brand));
     }
     if (filterdata.isFavOnly) {
       productlistmodel.removeWhere((e) => !e.favourite);
@@ -151,19 +141,27 @@ class Filtertool {
 
 class Filterdata {
   List<String> categorylist;
-  List<String> brandlist;
+  List<String?> brandlist;
   bool isFavOnly;
   Filterdata(
       {required this.brandlist,
       required this.categorylist,
       this.isFavOnly = false});
+
+  @override
+  String toString() =>
+      'Filterdata(categorylist: $categorylist, brandlist: $brandlist, isFavOnly: $isFavOnly)';
 }
 
 class BrandSelectionChip extends StatefulWidget {
-  final List<String?> brandlist;
-  final Function(List<String>) onBrandChange;
+  final List<String> brandlist;
+  final List<String?> Function() selecBrandlist;
+  final Function(List<String?>) onBrandChange;
   const BrandSelectionChip(
-      {Key? key, required this.brandlist, required this.onBrandChange})
+      {Key? key,
+      required this.brandlist,
+      required this.onBrandChange,
+      required this.selecBrandlist})
       : super(key: key);
 
   @override
@@ -173,16 +171,24 @@ class BrandSelectionChip extends StatefulWidget {
 class _BrandSelectionChipState extends State<BrandSelectionChip> {
   @override
   Widget build(BuildContext context) {
+    final selecBrandlist = widget.selecBrandlist();
     return Wrap(
       children: widget.brandlist
           .map(
             (e) => FilterChip(
                 onSelected: (b) => setState(() {
-                      final ccpy = [...widget.brandlist];
+                      final ccpy = [...selecBrandlist];
                       ccpy.contains(e) ? ccpy.remove(e) : ccpy.add(e);
+                      print(ccpy);
+                      widget.onBrandChange(ccpy);
                     }),
-                label: Text(e ?? '--', style: TextStyle(color: Colors.white)),
-                selected: widget.brandlist.contains(e),
+                label: Text(e,
+                    style: TextStyle(
+                        color: selecBrandlist.contains(e)
+                            ? Colors.white
+                            : Colors.black)),
+                selected: selecBrandlist.contains(e),
+                checkmarkColor: Colors.white,
                 selectedColor: Colors.blue),
           )
           .toList(),

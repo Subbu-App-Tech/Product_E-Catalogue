@@ -12,7 +12,7 @@ class Count {
 }
 
 @HiveType(typeId: 0)
-class Product extends HiveObject {
+class Product extends HiveObject with ChangeNotifier {
   @HiveField(0)
   String id;
   @HiveField(1)
@@ -143,5 +143,9 @@ class Product extends HiveObject {
     return varieties.length == 0
         ? [0, 0]
         : [varieties.first.price, varieties.last.price];
+  }
+
+  void notify() {
+    notifyListeners();
   }
 }

@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import '../Widgets/Drawer.dart';
+import 'package:open_file/open_file.dart';
 import '../Provider/ProductDataP.dart';
 import 'package:csv/csv.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:external_path/external_path.dart';
 import 'dart:io';
 import '../Pdf/PDFhomepage.dart';
-import '../Screens/Import.dart';
-import '../contact/Aboutus.dart';
-import '../contact/Contactus.dart';
-import '../Screens/Settingscreen.dart';
 import 'package:path_provider/path_provider.dart' as pPath;
 
 String localeName = Platform.localeName;
@@ -20,25 +16,6 @@ class ExportData extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: ExportD(),
-      routes: {
-        PDFbrandscatlogue.routeName: (ctx) => PDFbrandscatlogue(),
-        ImportExport.routeName: (ctx) => ImportExport(),
-        SettingScreen.routeName: (ctx) => SettingScreen(),
-        ExportData.routeName: (ctx) => ExportData(),
-        ContactUs.routeName: (ctx) => ContactUs(),
-        AboutUs.routeName: (ctx) => AboutUs()
-      },
-    );
-  }
-}
-
-class ExportD extends StatelessWidget {
-  const ExportD({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> _scaffoldkey =
         new GlobalKey<ScaffoldState>();
     SnackBar snackBar;
@@ -46,7 +23,7 @@ class ExportD extends StatelessWidget {
 
     Future export(BuildContext context) async {
       List<List<dynamic>> rows = [];
-
+      rows.add(Product.header);
       productdata.forEach((p) {
         rows.addAll(p.toList);
       });
@@ -84,7 +61,7 @@ class ExportD extends StatelessWidget {
           Directory imagedir =
               await Directory('$dir/Product E-catalogue/Exported Data')
                   .create(recursive: true);
-          File f = await new File("${imagedir.path}/ProductData.csv")
+          File f = await new File("${imagedir.path}/Product_Data.csv")
               .create(recursive: true);
           var isExist = await f.exists();
           if (isExist) {
@@ -94,19 +71,18 @@ class ExportD extends StatelessWidget {
                     'Data Exported Succesfully to Product E-catalogue folder..!'));
             // ignore: deprecated_member_use
             _scaffoldkey.currentState!.showSnackBar(snackBar);
-            return f.writeAsString(csv);
+            await f.writeAsString(csv);
+            OpenFile.open(f.path);
           }
         }
       } catch (e) {
         print(e);
         try {
-          // print('ddd');
           Directory appDir =
               await (pPath.getExternalStorageDirectory() as Future<Directory>);
           Directory csvdir = await Directory('${appDir.path}/ProductDataCSV')
               .create(recursive: true);
-          print(csvdir);
-          File file = await new File("${csvdir.path}/ProductData.csv")
+          File file = await new File("${csvdir.path}/Product_Data.csv")
               .create(recursive: true);
           String? output = await showDialog(
               context: context,
@@ -119,7 +95,8 @@ class ExportD extends StatelessWidget {
                   SnackBar(content: Text('CSV exported to App Directory..!'));
               // ignore: deprecated_member_use
               _scaffoldkey.currentState!.showSnackBar(snackBar);
-              return file.writeAsString(csv);
+              await file.writeAsString(csv);
+              OpenFile.open(file.path);
             } else {
               snackBar =
                   SnackBar(content: Text('Sorry, Error in Exporting Data..!'));
@@ -127,12 +104,9 @@ class ExportD extends StatelessWidget {
           } else {
             snackBar = SnackBar(content: Text('Sorry, Error -> $e'));
           }
-          print(snackBar);
         } catch (ee) {
-          print('>>> $ee');
           snackBar = SnackBar(content: Text('Sorry, Error -> $ee'));
         }
-        // print(snackBar);
         // ignore: deprecated_member_use
         _scaffoldkey.currentState!.showSnackBar(snackBar);
       }
@@ -140,10 +114,7 @@ class ExportD extends StatelessWidget {
 
     return Scaffold(
       key: _scaffoldkey,
-      drawer: MyDrawer(),
-      appBar: AppBar(
-        title: Text('Import Export Data'),
-      ),
+      appBar: AppBar(title: Text('Import Export Data')),
       body: SingleChildScrollView(
         child: Container(
           alignment: Alignment.center,

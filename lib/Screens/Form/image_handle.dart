@@ -61,8 +61,8 @@ class ImageHandler {
     return false;
   }
 
-  List imagefilelist(List<String> pathlist) {
-    List image = [];
+  List<FileImage> imagefilelist(List<String> pathlist) {
+    List<FileImage> image = [];
     for (String i in validimagepath(pathlist)) {
       image.add(FileImage(File(i)));
     }

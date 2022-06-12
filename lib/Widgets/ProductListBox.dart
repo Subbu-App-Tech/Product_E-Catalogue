@@ -26,8 +26,6 @@ class _ProductListBoxState extends State<ProductListBox> {
     isexpand = false;
     varietydetails = '';
     selectedvariety = [];
-    currencyset();
-    setState(() {});
     super.initState();
   }
 
@@ -153,10 +151,9 @@ class _ProductListBoxState extends State<ProductListBox> {
                                               '${varietyrange[1].toStringAsFixed(2)}',
                                               overflow: TextOverflow.clip,
                                               style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.red,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                                  fontSize: 16,
+                                                  color: Colors.red,
+                                                  fontWeight: FontWeight.bold),
                                             ),
                                 ),
                                 SizedBox(height: 7),
@@ -166,22 +163,19 @@ class _ProductListBoxState extends State<ProductListBox> {
                                     : FittedBox(
                                         fit: BoxFit.contain,
                                         child: Text(
-                                          'Brand: ${widget.product.brand}',
-                                          style: TextStyle(
-                                              fontSize: 13,
-                                              color: Colors.black54),
-                                        ),
+                                            'Brand: ${widget.product.brand}',
+                                            style: TextStyle(
+                                                fontSize: 13,
+                                                color: Colors.black54)),
                                       ),
                                 (varietycount == 0)
                                     ? SizedBox.shrink()
                                     : FittedBox(
                                         fit: BoxFit.contain,
-                                        child: Text(
-                                          '$varietycount Varieties',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black54),
-                                        )),
+                                        child: Text('$varietycount Varieties',
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.black54))),
                                 SizedBox(height: 7),
                               ],
                             ),
@@ -193,26 +187,27 @@ class _ProductListBoxState extends State<ProductListBox> {
                   Positioned(
                       top: 10,
                       right: 10,
-                      child: InkWell(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.grey[100],
+                      child: StatefulBuilder(builder: (context, setState) {
+                        widget.product.addListener(() => setState(() {}));
+                        return InkWell(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.grey[100],
+                            ),
+                            padding: EdgeInsets.all(5),
+                            child: (widget.product.favourite)
+                                ? Icon(Icons.favorite,
+                                    color: Colors.red, size: 27)
+                                : Icon(Icons.favorite_border, size: 27),
                           ),
-                          padding: EdgeInsets.all(5),
-                          child: (widget.product.favourite)
-                              ? Icon(Icons.favorite,
-                                  color: Colors.red, size: 27)
-                              : Icon(Icons.favorite_border, size: 27),
-                        ),
-                        onTap: () {
-                          widget.product.toggleFavoriteStatus();
-                          Provider.of<ProductData>(context, listen: false)
-                              .toggleFavoriteStatus(widget.product);
-                          // setState(() {
-                          // });
-                        },
-                      )),
+                          onTap: () {
+                            Provider.of<ProductData>(context, listen: false)
+                                .toggleFavoriteStatus(widget.product);
+                            setState(() {});
+                          },
+                        );
+                      })),
                 ],
               ),
             ),

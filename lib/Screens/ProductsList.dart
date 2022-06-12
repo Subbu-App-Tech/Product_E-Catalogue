@@ -6,10 +6,26 @@ import '../Screens/Import.dart';
 import '../contact/Aboutus.dart';
 import 'Form/product_form.dart';
 
+class ProductListPg extends StatelessWidget {
+  final bool isFavOnly;
+  final Filterdata Function()? filterdata;
+  const ProductListPg({Key? key, this.isFavOnly = false, this.filterdata})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Product List')),
+      body: ProductsList(filterdata: filterdata, isFavOnly: isFavOnly),
+    );
+  }
+}
+
 class ProductsList extends StatefulWidget {
   final bool isFavOnly;
+  final Filterdata Function()? filterdata;
   static const routeName = '/productlist';
-  const ProductsList({this.isFavOnly = false});
+  const ProductsList({this.isFavOnly = false, this.filterdata});
   @override
   _ProductsListState createState() => _ProductsListState();
 }
@@ -28,7 +44,6 @@ class _ProductsListState extends State<ProductsList> {
   // final _nativeAdmob = NativeAdmob();
   @override
   void initState() {
-    filterdata.isFavOnly = widget.isFavOnly;
     controller.addListener(() {
       setState(() => filter = controller.text);
     });
@@ -51,10 +66,25 @@ class _ProductsListState extends State<ProductsList> {
 
   @override
   void didChangeDependencies() {
+    filterdata = widget.filterdata == null
+        ? Filterdata(brandlist: [], categorylist: [])
+        : widget.filterdata!();
+    filterdata.isFavOnly = widget.isFavOnly;
     allproductlist = Provider.of<ProductData>(context).items;
+    isProdExist = allproductlist.length > 1;
     super.didChangeDependencies();
   }
 
+  // @override
+  // void didUpdateWidget(ProductsList oldWidget) {
+  //   print('2,filterdata: $filterdata');
+  //   filterdata =
+  //       widget.filterdata ?? Filterdata(brandlist: [], categorylist: []);
+  //   filterdata.isFavOnly = widget.isFavOnly;
+  //   super.didUpdateWidget(oldWidget);
+  // }
+
+  bool isProdExist = false;
   void sortbyname(List<Product?> list) {
     list
       ..sort((a, b) => issortname
@@ -110,82 +140,78 @@ class _ProductsListState extends State<ProductsList> {
         elevation: 5);
   }
 
+  Widget filterchip() {
+    if (filterdata.brandlist.isEmpty && filterdata.categorylist.isEmpty) {
+      return SizedBox(height: 1);
+    } else {
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Padding(
+          padding: const EdgeInsets.all(2.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              (filterdata.brandlist.isEmpty)
+                  ? SizedBox(width: 2)
+                  : Container(
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.all(1),
+                      height: 32,
+                      child: ListView.builder(
+                        itemBuilder: (ctx, idx) {
+                          return FilterChip(
+                              label: Text('${filterdata.brandlist[idx]}',
+                                  style: TextStyle(fontSize: 12)),
+                              avatar: Icon(Icons.cancel, size: 15),
+                              onSelected: (_) {
+                                setState(() {
+                                  filterdata.brandlist.removeAt(idx);
+                                });
+                              });
+                        },
+                        scrollDirection: Axis.horizontal,
+                        shrinkWrap: true,
+                        itemCount: filterdata.brandlist.length,
+                      ),
+                    ),
+              (filterdata.categorylist.isEmpty)
+                  ? SizedBox(width: 2)
+                  : Container(
+                      alignment: Alignment.center,
+                      height: 30,
+                      child: ListView.builder(
+                        itemBuilder: (ctx, idx) {
+                          return Padding(
+                            padding: const EdgeInsets.all(1.0),
+                            child: FilterChip(
+                                label: Text(filterdata.categorylist[idx],
+                                    style: TextStyle(fontSize: 12)),
+                                avatar: Icon(Icons.cancel, size: 15),
+                                onSelected: (_) {
+                                  setState(() {
+                                    filterdata.categorylist.removeAt(idx);
+                                  });
+                                }),
+                          );
+                        },
+                        scrollDirection: Axis.horizontal,
+                        shrinkWrap: true,
+                        itemCount: filterdata.categorylist.length,
+                      ),
+                    )
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
   bool? issort;
   @override
   Widget build(BuildContext context) {
-    filteredlist = filtertool.filteredproduct(allproductlist, filterdata);
-
-    Widget filterchip() {
-      if (filterdata.brandlist.isEmpty && filterdata.categorylist.isEmpty) {
-        return SizedBox(height: 1);
-      } else {
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                (filterdata.brandlist.isEmpty)
-                    ? SizedBox(width: 2)
-                    : Container(
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.all(1),
-                        height: 30,
-                        child: ListView.builder(
-                          itemBuilder: (ctx, idx) {
-                            return Padding(
-                              padding: const EdgeInsets.all(1.0),
-                              child: FilterChip(
-                                  label: Text('${filterdata.brandlist[idx]}',
-                                      style: TextStyle(fontSize: 12)),
-                                  avatar: Icon(Icons.cancel, size: 15),
-                                  onSelected: (_) {
-                                    setState(() {
-                                      filterdata.brandlist.removeAt(idx);
-                                    });
-                                  }),
-                            );
-                          },
-                          scrollDirection: Axis.horizontal,
-                          shrinkWrap: true,
-                          itemCount: filterdata.brandlist.length,
-                        ),
-                      ),
-                (filterdata.categorylist.isEmpty)
-                    ? SizedBox(width: 2)
-                    : Container(
-                        alignment: Alignment.center,
-                        height: 30,
-                        child: ListView.builder(
-                          itemBuilder: (ctx, idx) {
-                            return Padding(
-                              padding: const EdgeInsets.all(1.0),
-                              child: FilterChip(
-                                  label: Text(filterdata.categorylist[idx],
-                                      style: TextStyle(fontSize: 12)),
-                                  avatar: Icon(Icons.cancel, size: 15),
-                                  onSelected: (_) {
-                                    setState(() {
-                                      filterdata.categorylist.removeAt(idx);
-                                    });
-                                  }),
-                            );
-                          },
-                          scrollDirection: Axis.horizontal,
-                          shrinkWrap: true,
-                          itemCount: filterdata.categorylist.length,
-                        ),
-                      )
-              ],
-            ),
-          ),
-        );
-      }
-    }
-
+    filteredlist = filtertool.filteredproduct([...allproductlist], filterdata);
     List<int> ints = List<int>.generate(5, (i) => i * 7);
     ints.remove(0);
     filteredlist = filteredlist
@@ -215,14 +241,13 @@ class _ProductsListState extends State<ProductsList> {
                     child: Container(
                       height: 40,
                       child: TextField(
-                        decoration: new InputDecoration(
-                            prefixIcon: Icon(Icons.search),
-                            labelText: "Search Product",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            )),
-                        controller: controller,
-                      ),
+                          decoration: new InputDecoration(
+                              prefixIcon: Icon(Icons.search),
+                              labelText: "Search Product",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              )),
+                          controller: controller),
                     ),
                   ),
                   SizedBox(width: 5),
@@ -236,8 +261,7 @@ class _ProductsListState extends State<ProductsList> {
                                 builder: (ctx) =>
                                     FilterProduct(filterdata: filterdata)));
                         if (fdata != null) {
-                          filterdata = fdata;
-                          setState(() {});
+                          setState(() => filterdata = fdata);
                         }
                       })
                 ],

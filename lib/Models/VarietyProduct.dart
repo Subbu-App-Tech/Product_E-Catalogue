@@ -6,7 +6,7 @@ part 'VarietyProduct.g.dart';
 @HiveType(typeId: 1)
 class VarietyProductM extends HiveObject {
   @HiveField(0)
-  final String productid;
+  String productid;
   @HiveField(1)
   final String id;
   @HiveField(2)

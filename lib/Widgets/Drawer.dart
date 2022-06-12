@@ -57,9 +57,7 @@ class _MyDrawerState extends State<MyDrawer> {
             },
           ),
           ElevatedButton(
-            child: Text('Back'),
-            onPressed: () => Navigator.pop(context),
-          )
+              child: Text('Back'), onPressed: () => Navigator.pop(context))
         ],
       );
     }

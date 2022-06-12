@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../Widgets/Drawer.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:csv/csv.dart';
@@ -8,14 +7,8 @@ import 'dart:async';
 import '../Provider/ProductDataP.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../Tool/Helper.dart';
-import '../Screens/Export.dart';
-import '../Screens/Settingscreen.dart';
-import '../contact/Aboutus.dart';
-import '../contact/Contactus.dart';
 import 'package:flutter/services.dart';
 import 'package:external_path/external_path.dart';
-// import 'package:path/path.dart' as p;
-// import 'package:path_provider/path_provider.dart' as pr;
 
 class ImportExport extends StatefulWidget {
   const ImportExport({Key? key}) : super(key: key);
@@ -111,15 +104,13 @@ class _ImportExportState extends State<ImportExport> {
                 rank: helper.intval(i[rankIdx]),
                 brand: helper.stringval(i[brandIdx]),
                 description: helper.stringval(i[descIdx]),
-                categories: i[categIdx],
+                categories: i[categIdx]?.toString().split(', ') ?? [],
                 imagepathlist: imageinput(i[imgPathsIdx]));
             int iddx = productdata.indexWhere((e) =>
                 e.name == prodmod.name &&
                 e.categories.join(',') == prodmod.categories.join(','));
-            final vvrr = VarietyProductM(
-                productid: productdata
-                    .firstWhere((f) => helper.isequal(f, prodmod))
-                    .id,
+            VarietyProductM vvrr = VarietyProductM(
+                productid: prodmod.id,
                 id: UniqueKey().toString(),
                 name: helper.stringval(i[vNameIdx]),
                 price: helper.doubleval(i[vPriceIdx]) ?? 0,
@@ -128,6 +119,7 @@ class _ImportExportState extends State<ImportExport> {
               prodmod.varieties.add(vvrr);
               productdata.add(prodmod);
             } else {
+              vvrr.productid = productdata[iddx].id;
               productdata[iddx].varieties.add(vvrr);
             }
             BotToast.showText(text: 'Data Uploaded Succesfully..!');
@@ -172,10 +164,9 @@ class _ImportExportState extends State<ImportExport> {
       if (file == null) return;
       String? filePath = file.files.first.path;
       print("Path: " + filePath!);
-      setState(() {
-        importdatastatus = true;
-        savedataa(filePath);
-      });
+      importdatastatus = true;
+      await savedataa(filePath);
+      setState(() {});
     } catch (e) {
       snackBar = SnackBar(content: Text(' 😔 Error Uploading Data! :: $e'));
       // ignore: deprecated_member_use
@@ -184,7 +175,6 @@ class _ImportExportState extends State<ImportExport> {
   }
 
   Future<void> emptydownload(BuildContext context) async {
-    // EmptyHeader
     String result = '';
     try {
       bool isAcc = await Permission.storage.request().isGranted;
@@ -254,122 +244,114 @@ class _ImportExportState extends State<ImportExport> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        key: _scaffoldkey,
-        drawer: MyDrawer(),
-        appBar: AppBar(
-          title: Text('Import Product Data'),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              SizedBox(
-                height: 10,
+    return Scaffold(
+      key: _scaffoldkey,
+      appBar: AppBar(title: Text('Import Product Data')),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              height: 10,
+            ),
+            Container(
+              padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+              alignment: Alignment.center,
+              // ignore: deprecated_member_use
+              child: RaisedButton(
+                color: Colors.blue,
+                elevation: 5,
+                onPressed: () => downloadwithdata(context),
+                child: Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Text(
+                    'Download CSV Template with sample data',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               ),
-              Container(
-                padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                alignment: Alignment.center,
-                // ignore: deprecated_member_use
-                child: RaisedButton(
-                  color: Colors.blue,
-                  elevation: 5,
-                  onPressed: () => downloadwithdata(context),
-                  child: Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: Text(
-                      'Download CSV Template with sample data',
+            ),
+            Container(
+              padding: EdgeInsets.fromLTRB(30, 10, 30, 5),
+              alignment: Alignment.center,
+              // ignore: deprecated_member_use
+              child: RaisedButton(
+                color: Colors.blue,
+                elevation: 5,
+                onPressed: () {
+                  emptydownload(context);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Text('Download Empty CSV Template',
                       style: TextStyle(color: Colors.white, fontSize: 18),
-                      textAlign: TextAlign.center,
-                    ),
+                      textAlign: TextAlign.center),
+                ),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.fromLTRB(30, 5, 30, 10),
+              alignment: Alignment.center,
+              // ignore: deprecated_member_use
+              child: RaisedButton(
+                color: Colors.blue,
+                elevation: 5,
+                onPressed: () => getFilePath(context),
+                child: Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Text(
+                    'Import Data With CSV',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                 ),
               ),
-              Container(
-                padding: EdgeInsets.fromLTRB(30, 10, 30, 5),
-                alignment: Alignment.center,
-                // ignore: deprecated_member_use
-                child: RaisedButton(
-                  color: Colors.blue,
-                  elevation: 5,
-                  onPressed: () {
-                    emptydownload(context);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: Text(
-                      'Download Empty CSV Template',
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.fromLTRB(30, 5, 30, 10),
-                alignment: Alignment.center,
-                // ignore: deprecated_member_use
-                child: RaisedButton(
-                  color: Colors.blue,
-                  elevation: 5,
-                  onPressed: () {
-                    getFilePath(context);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: Text(
-                      'Import Data With CSV',
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              (importeddatastatus != null)
-                  ? (importeddatastatus == false)
-                      ? Center(child: CircularProgressIndicator())
-                      : Container(
-                          padding: EdgeInsets.all(5),
-                          child: Container(
-                            color: Colors.grey[300],
-                            padding: EdgeInsets.all(10),
-                            width: double.infinity,
-                            alignment: Alignment.center,
-                            child: (importdata == null || importdata == 0)
-                                ? Text('Error Uploading Products 😔 ',
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                    textAlign: TextAlign.center)
-                                : (importdata == 0)
-                                    ? Text('No Data is there 😔',
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold),
-                                        textAlign: TextAlign.center)
-                                    : Text(
-                                        '''😁 
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            (importeddatastatus != null)
+                ? (importeddatastatus == false)
+                    ? Center(child: CircularProgressIndicator())
+                    : Container(
+                        padding: EdgeInsets.all(5),
+                        child: Container(
+                          color: Colors.grey[300],
+                          padding: EdgeInsets.all(10),
+                          width: double.infinity,
+                          alignment: Alignment.center,
+                          child: (importdata == null || importdata == 0)
+                              ? Text('Error Uploading Products 😔 ',
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.center)
+                              : (importdata == 0)
+                                  ? Text('No Data is there 😔',
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.center)
+                                  : Text(
+                                      '''😁 
 $importdata Product Imported Successfuly 
 👍''',
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold),
-                                        textAlign: TextAlign.center,
-                                      ),
-                          ),
-                        )
-                  : SizedBox(height: 10),
-              Container(
-                padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                child: Column(
-                  children: [
-                    _header('Table Column Details'),
-                    SizedBox(height: 15),
-                    _content('''
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.center,
+                                    ),
+                        ),
+                      )
+                : SizedBox(height: 10),
+            Container(
+              padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+              child: Column(
+                children: [
+                  _header('Table Column Details'),
+                  SizedBox(height: 15),
+                  _content('''
 rank       ➔ Rank help to sort your product in Product List & also Help to Export Product Catalogue sorted by Rank
 
 name         ➔ Name of the Product
@@ -389,71 +371,72 @@ varietywsp    ➔ Variety WSP of the Product
 imagefilename ➔ Image files*
 
 *Product Name with atleast one variety is essential to upload data
+*Please Save Your Import CSV File in Download Folder
                     '''),
-                    SizedBox(height: 10),
-                    _header('Example'),
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      width: double.infinity,
-                      child: Text(
-                        'For Category:',
-                        textAlign: TextAlign.left,
-                        style: TextStyle(fontSize: 16),
-                      ),
+                  SizedBox(height: 10),
+                  _header('Example'),
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    width: double.infinity,
+                    child: Text(
+                      'For Category:',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(fontSize: 16),
                     ),
-                    SizedBox(height: 5),
-                    Text(
-                      '''
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    '''
 If Product Category Names were ‘Electronics’, ‘Mobile’ .
 Then you would mention: Electronics, Mobiles .
                       ''',
+                    textAlign: TextAlign.left,
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    width: double.infinity,
+                    child: Text(
+                      'For ImageFiles:',
                       textAlign: TextAlign.left,
-                      style: TextStyle(fontSize: 14),
+                      style: TextStyle(fontSize: 16),
                     ),
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      width: double.infinity,
-                      child: Text(
-                        'For ImageFiles:',
-                        textAlign: TextAlign.left,
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      '''
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    '''
 If Image File Names were ‘product1.png’, ‘Product2.jpg’ .
 Then you would mention: product1.png, Product2.jpg .
                       ''',
+                    textAlign: TextAlign.left,
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    width: double.infinity,
+                    child: Text(
+                      '* Note',
                       textAlign: TextAlign.left,
-                      style: TextStyle(fontSize: 14),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      width: double.infinity,
-                      child: Text(
-                        '* Note',
+                  ),
+                  Wrap(
+                    children: [
+                      Text(
+                        '''Image Files ➔ Image file name in the App folder. You Can find the product folder in''',
+                        textAlign: TextAlign.left,
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      Text(
+                        '''Product E-catalogue > Product Pictures Folder in Internal Storage''',
+                        // ''' Android > data> com.subbu.productcatalogue > files > Pictures.''',
                         textAlign: TextAlign.left,
                         style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                            fontSize: 14, fontWeight: FontWeight.bold),
                       ),
-                    ),
-                    Wrap(
-                      children: [
-                        Text(
-                          '''Image Files ➔ Image file name in the App folder. You Can find the product folder in''',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        Text(
-                          '''Product E-catalogue > Product Pictures Folder in Internal Storage''',
-                          // ''' Android > data> com.subbu.productcatalogue > files > Pictures.''',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          '''Save your product Images in this folder (If you can’t find “Picture” Folder. Create it [It is Case Sensitive])
+                      Text(
+                        '''Save your product Images in this folder (If you can’t find “Picture” Folder. Create it [It is Case Sensitive])
 
 * Every Text is case Sensitive.
 * You can only Import New Products. can't update previously saved Products.
@@ -464,116 +447,21 @@ Hint : If you want to update products.
   3. Delete All Data
   4. Upload Updated CSV File
 ''',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        SizedBox(height: 25)
-                      ],
-                    )
-                  ],
-                ),
+                        textAlign: TextAlign.left,
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      SizedBox(height: 25)
+                    ],
+                  )
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-      routes: {
-        ExportData.routeName: (ctx) => ExportData(),
-        SettingScreen.routeName: (ctx) => SettingScreen(),
-        ImportExport.routeName: (ctx) => ImportExport(),
-        ContactUs.routeName: (ctx) => ContactUs(),
-        AboutUs.routeName: (ctx) => AboutUs()
-      },
     );
   }
 }
 
 const String EmptyHeader =
     'name,description,brand,category,varietyname,varietyprice,varietywsp,rank,imagefilename';
-// Future<void> downloadwithdata(BuildContext context) async {
-//   String url = 'https://firebasestorage.googleapis.com/v0/b/'
-//       'product-catalogue-app-f7bf8.appspot.com/o/Cataloguetemplatewithdata.csv'
-//       '?alt=media&token=df899fc0-f74f-4613-ab74-30350801776b';
-//   try {
-//     print(await Permission.storage.status);
-//     bool isAcc = await Permission.storage.request().isGranted;
-//     if (!isAcc) await Permission.storage.request();
-//     isAcc = await Permission.storage.request().isGranted;
-//     String dir = await ExternalPath.getExternalStoragePublicDirectory(
-//         ExternalPath.DIRECTORY_DOWNLOADS);
-//     Directory savedDir = Directory(dir + '/Product E-catalogue');
-//     bool hasExisted = await savedDir.exists();
-//    if (!hasExisted) await savedDir.create(recursive: true);
-//     var connectivityResult = await Connectivity().checkConnectivity();
-//     if (connectivityResult != ConnectivityResult.none) {
-//       await FlutterDownloader.enqueue(
-//           url: url,
-//           savedDir: savedDir.path,
-//           fileName: 'PECTemplatewithdata.csv',
-//           showNotification: true,
-//           openFileFromNotification: true);
-//       snackBar = SnackBar(
-//           content: Text(
-//               'Template Downloaded Succesfully in Product E-catalogue folder..!'));
-//     } else {
-//       snackBar = SnackBar(content: Text('Check Network Connection..!'));
-//     }
-//   } catch (e) {
-//     print('Error ::$e');
-//     String? output = await showDialog(
-//         context: context,
-//         builder: (BuildContext context) => _errorondownload(context, url));
-//     if (output == 'copied') {
-//       snackBar = SnackBar(content: Text('Download link copied..!'));
-//     } else {
-//       snackBar = SnackBar(content: Text('Link not Copied..!'));
-//     }
-//   }
-//   // ignore: deprecated_member_use
-//   _scaffoldkey.currentState!.showSnackBar(snackBar);
-// }
-// Future<void> emptydownload(BuildContext context) async {
-//   // EmptyHeader
-//   String url =
-//       'https://firebasestorage.googleapis.com/v0/b/product-catalogue-app-f7bf8.appspot.com/o/EmptyCatalogueTemplate.csv?alt=media&token=1f85a6da-8c8f-402a-bd03-2065e775ae58';
-//   try {
-//     if (await Permission.storage.request().isGranted) {
-//       String dir = await ExternalPath.getExternalStoragePublicDirectory(
-//           ExternalPath.DIRECTORY_DOWNLOADS);
-//       Directory savedDir =
-//           await Directory('$dir/Product E-catalogue/Sample Data')
-//               .create(recursive: true);
-//       bool hasExisted = await savedDir.exists();
-//       if (!hasExisted) {
-//         savedDir.create();
-//       }
-//       var connectivityResult = await (Connectivity().checkConnectivity());
-//       if (connectivityResult != ConnectivityResult.none) {
-//         await FlutterDownloader.enqueue(
-//             url: url,
-//             savedDir: savedDir.path,
-//             fileName: 'PECEmptyTemplate.csv',
-//             showNotification: true,
-//             openFileFromNotification: true);
-//         snackBar = SnackBar(
-//             content: Text(
-//                 'Template Downloaded Succesfully in Product E-catalogue folder..!'));
-//       } else {
-//         snackBar = SnackBar(content: Text('Check Network Connection..!'));
-//       }
-//     } else {
-//       snackBar = SnackBar(content: Text('Permission Declined..!'));
-//     }
-//   } catch (e) {
-//     print('Error');
-//     String? output = await showDialog(
-//         context: context,
-//         builder: (BuildContext context) => _errorondownload(context, url));
-//     if (output == 'copied') {
-//       snackBar = SnackBar(content: Text('Download link copied..!'));
-//     } else {
-//       snackBar = SnackBar(content: Text('Link not Copied..!'));
-//     }
-//   }
-//   _scaffoldkey.currentState!.showSnackBar(snackBar);
-// }

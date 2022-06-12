@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:productcatalogue/Models/Settings.dart';
 import 'package:productcatalogue/Pdf/PdfTools.dart';
 import 'package:productcatalogue/main.dart';
-import '../Widgets/Drawer.dart';
 import '../Models/SecureStorage.dart';
 
 class SettingScreen extends StatefulWidget {
@@ -46,7 +45,6 @@ class _SettingScreenState extends State<SettingScreen> {
     viewMode = appSetting.isViewMode;
     return Scaffold(
       key: _scafkey,
-      drawer: MyDrawer(),
       appBar: AppBar(title: Text('Setting')),
       body: SingleChildScrollView(
         child: Container(
