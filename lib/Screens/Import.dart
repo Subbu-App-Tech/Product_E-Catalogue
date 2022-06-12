@@ -1,18 +1,11 @@
 import 'package:flutter/material.dart';
 import '../Widgets/Drawer.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:io';
 import 'package:csv/csv.dart';
 import 'dart:convert';
 import 'dart:async';
-import '../Models/CategoryModel.dart';
-import '../Models/ProductModel.dart';
-import '../Models/VarietyProductModel.dart';
-import 'package:provider/provider.dart';
-import '../Provider/CategoryDataP.dart';
 import '../Provider/ProductDataP.dart';
-import '../Provider/VarietyDataP.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../Tool/Helper.dart';
 import '../Screens/Export.dart';
@@ -38,7 +31,6 @@ class _ImportExportState extends State<ImportExport> {
   int? importdata;
   Helper helper = Helper();
   String? output;
-  String? out;
   bool? importdatastatus;
   bool? importeddatastatus;
   List<List<dynamic>> importeddata = [];
@@ -49,7 +41,7 @@ class _ImportExportState extends State<ImportExport> {
     super.initState();
   }
 
-  Future savedataa(String filepath) async {
+  Future<void> savedataa(String filepath) async {
     importeddatastatus = false;
     try {
       final input = new File(filepath).openRead();
@@ -57,153 +49,117 @@ class _ImportExportState extends State<ImportExport> {
           .transform(utf8.decoder)
           .transform(new CsvToListConverter())
           .toList();
-      // print(fields);
-      importeddata = fields;
-      List<String> header = [
-        'name',
-        'description',
-        'brand',
-        'category',
-        'varietyname',
-        'varietyprice',
-        'varietywsp',
-        'rank',
-        'imagefilename'
-      ];
-      List<ProductModel> productdata = [];
-      List<CategoryModel> catdata = [];
-      List<VarietyProductM> vardata = [];
-      List<String> catnamedata = [];
+      importeddata = fields.sublist(1);
 
+      int nameIdx = fields[0].indexWhere((e) => e.toString() == 'name');
+      int brandIdx = fields[0].indexWhere((e) => e.toString() == 'brand');
+      int descIdx = fields[0].indexWhere((e) => e.toString() == 'description');
+      int categIdx = fields[0].indexWhere((e) => e.toString() == 'category');
+      int vNameIdx = fields[0].indexWhere((e) => e.toString() == 'varietyname');
+      int vPriceIdx =
+          fields[0].indexWhere((e) => e.toString() == 'varietyprice');
+      int vWSPIdx = fields[0].indexWhere((e) => e.toString() == 'varietywsp');
+      int rankIdx = fields[0].indexWhere((e) => e.toString() == 'rank');
+      int imgPathsIdx =
+          fields[0].indexWhere((e) => e.toString() == 'imagefilename');
+      if ([
+        nameIdx,
+        brandIdx,
+        descIdx,
+        categIdx,
+        brandIdx,
+        vNameIdx,
+        vWSPIdx,
+        vPriceIdx,
+        rankIdx,
+        imgPathsIdx
+      ].contains(-1)) {
+        return;
+      }
+      List<Product> productdata = [];
       Future<void> validate(datafield) async {
         String appDirs = await ExternalPath.getExternalStoragePublicDirectory(
             ExternalPath.DIRECTORY_DOWNLOADS);
         Directory imagedir =
             await Directory('$appDirs/Product E-catalogue/Product Pictures')
                 .create(recursive: true);
-        if (helper.areListsEqual(datafield[0], header)) {
-          {
-            for (List i in fields) {
-              if (i[0] == 'name' || i[1] == 'description') {
+        for (List i in fields) {
+          if (helper.stringval(i[nameIdx]).isNotEmpty &&
+              helper.stringval(i[categIdx]).isNotEmpty) {
+            final prodid =
+                '${UniqueKey().toString()}_${DateTime.now().microsecondsSinceEpoch}';
+            List<String> imageinput(String? value) {
+              const List<String> empty = [];
+              if (value == null) {
+                return empty;
+              } else if (value.trim() == '') {
+                return empty;
               } else {
-                if (helper.stringval(i[0]) != null ||
-                    helper.stringval(i[4]) != null) {
-                  if (helper.stringval(i[0])!.trim() != '' ||
-                      helper.stringval(i[4])!.trim() != '') {
-                    final prodid = UniqueKey().toString();
-                    List<String> catid(String? catstring) {
-                      List<String?> _catid = [];
-                      if (catstring == null || catstring.trim() == '') {
-                        return ['otherid'];
-                      } else {
-                        for (String k in catstring.split(',')) {
-                          if (catnamedata.contains(k.trim())) {
-                            _catid.add(catdata
-                                .firstWhere((f) => f.name == k.trim())
-                                .id);
-                          } else {
-                            String _cid = UniqueKey().toString();
-                            catnamedata.add(k.trim());
-                            catdata
-                                .add(CategoryModel(id: _cid, name: k.trim()));
-                            _catid.add(_cid);
-                          }
-                        }
-                        _catid.removeWhere((e) => e == null);
-                        return _catid.map((e) => e!).toList();
-                      }
-                    }
-
-                    List<String> imageinput(String? value) {
-                      const List<String> empty = [];
-                      if (value == null) {
-                        return empty;
-                      } else if (value.trim() == '') {
-                        return empty;
-                      } else {
-                        List<String> pathlist = [];
-                        for (String i in value.split(',')) {
-                          if (i != '') {
-                            pathlist.add('${imagedir.path}/$i');
-                            print('>>>>>>>>>>>>>>>>>>>>>>>>>>> $pathlist');
-                          }
-                        }
-                        return pathlist;
-                      }
-                    }
-
-                    ProductModel prodmod = ProductModel(
-                        id: prodid,
-                        name: helper.stringval(i[0]),
-                        rank: helper.intval(i[7]),
-                        brand: helper.stringval(i[2]),
-                        description: helper.stringval(i[1]),
-                        categorylist: catid(i[3]),
-                        imagepathlist: imageinput(i[8]));
-                    if (helper.iscontains(productdata, prodmod)) {
-                      if (i[4] == null || i[4].trim() == '') {
-                      } else {
-                        vardata.add(VarietyProductM(
-                            productid: productdata
-                                .firstWhere((f) => helper.isequal(f, prodmod))
-                                .id,
-                            id: UniqueKey().toString(),
-                            varityname: helper.stringval(i[4]),
-                            price: helper.doubleval(i[5]),
-                            wsp: helper.doubleval(i[6])));
-                      }
-                    } else {
-                      productdata.add(prodmod);
-                      vardata.add(VarietyProductM(
-                          productid: prodid,
-                          id: UniqueKey().toString(),
-                          varityname: helper.stringval(i[4]),
-                          price: helper.doubleval(i[5]),
-                          wsp: helper.doubleval(i[6])));
-                    }
-                    out = 'Data Uploaded Succesfully..!';
+                List<String> pathlist = [];
+                for (String i in value.split(',')) {
+                  if (i != '') {
+                    pathlist.add('${imagedir.path}/$i');
                   }
-                  out = 'Error on Data..!';
                 }
-                out = 'Error on Data..!';
-                if (helper.stringval(i[0]) != null ||
-                    helper.stringval(i[4]) != null) {
-                  out = 'Porduct Must have atleast one Variety Name';
-                }
+                return pathlist;
               }
             }
-            setState(() {
-              importdata = productdata.length;
-              Provider.of<ProductData>(context, listen: false)
-                  .addallproduct(productdata);
-              Provider.of<VarietyData>(context, listen: false)
-                  .addallvarity(vardata);
-              Provider.of<CategoryData>(context, listen: false)
-                  .addallcategory(catdata);
-              // out = 'Data Uploaded Succesfully..!';
-            });
-            if (importdata! > 0) {
-              out = '$importdata Data Uploaded Succesfully..!';
+
+            Product prodmod = Product(
+                id: prodid,
+                name: i[nameIdx],
+                rank: helper.intval(i[rankIdx]),
+                brand: helper.stringval(i[brandIdx]),
+                description: helper.stringval(i[descIdx]),
+                categories: i[categIdx],
+                imagepathlist: imageinput(i[imgPathsIdx]));
+            int iddx = productdata.indexWhere((e) =>
+                e.name == prodmod.name &&
+                e.categories.join(',') == prodmod.categories.join(','));
+            final vvrr = VarietyProductM(
+                productid: productdata
+                    .firstWhere((f) => helper.isequal(f, prodmod))
+                    .id,
+                id: UniqueKey().toString(),
+                name: helper.stringval(i[vNameIdx]),
+                price: helper.doubleval(i[vPriceIdx]) ?? 0,
+                wsp: helper.doubleval(i[vWSPIdx]) ?? 0);
+            if (iddx == -1) {
+              prodmod.varieties.add(vvrr);
+              productdata.add(prodmod);
             } else {
-              out = 'No Valid Data to Upload..!';
+              productdata[iddx].varieties.add(vvrr);
             }
-            // out = 'No Valid !';
+            BotToast.showText(text: 'Data Uploaded Succesfully..!');
           }
-          out = 'No Valid Data to Upload..!';
-          importeddatastatus = true;
-          setState(() {});
+          BotToast.showText(text: 'Error on Data..!');
+          if (helper.stringval(i[0]).isEmpty ||
+              helper.stringval(i[4]).isEmpty) {
+            BotToast.showText(
+                text: 'Porduct Must have atleast one Variety Name');
+          }
+        }
+        setState(() {
+          importdata = productdata.length;
+          Provider.of<ProductData>(context, listen: false)
+              .addallproduct(productdata);
+        });
+        if (importdata! > 0) {
+          BotToast.showText(text: '$importdata Data Uploaded Succesfully..!');
         } else {
-          out = 'Please check the template Formate..!';
-          setState(() {});
+          BotToast.showText(text: 'No Valid Data to Upload..!');
         }
       }
+
+      BotToast.showText(text: 'No Valid Data to Upload..!');
+      importeddatastatus = true;
+      setState(() {});
 
       validate(fields);
     } catch (e) {
       importeddatastatus = true;
-      print('>>> $e');
-      out = '''Error in Document formate ''';
-      return output = '';
+      BotToast.showText(
+          text: 'Error Uploading: please Recheck the CSV Format \n$e');
     }
   }
 
@@ -218,17 +174,10 @@ class _ImportExportState extends State<ImportExport> {
       print("Path: " + filePath!);
       setState(() {
         importdatastatus = true;
-        savedataa(filePath).whenComplete(() {
-          if (out != null) {
-            snackBar = SnackBar(content: Text(out!));
-            // ignore: deprecated_member_use
-            _scaffoldkey.currentState!.showSnackBar(snackBar);
-          }
-        });
+        savedataa(filePath);
       });
     } catch (e) {
       snackBar = SnackBar(content: Text(' 😔 Error Uploading Data! :: $e'));
-      setState(() {});
       // ignore: deprecated_member_use
       _scaffoldkey.currentState!.showSnackBar(snackBar);
     }
@@ -260,35 +209,6 @@ class _ImportExportState extends State<ImportExport> {
     // ignore: deprecated_member_use
     _scaffoldkey.currentState!.showSnackBar(snackBar);
   }
-
-  // Widget _errorondownload(BuildContext context, String url) {
-  //   return AlertDialog(
-  //     title: Text('Error Downloading'),
-  //     content: Column(
-  //       mainAxisSize: MainAxisSize.min,
-  //       children: [
-  //         Text('Sorry, Some Error Occurs.'
-  //             '\nDownload it Manually by copy & paste the link to your browser'),
-  //         SizedBox(height: 7),
-  //         // ignore: deprecated_member_use
-  //         RaisedButton(
-  //           color: Colors.green,
-  //           child: Padding(
-  //             padding: const EdgeInsets.all(5),
-  //             child: Text('Click Here to Copy Download Link',
-  //                 textAlign: TextAlign.center,
-  //                 style: TextStyle(color: Colors.white)),
-  //           ),
-  //           onPressed: () {
-  //             print('copy');
-  //             Clipboard.setData(new ClipboardData(text: url));
-  //             Navigator.of(context).pop('copied');
-  //           },
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Future<void> downloadwithdata(BuildContext context) async {
     String result = '';

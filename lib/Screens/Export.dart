@@ -1,22 +1,10 @@
 import 'package:flutter/material.dart';
 import '../Widgets/Drawer.dart';
-import '../Models/ProductModel.dart';
-import '../Models/VarietyProductModel.dart';
-import 'package:provider/provider.dart';
-import '../Provider/CategoryDataP.dart';
 import '../Provider/ProductDataP.dart';
-import '../Provider/VarietyDataP.dart';
 import 'package:csv/csv.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:external_path/external_path.dart';
 import 'dart:io';
-import 'package:path/path.dart';
-import '../Pdf/Grid/GridViewPV.dart';
-import '../Pdf/Grid/Gridonlypicdesc.dart';
-import '../Pdf/Grid/Gridvarietyvertical.dart';
-import '../Pdf/Grid/GridDefinedSize.dart';
-import '../Pdf/Grid/GridpicVariety.dart';
-import '../Pdf/ListView/Listviewone.dart';
 import '../Pdf/PDFhomepage.dart';
 import '../Screens/Import.dart';
 import '../contact/Aboutus.dart';
@@ -35,13 +23,6 @@ class ExportData extends StatelessWidget {
     return MaterialApp(
       home: ExportD(),
       routes: {
-        PDFListviewone.routeName: (ctx) => PDFListviewone(),
-        PDFGridViewPV.routeName: (ctx) => PDFGridViewPV(),
-        PDFGridPicDecs.routeName: (ctx) => PDFGridPicDecs(),
-        PDFGridpicVarietyVertical.routeName: (ctx) =>
-            PDFGridpicVarietyVertical(),
-        PDFGriddefinedsize.routeName: (ctx) => PDFGriddefinedsize(),
-        PDFGridpicVarietyonly.routeName: (ctx) => PDFGridpicVarietyonly(),
         PDFbrandscatlogue.routeName: (ctx) => PDFbrandscatlogue(),
         ImportExport.routeName: (ctx) => ImportExport(),
         SettingScreen.routeName: (ctx) => SettingScreen(),
@@ -61,121 +42,14 @@ class ExportD extends StatelessWidget {
     final GlobalKey<ScaffoldState> _scaffoldkey =
         new GlobalKey<ScaffoldState>();
     SnackBar snackBar;
-    List<ProductModel?> productdata = Provider.of<ProductData>(context).items;
-    List<VarietyProductM> vardata = Provider.of<VarietyData>(context).items;
-
-    String output(var val) {
-      if (val == null) {
-        return '';
-      } else if (val.runtimeType == String) {
-        return val;
-      } else {
-        return val.toString();
-      }
-    }
+    List<Product> productdata = Provider.of<ProductData>(context).items;
 
     Future export(BuildContext context) async {
-      List<String?> prodid = [];
-      List<String> name = [];
-      List<String> description = [];
-      // List<String> price = [];
-      List<String> varietywsp = [];
-      List<String> brand = [];
-      List<String> category = [];
-      List<String> varietyname = [];
-      List<String> varietyprice = [];
-      List<String> rank = [];
-      List<String> imagefilename = [];
-      List<String> header = [
-        'name',
-        'description',
-        'brand',
-        'category',
-        'varietyname',
-        'varietyprice',
-        'varietywsp',
-        'rank',
-        'imagefilename'
-      ];
-
-      String catstr(var categorylist) {
-        List catnamelist = Provider.of<CategoryData>(context, listen: false)
-            .findcategorylist(categorylist);
-        if (catnamelist.length == 0) {
-          return '';
-        } else if (catnamelist.length == 1) {
-          return catnamelist[0];
-        } else {
-          return catnamelist.join(',');
-        }
-      }
-
-      String filenamelist(List<String>? list) {
-        List filename = [];
-        if (list == null) {
-          return '';
-        } else if (list.length == 0) {
-          return '';
-        } else {
-          for (String i in list) {
-            // print(i);
-            // print(basename(i));
-            // if (i != null) {
-            // }
-              if (basename(i) != '') {
-                filename.add(basename(i));
-              }
-          }
-          return filename.join(',');
-        }
-      }
-
-      void productd(String? idx) {
-        ProductModel prod = productdata.firstWhere((f) => f!.id == idx)!;
-        name.add(output(prod.name));
-        description.add(output(prod.description));
-        rank.add(output(prod.rank));
-        brand.add(output(prod.brand));
-        category.add(output(catstr(prod.categorylist)));
-        imagefilename.add(filenamelist(prod.imagepathlist));
-      }
-
-      for (VarietyProductM i in vardata) {
-        varietyname.add(output(i.varityname));
-        varietyprice.add(output(i.price));
-        varietywsp.add(output(i.wsp));
-        prodid.add(i.productid);
-        productd(i.productid);
-      }
-
-      for (ProductModel? i in productdata) {
-        if (!prodid.contains(i!.id)) {
-          varietyname.add('');
-          varietyprice.add('');
-          varietywsp.add('');
-          prodid.add(i.id);
-          productd(i.id);
-        }
-      }
       List<List<dynamic>> rows = [];
-      rows.add(header);
 
-      if (name.length == varietyname.length && category.length == name.length) {
-        for (int i = 0; i < name.length; i++) {
-          List<dynamic> row = [];
-          row.add(name[i]);
-          row.add(description[i]);
-          row.add(brand[i]);
-          row.add(category[i]);
-          row.add(varietyname[i]);
-          row.add(varietyprice[i]);
-          row.add(varietywsp[i]);
-          row.add(rank[i]);
-          row.add(imagefilename[i]);
-          rows.add(row);
-        }
-      }
-
+      productdata.forEach((p) {
+        rows.addAll(p.toList);
+      });
       Widget _errorondownload(BuildContext context) {
         return AlertDialog(
           title: Text('Error Downloading'),

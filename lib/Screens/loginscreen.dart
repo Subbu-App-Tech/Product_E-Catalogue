@@ -3,7 +3,6 @@ import '../Auth/sign_in.dart';
 import '../Home.dart';
 import '../Models/SecureStorage.dart';
 
-
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -16,11 +15,7 @@ class _LoginPageState extends State<LoginPage> {
         FutureBuilder(
           future: signInWithGoogle().whenComplete(() {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) {      
-                  return HomePage();
-                },
-              ),
+              MaterialPageRoute(builder: (context) => HomePage()),
             );
           }),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -62,8 +57,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  SecureStorage storage = SecureStorage();
-  String? loginstatus;   
+  String? loginstatus;
 
   @override
   Widget build(BuildContext context) {

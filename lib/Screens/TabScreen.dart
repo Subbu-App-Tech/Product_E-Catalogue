@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:productcatalogue/main.dart';
-import 'package:provider/provider.dart';
-import '../Models/ProductModel.dart';
 import '../Screens/ProductsList.dart';
 import '../Screens/CategoryGridS.dart';
 import '../Screens/BrandGridS.dart';
-import '../Screens/UserAEFrom.dart';
-import '../Screens/FavproductList.dart';
+import 'Form/product_form.dart';
 import '../Provider/ProductDataP.dart';
 import '../Widgets/Drawer.dart';
-import '../Provider/CategoryDataP.dart';
-import '../Provider/VarietyDataP.dart';
 import '../Tool/FilterProduct.dart';
 import 'package:rate_my_app/rate_my_app.dart';
 import '../contact/Contactus.dart';
-import 'dart:async';
+import 'package:badges/badges.dart';
 
 class Tabscreenwithdata extends StatelessWidget {
   static const routeName = '/Tabscreenwithdata';
@@ -38,69 +34,17 @@ class TabScreen extends StatefulWidget {
 class _TabScreenState extends State<TabScreen> {
   late List<Map<String, Object>> _pages;
   int _selectedPageIndex = 0;
-  late List<ProductModel?> favproducts;
-  var _isInit = true;
-  var _isLoading = false;
-  RateMyApp _rateMyApp = RateMyApp(
-      preferencesPrefix: 'Rate My APP',
-      googlePlayIdentifier: 'com.subbu.productcatalogue',
-      appStoreIdentifier: 'com.subbu.productcatalogue',
-      //'product-catalogue-app-f7bf8',
-      minDays: 3,
-      minLaunches: 7,
-      remindDays: 2,
-      remindLaunches: 11);
+  late List<Product?> favproducts;
   @override
   void initState() {
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      _rateMyApp.init().then((_) {
-        if (_rateMyApp.shouldOpenDialog) {
-          _rateMyApp.showStarRateDialog(
-            context,
-            title: 'Rate this App',
-            message:
-                'If you like this app, please take a little bit of your time to review it !'
-                ''
-                'It really helps us and it shouldn\'t take you more than one minute.',
-            actionsBuilder: (_, stars) {
-              return [
-                TextButton(
-                  child: Text('OK'),
-                  onPressed: () async {
-                    if (stars != null && (stars > 2)) {
-                      await _rateMyApp
-                          .callEvent(RateMyAppEventType.rateButtonPressed);
-                      Navigator.pop<RateMyAppDialogButton>(
-                          context, RateMyAppDialogButton.rate);
-                    } else {
-                      Navigator.pop(context);
-                    }
-                  },
-                ),
-              ];
-            },
-            dialogStyle: DialogStyle(
-                titleAlign: TextAlign.center,
-                messageAlign: TextAlign.center,
-                messagePadding: EdgeInsets.only(bottom: 20.0)),
-            starRatingOptions: StarRatingOptions(),
-            onDismissed: () =>
-                _rateMyApp.callEvent(RateMyAppEventType.laterButtonPressed),
-          );
-        }
-      });
-    });
     super.initState();
   }
 
   @override
   void didChangeDependencies() {
-    if (_isInit) {
-      setState(() => _isLoading = true);
-      fetchdata().then((_) => setState(() => _isLoading = false));
-    }
-    _isInit = false;
-
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      MyAppFunc(context).rateMyApp();
+    });
     favproducts = Provider.of<ProductData>(context).favoriteItems;
     _pages = [
       {'page': ProductsList(), 'title': 'Products'},
@@ -112,12 +56,6 @@ class _TabScreenState extends State<TabScreen> {
 
   void _selectPage(int index) {
     setState(() => _selectedPageIndex = index);
-  }
-
-  Future fetchdata() async {
-    await Provider.of<ProductData>(context, listen: false).fetchproduct();
-    await Provider.of<CategoryData>(context, listen: false).fetchcategory();
-    return Provider.of<VarietyData>(context, listen: false).fetchvariety();
   }
 
   @override
@@ -137,46 +75,26 @@ class _TabScreenState extends State<TabScreen> {
                         Navigator.pushNamed(context, ContactUs.routeName,
                             arguments: true);
                       }),
-                  Container(
-                    child: Stack(
-                      children: [
-                        Container(
-                          alignment: Alignment.center,
-                          child: IconButton(
-                            icon: Icon(Icons.favorite, size: 27),
-                            onPressed: () {
-                              Navigator.pushNamed(
-                                  context, FavProductsList.routeName);
-                            },
-                          ),
-                        ),
-                        (favproducts.length == 0)
-                            ? SizedBox.shrink()
-                            : Positioned(
-                                right: 3,
-                                top: 5,
-                                child: Container(
-                                  padding: EdgeInsets.all(5),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.red,
-                                  ),
-                                  child: Text(
-                                    '${favproducts.length}',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              )
-                      ],
+                  SizedBox(width: 5),
+                  Badge(
+                    child: IconButton(
+                      icon: Icon(Icons.favorite, size: 27),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ProductsList(isFavOnly: true),
+                            ));
+                        // Navigator.pushNamed(context, FavProductsList.routeName);
+                      },
                     ),
-                  )
+                    badgeContent: Text('${favproducts.length}'),
+                    showBadge: favproducts.length > 0,
+                  ),
                 ],
               ),
-              body: _isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : _pages[_selectedPageIndex]['page'] as Widget?,
+              body: _pages[_selectedPageIndex]['page'] as Widget,
               floatingActionButton: appSetting.isViewMode
                   ? SizedBox()
                   : FloatingActionButton(
@@ -201,5 +119,58 @@ class _TabScreenState extends State<TabScreen> {
         ],
       ),
     );
+  }
+}
+
+class MyAppFunc {
+  BuildContext context;
+  MyAppFunc(this.context);
+  RateMyApp _rateMyApp = RateMyApp(
+      preferencesPrefix: 'Rate My APP',
+      googlePlayIdentifier: 'com.subbu.productcatalogue',
+      appStoreIdentifier: 'com.subbu.productcatalogue',
+      //'product-catalogue-app-f7bf8',
+      minDays: 3,
+      minLaunches: 7,
+      remindDays: 2,
+      remindLaunches: 11);
+
+  void rateMyApp() {
+    _rateMyApp.init().then((_) {
+      if (_rateMyApp.shouldOpenDialog) {
+        _rateMyApp.showStarRateDialog(
+          context,
+          title: 'Rate this App',
+          message:
+              'If you like this app, Please take a little bit of your time to review it !'
+              ''
+              'It really helps us and it shouldn\'t take you more than one minute.',
+          actionsBuilder: (_, stars) {
+            return [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () async {
+                  if (stars != null && (stars > 2)) {
+                    await _rateMyApp
+                        .callEvent(RateMyAppEventType.rateButtonPressed);
+                    Navigator.pop<RateMyAppDialogButton>(
+                        context, RateMyAppDialogButton.rate);
+                  } else {
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ];
+          },
+          dialogStyle: DialogStyle(
+              titleAlign: TextAlign.center,
+              messageAlign: TextAlign.center,
+              messagePadding: EdgeInsets.only(bottom: 20.0)),
+          starRatingOptions: StarRatingOptions(),
+          onDismissed: () =>
+              _rateMyApp.callEvent(RateMyAppEventType.laterButtonPressed),
+        );
+      }
+    });
   }
 }

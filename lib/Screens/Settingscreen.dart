@@ -20,7 +20,6 @@ class _SettingScreenState extends State<SettingScreen> {
   String? currency;
   String? companyname;
   String? mobileno;
-  SecureStorage storage = SecureStorage();
   TextEditingController _textcontroller = TextEditingController();
   TextEditingController _companycontroller = TextEditingController();
   TextEditingController _mobilenocontroller = TextEditingController();

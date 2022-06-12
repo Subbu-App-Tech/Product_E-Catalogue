@@ -1,41 +1,31 @@
 import 'package:hive/hive.dart';
 
-part 'VarietyProductModel.g.dart';
+part 'VarietyProduct.g.dart';
 
 // flutter packages pub run build_runner build
 @HiveType(typeId: 1)
 class VarietyProductM extends HiveObject {
   @HiveField(0)
-  final String? productid;
+  final String productid;
   @HiveField(1)
-  final String? id;
+  final String id;
   @HiveField(2)
-  String? varityname;
+  String name;
   @HiveField(3)
-  double? price;
+  late double price;
   @HiveField(4)
-  double? wsp;
+  late double wsp;
 
   VarietyProductM({
     required this.productid,
     required this.id,
-    required this.varityname,
+    required this.name,
     this.price = 0,
     this.wsp = 0,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'productid': productid,
-      'name': varityname,
-      'price': price,
-      'wsp': wsp
-    };
-  }
-
   void updatename(name) {
-    this.varityname = name;
+    this.name = name;
   }
 
   void updateprice(double price) {
@@ -49,11 +39,9 @@ class VarietyProductM extends HiveObject {
   String getIndex(int index) {
     switch (index) {
       case 0:
-        return '$varityname';
+        return '$name';
       case 1:
         return '${price.toString()}';
-      // case 3:
-      //   return '${wsp.toString()}';
     }
     return '';
   }

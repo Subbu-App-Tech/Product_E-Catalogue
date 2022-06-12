@@ -2,8 +2,8 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:io';
-import '../Models/ProductModel.dart';
-import '../Models/VarietyProductModel.dart';
+import '../Models/Product.dart';
+import '../Models/VarietyProduct.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:external_path/external_path.dart';
@@ -11,8 +11,8 @@ import 'package:flutter/services.dart';
 
 class ProcuctbasedModel {
   String? basedon;
-  List<ProductModel?>? productlist;
-  ProcuctbasedModel({this.basedon, this.productlist});
+  List<Product> productlist;
+  ProcuctbasedModel({this.basedon, required this.productlist});
 }
 
 class Pdftools {
@@ -115,13 +115,8 @@ class Pdftools {
     return false;
   }
 
-  pw.Widget varietytable(
-      String? productid,
-      Function findvardatas,
-      String currency,
-      double tableonewidth,
-      double tabletwowidth,
-      int maxlistlen) {
+  pw.Widget varietytable(Product product, String currency, double tableonewidth,
+      double tabletwowidth, int maxlistlen) {
     String? val;
     List<VarietyProductM>? varietylist;
     if (currency != '') {
@@ -130,8 +125,8 @@ class Pdftools {
       val = 'Price in $val';
     }
     final tableHeaders = ['Varietes', '$val'];
-    varietylist = findvardatas(productid);
-    if (varietylist!.length > maxlistlen) {
+    varietylist = product.varieties;
+    if (varietylist.length > maxlistlen) {
       varietylist = varietylist.sublist(0, maxlistlen);
     }
     return pw.Table.fromTextArray(
@@ -248,20 +243,15 @@ class Pdftools {
             await rootBundle.load("assets/Open_Sans/OpenSans-Italic.ttf")));
   }
 
-  List<ProductModel?>? sortedlist(
-      {List<ProductModel?>? list,
-      String? type,
-      Function? functofindvarietycount}) {
-    if (list != null) if (type == 'rank') {
-      return list..sort((a, b) => a!.rank!.compareTo(b!.rank!));
+  List<Product> sortedlist({required List<Product> list, String? type}) {
+    if (type == 'rank') {
+      return list..sort((a, b) => a.rank!.compareTo(b.rank!));
     } else if (type == 'variety') {
       return list
-        ..sort((a, b) => functofindvarietycount!(a!.id)
-            .compareTo(functofindvarietycount(b!.id)));
+        ..sort((a, b) => a.varieties.length.compareTo(b.varieties.length));
     } else if (type == 'name') {
       return list
-        ..sort(
-            (a, b) => a!.name!.toLowerCase().compareTo(b!.name!.toLowerCase()));
+        ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     } else if (type == 'none') {
       return list;
     }

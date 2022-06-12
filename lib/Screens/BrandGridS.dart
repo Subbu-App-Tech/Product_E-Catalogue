@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../Provider/ProductDataP.dart';
 import '../Widgets/GridW.dart';
 import 'dart:async';
-import '../Models/CategoryModel.dart';
 
 class BrandListS extends StatefulWidget {
   const BrandListS({Key? key}) : super(key: key);
@@ -16,22 +14,21 @@ class BrandListS extends StatefulWidget {
 class _BrandListSState extends State<BrandListS> {
   @override
   void initState() {
-
     super.initState();
   }
 
   @override
   void dispose() {
-    _subscription.cancel();
+    // _subscription.cancel();
     super.dispose();
   }
 
   // static const _adUnitID = "ca-app-pub-9568938816087708/6044993041";
-  late StreamSubscription _subscription;
+  // late StreamSubscription _subscription;
 
   @override
   Widget build(BuildContext context) {
-    List<Brandcount> branddata = Provider.of<ProductData>(context).uqbrand();
+    List<Count> branddata = Provider.of<ProductData>(context).uqBrand;
     return (branddata.length == 0)
         ? Center(
             child: Column(
@@ -61,14 +58,10 @@ class _BrandListSState extends State<BrandListS> {
                       childAspectRatio: 3 / 2,
                       crossAxisSpacing: 2,
                       mainAxisSpacing: 2),
-                  itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
-                    value: branddata[index],
-                    child: GridViewW(
-                      title: branddata[index].name,
-                      count: branddata[index].count,
-                      brand: branddata[index].name,
-                      // productlist: productlist(branddata[index].name),
-                    ),
+                  itemBuilder: (ctx, index) => GridViewW(
+                    count: branddata[index].count,
+                    name: branddata[index].name ?? ' -N- ',
+                    isCateg: false,
                   ),
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),

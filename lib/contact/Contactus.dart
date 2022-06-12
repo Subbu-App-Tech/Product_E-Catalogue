@@ -164,19 +164,15 @@ class _ContactUsState extends State<ContactUs> {
                   child: TextButton(
                     child: Column(
                       children: [
-                        Image.asset(
-                          'assets/camera.png',
-                          fit: BoxFit.fill,
-                        ),
+                        Image.asset('assets/camera.png', fit: BoxFit.fill),
                         Text('Camera')
                       ],
                     ),
                     onPressed: () async {
-                      PickedFile? pick = await ImagePicker()
-                          .getImage(source: ImageSource.camera);
-                      setState(() {
-                        attachments.add(pick!.path);
-                      });
+                      final pick = await ImagePicker()
+                          .pickImage(source: ImageSource.camera);
+                      if (pick != null)
+                        setState(() => attachments.add(pick.path));
                       Navigator.pop(context);
                     },
                   ),
@@ -187,19 +183,15 @@ class _ContactUsState extends State<ContactUs> {
                   child: TextButton(
                     child: Column(
                       children: [
-                        Image.asset(
-                          'assets/gallery.png',
-                          fit: BoxFit.fill,
-                        ),
+                        Image.asset('assets/gallery.png', fit: BoxFit.fill),
                         Text('Gallery')
                       ],
                     ),
                     onPressed: () async {
-                      PickedFile? pick = await ImagePicker()
-                          .getImage(source: ImageSource.gallery);
-                      setState(() {
-                        attachments.add(pick!.path);
-                      });
+                      final pick = await ImagePicker()
+                          .pickImage(source: ImageSource.gallery);
+                      if (pick != null)
+                        setState(() => attachments.add(pick.path));
                       Navigator.pop(context);
                     },
                   ),

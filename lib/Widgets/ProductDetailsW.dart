@@ -1,23 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:productcatalogue/Models/VarietyProductModel.dart';
 import 'package:productcatalogue/main.dart';
-import 'package:provider/provider.dart';
-import '../Screens/UserAEFrom.dart';
-import '../Models/ProductModel.dart';
-import '../Provider/CategoryDataP.dart';
-import '../Provider/VarietyDataP.dart';
+import '../Screens/Form/product_form.dart';
 import '../Provider/ProductDataP.dart';
 import 'dart:io';
-// import 'package:carousel_pro/carousel_pro.dart';
 import '../Widgets/Group/carousel_pro/carousel_pro.dart';
-import '../Home.dart';
-import '../Models/SecureStorage.dart';
 import 'package:wc_flutter_share/wc_flutter_share.dart';
 import '../Pdf/PdfTools.dart';
 import 'dart:typed_data';
 
 class ProductDetailsW extends StatefulWidget {
-  final ProductModel product;
+  final Product product;
   ProductDetailsW(this.product);
 
   @override
@@ -26,22 +18,19 @@ class ProductDetailsW extends StatefulWidget {
 
 class _ProductDetailsWState extends State<ProductDetailsW> {
   List<String> categorylist = [];
-  bool? _sortAsc;
+  bool _sortAsc = false;
   late List<VarietyProductM> selectedvariety;
   List<VarietyProductM> varietylist = [];
   int? _sortColumnIndex;
-  bool? _sortnameAsc;
-  bool? _sortpriceAsc;
-  bool? _sortwspAsc;
-  SecureStorage storage = SecureStorage();
+  bool _sortnameAsc = false;
+  bool _sortpriceAsc = false;
+  bool _sortwspAsc = false;
   String? currency;
-  String? varietydetails;
   String? text;
 
   @override
   void initState() {
     _sortAsc = false;
-    varietydetails = '';
     selectedvariety = [];
     _sortColumnIndex = 0;
     _sortpriceAsc = false;
@@ -53,15 +42,8 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
 
   @override
   void didChangeDependencies() async {
-    if (widget.product.categorylist == null) {
-      categorylist = [];
-    } else {
-      categorylist = Provider.of<CategoryData>(context)
-          .findcategorylist(widget.product.categorylist);
-    }
-    varietylist = Provider.of<VarietyData>(context).findbyid(widget.product.id);
-    varietydetails =
-        Provider.of<VarietyData>(context).vartext(widget.product.id);
+    varietylist = widget.product.varieties;
+    categorylist = widget.product.categories;
     currency = await storage.getcurrency();
     super.didChangeDependencies();
   }
@@ -81,7 +63,7 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
   }
 
   Widget imageDetails() {
-    images = imagefilelist(widget.product.imagepathlist?.cast<String>() ?? []);
+    images = imagefilelist(widget.product.imagepathlist);
     return InkWell(
       child: Hero(tag: '${widget.product.id}', child: imageWid()),
       onTap: () {
@@ -121,22 +103,19 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
     return image;
   }
 
+  List<Widget> catlist(List<String> list) {
+    return list
+        .map((e) => Container(
+            child: Text(e),
+            padding: EdgeInsets.all(7),
+            color: Colors.lightBlue[300]))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     Pdftools pdftool = Pdftools();
-    final varietypricerange =
-        Provider.of<VarietyData>(context).minmaxvalue(widget.product.id);
-
-    List<Widget> catlist(List list) {
-      List<Widget> widlist = [];
-      for (String i in list as Iterable<String>) {
-        widlist.add(Container(
-            child: Text(i),
-            padding: EdgeInsets.all(7),
-            color: Colors.lightBlue[300]));
-      }
-      return widlist;
-    }
+    final varPriceRange = widget.product.minMaxPrice;
 
     onSortnameColum(
         int columnIndex, bool ascending, List<VarietyProductM> list) {
@@ -146,9 +125,8 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
         _sortColumnIndex = columnIndex;
         _sortAsc = _sortnameAsc;
       }
-      list.sort((a, b) => _sortAsc!
-          ? b.varityname!.compareTo(a.varityname!)
-          : a.varityname!.compareTo(b.varityname!));
+      list.sort((a, b) =>
+          _sortAsc ? b.name.compareTo(a.name) : a.name.compareTo(b.name));
       setState(() {});
     }
 
@@ -160,9 +138,8 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
         _sortColumnIndex = columnIndex;
         _sortAsc = _sortpriceAsc;
       }
-      list.sort((a, b) => _sortAsc!
-          ? b.price!.compareTo(a.price!)
-          : a.price!.compareTo(b.price!));
+      list.sort((a, b) =>
+          _sortAsc? b.price.compareTo(a.price) : a.price.compareTo(b.price));
       setState(() {});
     }
 
@@ -175,7 +152,7 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
         _sortAsc = _sortwspAsc;
       }
       list.sort((a, b) =>
-          _sortAsc! ? b.wsp!.compareTo(a.price!) : a.wsp!.compareTo(b.price!));
+          _sortAsc? b.wsp.compareTo(a.price) : a.wsp.compareTo(b.price));
       setState(() {});
     }
 
@@ -183,9 +160,9 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
       List<DataRow> rowlist = [];
       for (VarietyProductM i in varietylist) {
         rowlist.add(DataRow(selected: selectedvariety.contains(i), cells: [
-          DataCell(Text(i.varityname ?? '')),
-          DataCell(Text((i.price ?? 0).toString())),
-          DataCell(Text((i.wsp ?? 0).toString()))
+          DataCell(Text(i.name)),
+          DataCell(Text((i.price).toString())),
+          DataCell(Text((i.wsp).toString()))
         ]));
       }
       return rowlist;
@@ -197,40 +174,32 @@ class _ProductDetailsWState extends State<ProductDetailsW> {
             textAlign: TextAlign.center),
         content: Text('Note: You can\'t redo it'),
         actions: [
-          // ignore: deprecated_member_use
-          RaisedButton(
-            child: Text('Delete Data', style: TextStyle(color: Colors.white)),
-            color: Colors.red,
+          ElevatedButton(
+            child: Text('Delete Data'),
+            style: ElevatedButton.styleFrom(primary: Colors.red),
             onPressed: () {
               Navigator.pop(context);
               Provider.of<ProductData>(context, listen: false)
                   .deleteproduct(widget.product.id);
-              Provider.of<VarietyData>(context, listen: false)
-                  .delete(widget.product.id);
-              Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (ctx) => ProductCatalogue()))
-                  .whenComplete(() => setState(() {}));
-            },
-          ),
-          // ignore: deprecated_member_use
-          RaisedButton(
-            child: Text('Back'),
-            color: Colors.blueAccent,
-            onPressed: () {
               Navigator.pop(context);
             },
-          )
+          ),
+          ElevatedButton(
+              child: Text('Back'), onPressed: () => Navigator.pop(context))
         ],
       );
     }
 
+    String vatText = widget.product.varieties
+        .map((e) => '${e.name} - ${e.price} - ${e.wsp}')
+        .join('\n');
     if (widget.product.description == null ||
         widget.product.description!.trim() == '') {
       text = '''
 ${widget.product.name}
 
 Varieties:
-$varietydetails
+  $vatText
             
 Created & Shared By Product E-Catalogue App''';
     } else {
@@ -239,46 +208,44 @@ ${widget.product.name}
 Description:
   ${widget.product.description}
 Varieties:
-  $varietydetails
+  $vatText
             
 Created with Product E-Catalogue App''';
     }
 
     void _shareImageAndText() async {
-      // try {
-      Uint8List bytes;
-      if (pdftool
-          .checkimagepath(widget.product.imagepathlist?.cast<String>() ?? [])) {
-        bytes = await File(
-                pdftool.validimagepath(widget.product.imagepathlist).first)
-            .readAsBytes();
-        String ext = pdftool
-            .validimagepath(widget.product.imagepathlist!.cast<String>())[0]
-            .split('.')
-            .last;
-        await WcFlutterShare.share(
-            sharePopupTitle: 'share',
-            subject: '${widget.product.name}',
-            text: text,
-            fileName: '${widget.product.name}.png',
-            mimeType: 'image/$ext',
-            bytesOfFile: bytes.buffer.asUint8List());
-      } else {
-        await WcFlutterShare.share(
-            sharePopupTitle: 'share',
-            subject: '${widget.product.name}',
-            text: text,
-            mimeType: 'text/plain');
+      try {
+        Uint8List bytes;
+        if (pdftool.checkimagepath(widget.product.imagepathlist)) {
+          bytes = await File(
+                  pdftool.validimagepath(widget.product.imagepathlist).first)
+              .readAsBytes();
+          String ext = pdftool
+              .validimagepath(widget.product.imagepathlist.cast<String>())[0]
+              .split('.')
+              .last;
+          await WcFlutterShare.share(
+              sharePopupTitle: 'share',
+              subject: '${widget.product.name}',
+              text: text,
+              fileName: '${widget.product.name}.png',
+              mimeType: 'image/$ext',
+              bytesOfFile: bytes.buffer.asUint8List());
+        } else {
+          await WcFlutterShare.share(
+              sharePopupTitle: 'share',
+              subject: '${widget.product.name}',
+              text: text,
+              mimeType: 'text/plain');
+        }
+      } catch (e) {
+        BotToast.showText(text: 'Error Occurs :: $e');
       }
-      // } catch (e) {
-      //   // print('error: $e');
-      //   Toast.show('Error Occurs :: $e', context);
-      // }
     }
 
     currency = currency ?? '';
     return Scaffold(
-      appBar: AppBar(title: Text(widget.product.name ?? '')),
+      appBar: AppBar(title: Text(widget.product.name)),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
@@ -290,9 +257,7 @@ Created with Product E-Catalogue App''';
                       height: 250,
                       width: double.infinity,
                       padding: EdgeInsets.all(8),
-                      child: checkimagepath(
-                              widget.product.imagepathlist?.cast<String>() ??
-                                  [])
+                      child: checkimagepath(widget.product.imagepathlist)
                           ? imageDetails()
                           : Center(
                               child: Container(
@@ -315,17 +280,16 @@ Created with Product E-Catalogue App''';
                         splashColor: Colors.red,
                         elevation: 7,
                         shape: CircleBorder(),
-                        child: (widget.product.favourite ?? false)
+                        child: (widget.product.favourite)
                             ? Icon(Icons.favorite, color: Colors.red, size: 30)
                             : Icon(Icons.favorite_border, size: 30),
                         fillColor: Colors.white,
                         padding: EdgeInsets.all(8),
                         onPressed: () {
-                          setState(() {
-                            widget.product.toggleFavoriteStatus();
-                            Provider.of<ProductData>(context, listen: false)
-                                .toggleFavoriteStatus(widget.product);
-                          });
+                          widget.product.toggleFavoriteStatus();
+                          Provider.of<ProductData>(context, listen: false)
+                              .toggleFavoriteStatus(widget.product);
+                          setState(() {});
                         }),
                   ),
                 ],
@@ -336,47 +300,34 @@ Created with Product E-Catalogue App''';
               color: Colors.grey[300],
               width: double.infinity,
               padding: EdgeInsets.fromLTRB(10, 7, 10, 7),
-              child: Text(
-                widget.product.name ?? '',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30,
-                ),
-                textAlign: TextAlign.center,
-              ),
+              child: Text(widget.product.name,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                  textAlign: TextAlign.center),
             ),
             SizedBox(height: 4),
-            (varietypricerange == null || varietypricerange.length == 0)
-                ? Text(
-                    '0',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
-                  )
-                : (varietypricerange[0] == varietypricerange[1])
-                    ? Text(
-                        '$currency ${varietypricerange[0].toStringAsFixed(2)}',
+            (varPriceRange.first == 0 && varPriceRange.last == 0)
+                ? Text('0',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25))
+                : (varPriceRange[0] == varPriceRange[1])
+                    ? Text('$currency ${varPriceRange[0].toStringAsFixed(2)}',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 25),
-                      )
+                            fontWeight: FontWeight.bold, fontSize: 25))
                     : Text(
-                        '$currency ${varietypricerange[0].toStringAsFixed(2)} - '
-                        '${varietypricerange[1].toStringAsFixed(2)}',
+                        '$currency ${varPriceRange[0].toStringAsFixed(2)} - '
+                        '${varPriceRange[1].toStringAsFixed(2)}',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 25),
-                      ),
+                            fontWeight: FontWeight.bold, fontSize: 25)),
             Divider(),
             if (widget.product.brand != null)
               Padding(
                 padding: const EdgeInsets.all(8),
-                child: Text(
-                  'Brand: ${widget.product.brand ?? ''}',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
+                child: Text('Brand: ${widget.product.brand ?? ''}',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
               ),
             Divider(),
             (categorylist.isEmpty)
-                ? SizedBox(
-                    height: 0.1,
-                  )
+                ? SizedBox(height: 0.1)
                 : Container(
                     padding: EdgeInsets.all(8),
                     width: double.infinity,
@@ -386,22 +337,17 @@ Created with Product E-Catalogue App''';
                         Text(
                           'Product Category',
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
+                              fontWeight: FontWeight.bold, fontSize: 16),
                           textAlign: TextAlign.left,
                         ),
                         Container(
                           width: double.infinity,
-                          decoration: BoxDecoration(
-                            border: Border.all(),
-                          ),
+                          decoration: BoxDecoration(border: Border.all()),
                           padding: EdgeInsets.all(3),
                           child: Wrap(
-                            runSpacing: 3,
-                            children: catlist(categorylist),
-                            spacing: 3,
-                          ),
+                              runSpacing: 3,
+                              children: catlist(categorylist),
+                              spacing: 3),
                         ),
                       ],
                     ),
@@ -410,28 +356,20 @@ Created with Product E-Catalogue App''';
                 ? Container(
                     width: double.infinity,
                     padding: EdgeInsets.all(8),
-                    child: Text(
-                      'No Variety Available',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    child: Text('No Variety Available',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                        textAlign: TextAlign.center),
                   )
                 : Column(
                     children: <Widget>[
                       Container(
                         width: double.infinity,
                         padding: EdgeInsets.all(8),
-                        child: Text(
-                          'Varity of Product',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                          textAlign: TextAlign.left,
-                        ),
+                        child: Text('Varity of Product',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16),
+                            textAlign: TextAlign.left),
                       ),
                       Container(
                         padding: EdgeInsets.all(10),
@@ -441,7 +379,7 @@ Created with Product E-Catalogue App''';
                             headingRowHeight: 50,
                             columnSpacing: 40,
                             dataRowHeight: 40,
-                            sortAscending: _sortAsc!,
+                            sortAscending: _sortAsc,
                             sortColumnIndex: _sortColumnIndex,
                             columns: [
                               DataColumn(

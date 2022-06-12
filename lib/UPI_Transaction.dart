@@ -1,7 +1,7 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:productcatalogue/Pdf/PdfTools.dart';
-import 'package:productcatalogue/Widgets/Group/Toast.dart';
 import 'package:upi_india/upi_india.dart';
 import 'package:open_file/open_file.dart';
 import 'dart:io' show Platform;
@@ -35,14 +35,13 @@ class _UpitransactionpageState extends State<Upitransactionpage> {
 
   void pop() async {
     const url = "http://buymeacoff.ee/anandsubbu";
-    if (await canLaunch(url)) launch(url);
+    if (await launchUrl(Uri.parse(url))) launchUrl(Uri.parse(url));
   }
 
   Future<UpiResponse> initiateTransaction(UpiApp app) async {
     return _upiIndia.startTransaction(
       app: app,
       receiverUpiId: 'anandsubbu7@oksbi',
-      //'alagappanchetty@oksbi',
       receiverName: 'Anand :: Product E-Catalogue',
       transactionRefId: 'Productcatalogue',
       transactionNote:
@@ -58,7 +57,7 @@ class _UpitransactionpageState extends State<Upitransactionpage> {
         child: Text("My UPI ID : anandsubbu7@oksbi"),
         onPressed: () {
           Clipboard.setData(new ClipboardData(text: 'anandsubbu7@oksbi'));
-          Toast.show('UPI ID Copied to ClipBoard', context);
+          BotToast.showText(text: 'UPI ID Copied to ClipBoard');
         },
       ));
     else
@@ -158,7 +157,7 @@ class _UpitransactionpageState extends State<Upitransactionpage> {
           result = 'Oppss, My Coffee is Cancelled 😔 ';
           print('Received an Unknown transaction status');
       }
-      Toast.show(result, context);
+      BotToast.showText(text: result ?? '');
     } catch (e) {
       switch (e.runtimeType) {
         case UpiIndiaAppNotInstalledException:
@@ -177,7 +176,7 @@ class _UpitransactionpageState extends State<Upitransactionpage> {
           text = "An Unknown error has occurred";
           break;
       }
-      Toast.show(text, context);
+      BotToast.showText(text: text);
     }
     setState(() {});
   }

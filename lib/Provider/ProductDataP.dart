@@ -1,36 +1,29 @@
-import '../Models/ProductModel.dart';
+import 'package:productcatalogue/export.dart';
 import 'package:flutter/material.dart';
-import '../Models/CategoryModel.dart';
-// import '../Tool/DB_Helper.dart';
-export '../Models/ProductModel.dart';
-// import 'dart:io';
+export '../export.dart';
 import 'package:hive/hive.dart';
 
 class ProductData with ChangeNotifier {
-  List<ProductModel?> _items = [];
-  Box<ProductModel?>? _dbbox;
-  ProductData(Box<ProductModel?>? db) {
-    _dbbox = db;
-    _items = [...(_dbbox?.values ?? [])];
+  List<Product> _items = [];
+  late Box<Product> _dbbox;
+  ProductData() {
+    _dbbox = Hive.box<Product>('Product');
+    _items = [...(_dbbox.values)];
   }
 
   void deleteall() {
-    // DBHelper.deleteall('product_data');
     _items = [];
-    _dbbox!.deleteAll(_dbbox!.keys);
-    return null;
+    _dbbox.deleteAll(_dbbox.keys);
   }
 
-  List<ProductModel?> get items {
-    return [..._items];
+  List<Product> get items => [..._items];
+
+  List<Product> get favoriteItems {
+    return _items.where((prodItem) => prodItem.favourite).toList();
   }
 
-  List<ProductModel?> get favoriteItems {
-    return _items.where((prodItem) => prodItem!.favourite ?? false).toList();
-  }
-
-  ProductModel? findbyid(String? id) {
-    return _items.firstWhere((prd) => prd!.id == id, orElse: () => null);
+  Product? findbyid(String? id) {
+    return _items.firstWhereOrNull((prd) => prd.id == id);
   }
 
   String? lsttostring(List vallist) {
@@ -41,26 +34,16 @@ class ProductData with ChangeNotifier {
     }
   }
 
-  List<ProductModel?> findbybrand(String? brandname) {
-    return [..._items.where((e) => e!.brand == brandname)];
+  List<Product> findbybrand(String? brandname) {
+    return [..._items.where((e) => e.brand == brandname)];
   }
 
-  void addallproduct(List<ProductModel> list) {
+  void addallproduct(List<Product> list) {
     // _items.addAll(list);
     for (var i in list) {
       addproduct(i);
     }
     notifyListeners();
-  }
-
-  void editproduct(String? id, ProductModel? newdata) {
-    final prodindex = _items.indexWhere((p) => p!.id == id);
-    if (prodindex >= 0) {
-      _items[prodindex] = newdata;
-      // DBHelper.updateData('product_data', newdata);
-      _dbbox!.put(newdata!.id.toString(), newdata);
-      notifyListeners();
-    } else {}
   }
 
   bool tog(bool? val) {
@@ -71,120 +54,63 @@ class ProductData with ChangeNotifier {
     }
   }
 
-  void toggleFavoriteStatus(ProductModel product) {
+  Future toggleFavoriteStatus(Product product) async {
     product.toggleFavoriteStatus();
-    final prodindex = _items.indexWhere((p) => p!.id == product.id);
-    ProductModel newdata = ProductModel(
-        id: product.id,
-        name: product.name,
-        brand: product.brand,
-        categorylist: product.categorylist,
-        description: product.description,
-        imagepathlist: product.imagepathlist,
-        favourite: tog(product.favourite));
-    _items[prodindex] = newdata;
-    _dbbox!.put(newdata.id.toString(), newdata);
-    // DBHelper.updateData('product_data', newdata);
+    final prodindex = _items.indexWhere((p) => p.id == product.id);
+    _items[prodindex] = product;
+    await _dbbox.put(product.id.toString(), product);
     notifyListeners();
   }
 
-  void deleteproduct(String? id) {
-    _items.removeWhere((p) => p!.id == id);
-    // DBHelper.delete('product_data', id);
-    _dbbox!.delete(id);
+  Future deleteproduct(String? id) async {
+    _items.removeWhere((p) => p.id == id);
+    await _dbbox.delete(id);
     notifyListeners();
   }
 
-  List<String?> uqcatidlist() {
-    List<String?> totalcat = [];
-    for (var i in _items) {
-      if (i!.categorylist != null) {
-        for (var j in i.categorylist!) {
-          totalcat.add(j);
-        }
-      }
-    }
+  List<String> get uqCategList {
+    List<String> totalcat = [];
+    _items.forEach((w) => totalcat.addAll(w.categories));
     return totalcat.toSet().toList();
   }
 
-  List<Categorycount> categorycountlist() {
-    List<Categorycount> rst = [];
-    List<String?> totalcat = [];
-    List<int> valcount = [];
-    for (var i in _items) {
-      if (i!.categorylist != null) {
-        for (var j in i.categorylist!) {
-          totalcat.add(j);
-        }
-      }
-    }
-    List<String?> uniqval = totalcat.toSet().toList();
-    for (String? i in uniqval) {
-      valcount.add(totalcat.where((f) => f == i).length);
-    }
-    if (uniqval.length != valcount.length) {
-      return [];
-    }
-    for (int i = 0; i < (uniqval.length); i++) {
-      rst.add(Categorycount(id: uniqval[i], count: valcount[i]));
+  List<Count> get categCountList {
+    List<Count> rst = [];
+    List<String> totalcat = [];
+    _items.forEach((w) => totalcat.addAll(w.categories));
+    for (String i in uqCategList) {
+      rst.add(Count(name: i, count: totalcat.where((f) => f == i).length));
     }
     return rst;
   }
 
-  List<Brandcount> uqbrand() {
-    List<Brandcount> rst = [];
-    List<String?> totalbrand = [];
-    List<int> valcount = [];
-    for (var i in _items) {
-      if (i!.brand != null) {
-        totalbrand.add(i.brand);
-      }
-    }
-
+  List<Count> get uqBrand {
+    List<Count> rst = [];
+    List<String?> totalbrand = _items.map((e) => e.brand).toList();
     List<String?> uniqval = totalbrand.toSet().toList();
-    uniqval.remove('');
     for (String? i in uniqval) {
-      valcount.add(totalbrand.where((f) => f == i).length);
-    }
-    if (uniqval.length != valcount.length) {
-      return [];
-    }
-    for (int i = 0; i < (uniqval.length); i++) {
-      rst.add(Brandcount(name: uniqval[i], count: valcount[i]));
+      rst.add(Count(count: totalbrand.where((f) => f == i).length));
     }
     return rst;
   }
 
-  List<ProductModel?> productlistbycatid(String? id) {
-    if (id == null || id == 'null') {
-      return [];
-    } else {
-      return [
-        ..._items.where((f) =>
-            (f!.categorylist != null) ? f.categorylist!.contains(id) : false)
-      ];
-    }
+  List<Product> prodListByCateg(String? catId) {
+    return [..._items.where((f) => (f.categories).contains(catId))];
   }
 
-  List<ProductModel?> productlistbybrandname(String? name) {
-    return [..._items.where((f) => f!.brand == name)];
+  List<Product> prodListByBrand(String? name) {
+    return [..._items.where((f) => f.brand == name)];
   }
 
-  bool bolval(String? val) {
+  bool bolval(String val) {
     if (val == true.toString()) {
       return true;
     }
     return false;
   }
 
-  List<String?> brandlist() {
-    List<String?> totalbrand = [];
-    for (var i in _items) {
-      if (i!.brand != null) {
-        totalbrand.add(i.brand);
-      }
-    }
-    List<String?> uniqval = totalbrand.toSet().toList();
+  List<String> get uqBrandList {
+    List<String> uniqval = _items.map((e) => e.brand ?? '').toSet().toList();
     uniqval.remove('');
     return uniqval;
   }
@@ -196,16 +122,14 @@ class ProductData with ChangeNotifier {
     return null;
   }
 
-  Future<void> addproduct(ProductModel data) async {
-    print(data.toMap());
-    _items.add(data);
-    _dbbox!.put(data.id.toString(), data);
+  Future addproduct(Product data) async {
+    final prodindex = _items.indexWhere((p) => p.id == data.id);
+    if (prodindex >= 0) {
+      _items[prodindex] = data;
+    } else {
+      _items.add(data);
+    }
+    await _dbbox.put(data.id.toString(), data);
     notifyListeners();
-  }
-
-  Future<void> fetchproduct() async {
-    _items = [];
-    _items = [...(_dbbox?.values ?? [])];
-    // notifyListeners();
   }
 }

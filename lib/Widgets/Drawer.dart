@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import '../Screens/Import.dart';
-import 'package:provider/provider.dart';
-import '../Provider/CategoryDataP.dart';
 import '../Provider/ProductDataP.dart';
-import '../Provider/VarietyDataP.dart';
 import '../Auth/sign_in.dart';
 import '../Home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,7 +8,6 @@ import '../Screens/Export.dart';
 import '../Screens/Settingscreen.dart';
 import '../contact/Aboutus.dart';
 import '../contact/Contactus.dart';
-import '../Models/SecureStorage.dart';
 
 class MyDrawer extends StatefulWidget {
   const MyDrawer({Key? key}) : super(key: key);
@@ -21,7 +17,6 @@ class MyDrawer extends StatefulWidget {
 }
 
 class _MyDrawerState extends State<MyDrawer> {
-  SecureStorage storage = SecureStorage();
   String? loginstatus;
   User? user;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -49,30 +44,21 @@ class _MyDrawerState extends State<MyDrawer> {
         ),
         content: Text('Note: You can\'t redo it'),
         actions: [
-          // ignore: deprecated_member_use
-          RaisedButton(
+          ElevatedButton(
             child: Text(
               'Delete Data',
               style: TextStyle(color: Colors.white),
             ),
-            color: Colors.red,
+            style: ElevatedButton.styleFrom(primary: Colors.red),
             onPressed: () {
-              setState(() {
-                Provider.of<VarietyData>(context, listen: false).deleteall();
-                Provider.of<CategoryData>(context, listen: false).deleteall();
-                Provider.of<ProductData>(context, listen: false).deleteall();
-              });
+              Provider.of<ProductData>(context, listen: false).deleteall();
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (ctx) => ProductCatalogue()));
             },
           ),
-          // ignore: deprecated_member_use
-          RaisedButton(
+          ElevatedButton(
             child: Text('Back'),
-            color: Colors.blueAccent,
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: () => Navigator.pop(context),
           )
         ],
       );

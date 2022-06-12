@@ -1,5 +1,5 @@
 // import 'package:flutter/material.dart';
-import '../Models/ProductModel.dart';
+import '../Models/Product.dart';
 
 class Helper {
   double? doubleval(var input) {
@@ -15,7 +15,7 @@ class Helper {
   }
 
   int intval(var input) {
-    if (input == null || input == '') { 
+    if (input == null || input == '') {
       return 1000;
     } else if (input.runtimeType == double) {
       return int.parse(input);
@@ -25,16 +25,11 @@ class Helper {
       return 1000;
     }
   }
+
   bool areListsEqual(var list1, var list2) {
-    // check if both are lists
-    if (!(list1 is List && list2 is List)
-        // check if both have same length
-        ||
-        list1.length != list2.length) {
+    if (!(list1 is List && list2 is List) || list1.length != list2.length) {
       return false;
     }
-
-    // check if elements are equal
     for (int i = 0; i < list1.length; i++) {
       if (list1[i] != list2[i]) {
         return false;
@@ -43,7 +38,7 @@ class Helper {
     return true;
   }
 
-  String? stringval(var input) {
+  String stringval(var input) {
     if (input == null || input.trim() == '') {
       return '';
     } else {
@@ -55,12 +50,12 @@ class Helper {
     }
   }
 
-  bool isequal(ProductModel a, ProductModel b) {
+  bool isequal(Product a, Product b) {
     if (a.name == b.name &&
         a.brand == b.brand &&
         // a.price == a.price &&
         a.description == b.description &&
-        areListsEqual(a.categorylist, b.categorylist)) {
+        areListsEqual(a.categories, b.categories)) {
       return true;
     }
     return false;

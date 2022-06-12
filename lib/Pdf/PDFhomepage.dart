@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:productcatalogue/Pdf/PdfTools.dart';
+import 'package:productcatalogue/Pdf/pdf_page.dart';
 import '../Pdf/Grid/GridViewPV.dart';
 import '../Pdf/Grid/Gridonlypicdesc.dart';
 import '../Pdf/Grid/Gridvarietyvertical.dart';
@@ -163,8 +165,17 @@ class PDFbrandscatlogue extends StatelessWidget {
     }
 
     List vallst = ModalRoute.of(context)!.settings.arguments as List;
-    String value = '${vallst[0]}';
+    // String value = '${vallst[0]}';
     bool ispaid = vallst[1];
+    void navigateTo(Function(List<ProcuctbasedModel>, bool) getDataFunc) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                PDFPage(getDataFunc: getDataFunc, ispaid: ispaid),
+          ));
+    }
+
     return Scaffold(
         appBar: AppBar(title: Text('Export Product Catalogue')),
         body: ListView(
@@ -180,8 +191,7 @@ class PDFbrandscatlogue extends StatelessWidget {
                   onTap: () async {
                     sortby = await dialog(context);
                     if (clicked(sortby)) {
-                      Navigator.pushNamed(context, PDFGridViewPV.routeName,
-                          arguments: [value, sortby, ispaid]);
+                      navigateTo(gridViewPv);
                     }
                   },
                 ))),
@@ -196,8 +206,7 @@ class PDFbrandscatlogue extends StatelessWidget {
                   onTap: () async {
                     sortby = await dialog(context);
                     if (clicked(sortby)) {
-                      Navigator.pushNamed(context, PDFGridPicDecs.routeName,
-                          arguments: [value, sortby, ispaid]);
+                      navigateTo(gridOnlyPicDesc);
                     }
                   },
                 ))),
@@ -211,9 +220,7 @@ class PDFbrandscatlogue extends StatelessWidget {
                   onTap: () async {
                     sortby = await dialog(context);
                     if (clicked(sortby)) {
-                      Navigator.pushNamed(
-                          context, PDFGridpicVarietyVertical.routeName,
-                          arguments: [value, sortby, ispaid]);
+                      navigateTo(gridVarietyVertPv);
                     }
                   },
                 ))),
@@ -227,8 +234,7 @@ class PDFbrandscatlogue extends StatelessWidget {
                   onTap: () async {
                     sortby = await dialog(context);
                     if (clicked(sortby)) {
-                      Navigator.pushNamed(context, PDFGriddefinedsize.routeName,
-                          arguments: [value, sortby, ispaid]);
+                      navigateTo(gridDefineSize);
                     }
                   },
                 ))),
@@ -243,9 +249,7 @@ class PDFbrandscatlogue extends StatelessWidget {
                   onTap: () async {
                     sortby = await dialog(context);
                     if (clicked(sortby)) {
-                      Navigator.pushNamed(
-                          context, PDFGridpicVarietyonly.routeName,
-                          arguments: [value, sortby, ispaid]);
+                      navigateTo(gridPicVariety);
                     }
                   },
                 ))),
@@ -259,8 +263,7 @@ class PDFbrandscatlogue extends StatelessWidget {
                   onTap: () async {
                     sortby = await dialog(context);
                     if (clicked(sortby)) {
-                      Navigator.pushNamed(context, PDFListviewone.routeName,
-                          arguments: [value, sortby, ispaid]);
+                      navigateTo(listViewOne);
                     }
                   },
                 ))),

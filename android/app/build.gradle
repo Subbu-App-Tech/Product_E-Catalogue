@@ -32,11 +32,22 @@ def keystoreProperties = new Properties()
    }
 
    android {
-    compileSdkVersion 30
+    compileSdkVersion 31
+    // compileSdkVersion flutter.compileSdkVersion
+    ndkVersion flutter.ndkVersion
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
+
 
     lintOptions {
         disable 'InvalidPackage'
@@ -45,7 +56,9 @@ def keystoreProperties = new Properties()
     defaultConfig {
         applicationId "com.subbu.productcatalogue"
         minSdkVersion 21 // 16 
-        targetSdkVersion 30  // 28  
+        targetSdkVersion 31  // 28  
+        // minSdkVersion flutter.minSdkVersion
+        // targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true 
@@ -59,6 +72,7 @@ def keystoreProperties = new Properties()
            storePassword keystoreProperties['storePassword']
        }
    }
+   
    buildTypes {
        release {
             signingConfig signingConfigs.release
@@ -67,8 +81,6 @@ def keystoreProperties = new Properties()
 
     // buildTypes {
     //     release {
-    //         // TODO: Add your own signing config for the release build.
-    //         // Signing with the debug keys for now, so `flutter run --release` works.
     //         signingConfig signingConfigs.debug
     //     }
     // }
@@ -80,7 +92,7 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'com.android.support:multidex:2.0.1'
     implementation 'com.google.firebase:firebase-analytics:17.2.2'
 }
 apply plugin: 'com.google.gms.google-services' //

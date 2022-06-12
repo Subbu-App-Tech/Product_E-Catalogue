@@ -3,40 +3,27 @@ import 'package:flutter/material.dart';
 import '../Screens/FilteredProductList.dart';
 
 class GridViewW extends StatelessWidget {
-  final String? title;
-  final int? count;
-  final String? catid;
-  final String? brand;
-  // final String catid;
-  final VoidCallback? delete;
-  // final List<ProductModel> productlist;
-  GridViewW(
-      {required this.title, this.count, this.brand, this.catid, this.delete});
+  final int count;
+  final String name;
+  final bool isCateg;
+  GridViewW({required this.count, required this.name, required this.isCateg});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        if (count != 0) {
-          if (brand != null) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (ctx) => FilteredProductsList(
-                          brand: brand,
-                          // productlist: productlist,
-                          title: title,
-                        )));
-          } else if (catid != null) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (ctx) => FilteredProductsList(
-                          catid: catid,
-                          // productlist: productlist,
-                          title: title,
-                        )));
-          }
+        if (isCateg) {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (ctx) =>
+                      FilteredProductsList(brand: name, title: name)));
+        } else {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (ctx) =>
+                      FilteredProductsList(catName: name, title: name)));
         }
       },
       child: Card(
@@ -67,7 +54,7 @@ class GridViewW extends StatelessWidget {
                   color: Colors.black38,
                   width: double.infinity,
                   child: Text(
-                    '$title',
+                    name,
                     maxLines: 1,
                     overflow: TextOverflow.clip,
                     textAlign: TextAlign.center,
@@ -78,27 +65,6 @@ class GridViewW extends StatelessWidget {
                   ),
                 ),
               ),
-              (count == 0)
-                  ? Positioned(
-                      top: .5,
-                      right: .5,
-                      child: Container(
-                        padding: EdgeInsets.all(.01),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.red,
-                        ),
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.delete_forever,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          onPressed: this.delete,
-                        ),
-                      ),
-                    )
-                  : SizedBox.shrink(),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(

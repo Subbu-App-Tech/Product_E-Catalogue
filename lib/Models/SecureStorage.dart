@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class SecureStorage with ChangeNotifier {
+SecureStorage storage = SecureStorage();
+
+class SecureStorage {
   final storage = FlutterSecureStorage();
 
   //Save Credentials
