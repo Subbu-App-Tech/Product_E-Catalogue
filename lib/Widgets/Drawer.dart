@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productcatalogue/Screens/TabScreen.dart';
 import '../Screens/Import.dart';
 import '../Provider/ProductDataP.dart';
 import '../Auth/sign_in.dart';
@@ -53,7 +54,7 @@ class _MyDrawerState extends State<MyDrawer> {
             onPressed: () {
               Provider.of<ProductData>(context, listen: false).deleteall();
               Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (ctx) => ProductCatalogue()));
+                  MaterialPageRoute(builder: (ctx) => Tabscreenwithdata()));
             },
           ),
           ElevatedButton(

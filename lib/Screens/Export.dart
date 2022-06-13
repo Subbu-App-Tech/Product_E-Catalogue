@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
+import 'package:productcatalogue/Screens/Import.dart';
 import 'package:productcatalogue/adMob/my_ad_mod.dart';
 import '../Provider/ProductDataP.dart';
 import 'package:csv/csv.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:external_path/external_path.dart';
 import 'dart:io';
 import '../Pdf/PDFhomepage.dart';
 
@@ -27,25 +26,16 @@ class ExportData extends StatelessWidget {
       productdata.forEach((p) {
         rows.addAll(p.toList);
       });
-
-      Permission.storage.request();
       try {
         await MyMobAd().showInterstitialAd();
-        if (await Permission.storage.request().isGranted) {
-          var dir = await ExternalPath.getExternalStoragePublicDirectory(
-              ExternalPath.DIRECTORY_DOWNLOADS);
-          Directory ddir =
-              await Directory('$dir/$AppName').create(recursive: true);
-          File f = await new File("${ddir.path}/Product_Data.csv")
-              .create(recursive: true);
-          String csv = const ListToCsvConverter().convert(rows);
-          snackBar = SnackBar(
-              content: Text('Data Exported Succesfully to $AppName folder..!'));
-          await f.writeAsString(csv);
-          // ignore: deprecated_member_use
-          _scaffoldkey.currentState!.showSnackBar(snackBar);
-          OpenFile.open(f.path);
-        }
+        final f = await saveFile('Product_Data.csv');
+        String csv = const ListToCsvConverter().convert(rows);
+        snackBar = SnackBar(
+            content: Text('Data Exported Succesfully to $AppName folder..!'));
+        await f.writeAsString(csv);
+        // ignore: deprecated_member_use
+        _scaffoldkey.currentState!.showSnackBar(snackBar);
+        OpenFile.open(f.path);
       } catch (e) {
         print(e);
       }

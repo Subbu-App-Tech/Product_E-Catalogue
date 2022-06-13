@@ -36,7 +36,31 @@ class PdfDownloadPg extends StatelessWidget {
     return FutureBuilder(
         future: loadAd(),
         builder: (c, s) {
-          return Scaffold(body: Center(child: CircularProgressIndicator()));
+          return Scaffold(
+              appBar: AppBar(
+                title: Text('Loading PDF...'),
+                actions: [
+                  FutureBuilder(
+                      future: Future.delayed(Duration(seconds: 7)),
+                      builder: (c, s) {
+                        return s.connectionState == ConnectionState.done
+                            ? IconButton(
+                                onPressed: () {}, icon: Icon(Icons.download))
+                            : SizedBox();
+                      })
+                ],
+              ),
+              body: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                  Text('Make Sure you Connected to Internet')
+                ],
+              ));
         });
   }
 }

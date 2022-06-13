@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 // You can also test with your own ad unit IDs by registering your device as a
@@ -7,13 +6,15 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 const int maxFailedLoadAttempts = 3;
 
 class AdUnits {
-  static String reward = kDebugMode
+  // static bool get isDebug => true;
+  static bool get isDebug => false;
+  static String reward = isDebug
       ? 'ca-app-pub-3940256099942544/5224354917'
       : 'ca-app-pub-9568938816087708/8867980391';
-  static String interstitial = kDebugMode
+  static String interstitial = isDebug
       ? 'ca-app-pub-3940256099942544/1033173712'
       : 'ca-app-pub-9568938816087708/7976666598';
-  static String rewardInterstitial = kDebugMode
+  static String rewardInterstitial = isDebug
       ? 'ca-app-pub-3940256099942544/5354046379'
       : 'ca-app-pub-9568938816087708/3452606727';
 }

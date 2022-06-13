@@ -11,6 +11,8 @@
 
 # Android Related
 */android/key.properties
+android/app/google-services.json
+android/app/key.jks
 android/key.properties
 
 # IntelliJ related

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:csv/csv.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:open_file/open_file.dart';
 import 'package:productcatalogue/adMob/my_ad_mod.dart';
 import 'dart:convert';
@@ -12,6 +11,17 @@ import 'package:permission_handler/permission_handler.dart';
 import '../Tool/Helper.dart';
 import 'package:flutter/services.dart';
 import 'package:external_path/external_path.dart';
+import 'package:path/path.dart' as Path;
+
+Future<File> saveFile(String fileName) async {
+  bool isAcc = await Permission.storage.request().isGranted;
+  if (!isAcc) await Permission.storage.request();
+  isAcc = await Permission.storage.request().isGranted;
+  String dir = await ExternalPath.getExternalStoragePublicDirectory(
+      ExternalPath.DIRECTORY_DOWNLOADS);
+  File file = await File(Path.join(dir, fileName)).create(recursive: true);
+  return file;
+}
 
 class ImportExport extends StatefulWidget {
   const ImportExport({Key? key}) : super(key: key);
@@ -182,17 +192,10 @@ class _ImportExportState extends State<ImportExport> {
   Future<void> emptydownload(BuildContext context) async {
     String result = '';
     try {
-      bool isAcc = await Permission.storage.request().isGranted;
-      if (!isAcc) await Permission.storage.request();
-      isAcc = await Permission.storage.request().isGranted;
-      String dir = await ExternalPath.getExternalStoragePublicDirectory(
-          ExternalPath.DIRECTORY_DOWNLOADS);
-      Directory savedDir =
-          await Directory(dir + '//$AppName').create(recursive: true);
-      File file = await File(savedDir.path + '//Empty_Template.csv')
-          .create(recursive: true);
+      final file = await saveFile('Empty_Template.csv');
       file.writeAsString(EmptyHeader);
       result = 'Template Downloaded Succesfully in $AppName folder..!';
+      OpenFile.open(file.path);
     } catch (e) {
       print('Error ::$e');
       result = 'Error Occurs :: $e';
@@ -204,26 +207,15 @@ class _ImportExportState extends State<ImportExport> {
 
   Future<void> downloadwithdata(BuildContext context) async {
     String result = '';
-    ByteData data = await rootBundle.load('assets/SampleData.csv');
     try {
-      bool isAcc = await Permission.storage.request().isGranted;
-      if (!isAcc) await Permission.storage.request();
-      isAcc = await Permission.storage.request().isGranted;
-      String dir = await ExternalPath.getExternalStoragePublicDirectory(
-          ExternalPath.DIRECTORY_DOWNLOADS);
-      Directory savedDir =
-          await Directory(dir + '//$AppName').create(recursive: true);
-      File file = await File(savedDir.path + '//Sample_Data.csv')
-          .create(recursive: true);
-      await file.writeAsBytes(data.buffer.asUint8List());
-      OpenFile.open(file.path);
-      result = 'Template Downloaded Succesfully in $AppName folder..!';
-    } catch (e) {
-      final ffile = await File('Sample_Data.csv').create(recursive: true);
+      ByteData data = await rootBundle.load('assets/SampleData.csv');
+      final ffile = await saveFile('Empty_Template.csv');
       await ffile.writeAsBytes(data.buffer.asUint8List());
       OpenFile.open(ffile.path);
-      print('Error ::$e');
-      result = 'Error Occurs :: $e';
+      result = 'Template Downloaded Succesfully in $AppName folder..!';
+    } catch (e) {
+      print('Eoorr: $e');
+      result = 'Error: $e';
     }
     // ignore: deprecated_member_use
     _scaffoldkey.currentState!.showSnackBar(SnackBar(content: Text(result)));
