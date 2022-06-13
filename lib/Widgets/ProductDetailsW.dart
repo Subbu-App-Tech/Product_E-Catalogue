@@ -99,7 +99,7 @@ ${widget.product.name}
 Varieties:
   $vatText
             
-Created & Shared By Product E-Catalogue App''';
+Created & Shared By $AppName App''';
     } else {
       text = '''
 ${widget.product.name}
@@ -108,7 +108,7 @@ Description:
 Varieties:
   $vatText
             
-Created with Product E-Catalogue App''';
+Created with $AppName App''';
     }
   }
 

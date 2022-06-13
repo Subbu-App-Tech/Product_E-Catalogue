@@ -5,9 +5,10 @@ import 'dart:async';
 // import 'dart:io';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:productcatalogue/export.dart';
 
 const String val = '''
-If You want Product E-Catalogue For your own Business.
+If You want $AppName For your own Business.
 we were providing Mobile Apps & Website Services.
 Please send your requirements to anandsubbu7@gmail.com.
 ''';

@@ -35,9 +35,8 @@ class ImageHandler {
       File file = File(croppedFile.path);
       final appDirs = await ExternalPath.getExternalStoragePublicDirectory(
           ExternalPath.DIRECTORY_DOWNLOADS);
-      final imagedir =
-          await Directory('$appDirs/Product E-catalogue/Product Pictures')
-              .create(recursive: true);
+      final imagedir = await Directory('$appDirs/$AppName/Product Pictures')
+          .create(recursive: true);
       final savedImage = await file.copy('${imagedir.path}/$fileName');
       print('\nsavedImage: $savedImage\n');
       return savedImage.path;

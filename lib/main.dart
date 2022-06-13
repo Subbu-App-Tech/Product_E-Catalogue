@@ -39,7 +39,7 @@ Future testing() async {
   //   isAcc = await Permission.storage.request().isGranted;
   //   String dir = await ExternalPath.getExternalStoragePublicDirectory(
   //       ExternalPath.DIRECTORY_DOWNLOADS);
-  //   Directory savedDir = Directory(dir + '/Product E-catalogue');
+  //   Directory savedDir = Directory(dir + '/$AppName');
   //   bool hasExisted = await savedDir.exists();
   //   print('>>>');
   //   if (!hasExisted) await savedDir.create(recursive: true);

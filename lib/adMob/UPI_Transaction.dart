@@ -1,9 +1,8 @@
-import 'package:bot_toast/bot_toast.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:productcatalogue/adMob/my_ad_mod.dart';
+import 'package:productcatalogue/export.dart';
 import 'package:upi_india/upi_india.dart';
 import 'package:open_file/open_file.dart';
 import 'dart:io' show Platform;
@@ -72,7 +71,7 @@ class _UpitransactionpgState extends State<Upitransactionpg> {
     return _upiIndia.startTransaction(
       app: app,
       receiverUpiId: 'anandsubbu7@oksbi',
-      receiverName: 'Anand :: Product E-Catalogue',
+      receiverName: 'Anand :: $AppName',
       transactionRefId: 'Productcatalogue',
       transactionNote:
           ispaid ? 'Catalogue without Watermark' : 'I just offer you a coffee',

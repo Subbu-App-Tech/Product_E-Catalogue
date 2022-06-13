@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productcatalogue/export.dart';
 
 class LoadingScreen extends StatelessWidget {
   const LoadingScreen({Key? key}) : super(key: key);
@@ -27,7 +28,7 @@ class LoadingScreen extends StatelessWidget {
                   children: <Widget>[
                     Spacer(),
                     Container(
-                        child: Text('Product E-Catalogue',
+                        child: Text(AppName,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 fontSize: 27,

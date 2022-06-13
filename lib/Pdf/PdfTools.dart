@@ -1,8 +1,7 @@
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:productcatalogue/export.dart';
 import 'dart:io';
-import '../Models/Product.dart';
-import '../Models/VarietyProduct.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:external_path/external_path.dart';
@@ -37,7 +36,7 @@ class Pdftools {
               pw.Container(
                   padding: pw.EdgeInsets.fromLTRB(5, 5, 0, 5),
                   alignment: pw.Alignment.bottomRight,
-                  child: pw.Text('Created with Product E-Catalogue',
+                  child: pw.Text('Created with $AppName',
                       style: pw.TextStyle(
                           fontSize: 16,
                           color: PdfColors.white,
@@ -187,7 +186,7 @@ class Pdftools {
         buildBackground: (pw.Context context) {
           return pw.FullPage(
             ignoreMargins: true,
-            child: pw.Watermark.text(ispaid ? '' : 'Product E-Catalogue',
+            child: pw.Watermark.text(ispaid ? '' : '$AppName',
                 fit: pw.BoxFit.contain,
                 style: pw.TextStyle(
                     fontSize: 40,

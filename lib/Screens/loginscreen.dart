@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:productcatalogue/export.dart';
 import '../Auth/sign_in.dart';
-import '../Models/SecureStorage.dart';
 
 class LoginPage extends StatefulWidget {
   final Function() onDone;
@@ -78,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   Spacer(),
                   Container(
-                      child: Text('Product E-Catalogue',
+                      child: Text(AppName,
                           style: TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.bold,

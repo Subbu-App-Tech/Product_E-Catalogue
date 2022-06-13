@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:csv/csv.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:open_file/open_file.dart';
+import 'package:productcatalogue/adMob/my_ad_mod.dart';
 import 'dart:convert';
 import 'dart:async';
 import '../Provider/ProductDataP.dart';
@@ -73,9 +76,10 @@ class _ImportExportState extends State<ImportExport> {
       Future<void> validate(datafield) async {
         String appDirs = await ExternalPath.getExternalStoragePublicDirectory(
             ExternalPath.DIRECTORY_DOWNLOADS);
-        Directory imagedir =
-            await Directory('$appDirs/Product E-catalogue/Product Pictures')
-                .create(recursive: true);
+        final ddir =
+            await Directory('$appDirs//$AppName').create(recursive: true);
+        Directory imagedir = await Directory('${ddir.path}//Product Pictures')
+            .create(recursive: true);
         for (List i in fields) {
           if (helper.stringval(i[nameIdx]).isNotEmpty &&
               helper.stringval(i[categIdx]).isNotEmpty) {
@@ -146,13 +150,13 @@ class _ImportExportState extends State<ImportExport> {
       BotToast.showText(text: 'No Valid Data to Upload..!');
       importeddatastatus = true;
       setState(() {});
-
       validate(fields);
     } catch (e) {
       importeddatastatus = true;
       BotToast.showText(
           text: 'Error Uploading: please Recheck the CSV Format \n$e');
     }
+    await MyMobAd().showInterstitialAd();
   }
 
   void getFilePath(BuildContext context) async {
@@ -172,6 +176,7 @@ class _ImportExportState extends State<ImportExport> {
       // ignore: deprecated_member_use
       _scaffoldkey.currentState!.showSnackBar(snackBar);
     }
+    await MyMobAd().showInterstitialAd();
   }
 
   Future<void> emptydownload(BuildContext context) async {
@@ -182,47 +187,47 @@ class _ImportExportState extends State<ImportExport> {
       isAcc = await Permission.storage.request().isGranted;
       String dir = await ExternalPath.getExternalStoragePublicDirectory(
           ExternalPath.DIRECTORY_DOWNLOADS);
-      Directory savedDir = Directory(dir + '/Product E-catalogue');
-      bool hasExisted = await savedDir.exists();
-      if (!hasExisted) await savedDir.create(recursive: true);
-      File file = await File(savedDir.path + '/EmptyData.csv')
-          .writeAsString(EmptyHeader);
-      file.create(recursive: false);
-      result =
-          'Template Downloaded Succesfully in Product E-catalogue folder..!';
+      Directory savedDir =
+          await Directory(dir + '//$AppName').create(recursive: true);
+      File file = await File(savedDir.path + '//Empty_Template.csv')
+          .create(recursive: true);
+      file.writeAsString(EmptyHeader);
+      result = 'Template Downloaded Succesfully in $AppName folder..!';
     } catch (e) {
       print('Error ::$e');
       result = 'Error Occurs :: $e';
     }
     // ignore: deprecated_member_use
     _scaffoldkey.currentState!.showSnackBar(SnackBar(content: Text(result)));
-    // ignore: deprecated_member_use
-    _scaffoldkey.currentState!.showSnackBar(snackBar);
+    await MyMobAd().showInterstitialAd();
   }
 
   Future<void> downloadwithdata(BuildContext context) async {
     String result = '';
+    ByteData data = await rootBundle.load('assets/SampleData.csv');
     try {
       bool isAcc = await Permission.storage.request().isGranted;
       if (!isAcc) await Permission.storage.request();
       isAcc = await Permission.storage.request().isGranted;
       String dir = await ExternalPath.getExternalStoragePublicDirectory(
           ExternalPath.DIRECTORY_DOWNLOADS);
-      Directory savedDir = Directory(dir + '/Product E-catalogue');
-      bool hasExisted = await savedDir.exists();
-      if (!hasExisted) await savedDir.create(recursive: true);
-      ByteData data = await rootBundle.load('assets/SampleData.csv');
-      File file = await File(savedDir.path + '/SampleData.csv')
-          .writeAsBytes(data.buffer.asUint8List());
-      file.create(recursive: false);
-      result =
-          'Template Downloaded Succesfully in Product E-catalogue folder..!';
+      Directory savedDir =
+          await Directory(dir + '//$AppName').create(recursive: true);
+      File file = await File(savedDir.path + '//Sample_Data.csv')
+          .create(recursive: true);
+      await file.writeAsBytes(data.buffer.asUint8List());
+      OpenFile.open(file.path);
+      result = 'Template Downloaded Succesfully in $AppName folder..!';
     } catch (e) {
+      final ffile = await File('Sample_Data.csv').create(recursive: true);
+      await ffile.writeAsBytes(data.buffer.asUint8List());
+      OpenFile.open(ffile.path);
       print('Error ::$e');
       result = 'Error Occurs :: $e';
     }
     // ignore: deprecated_member_use
     _scaffoldkey.currentState!.showSnackBar(SnackBar(content: Text(result)));
+    await MyMobAd().showInterstitialAd();
   }
 
   Widget _header(String text) {
@@ -429,7 +434,7 @@ Then you would mention: product1.png, Product2.jpg .
                         style: TextStyle(fontSize: 14),
                       ),
                       Text(
-                        '''Product E-catalogue > Product Pictures Folder in Internal Storage''',
+                        '''$AppName > Product Pictures Folder in Internal Storage''',
                         // ''' Android > data> com.subbu.productcatalogue > files > Pictures.''',
                         textAlign: TextAlign.left,
                         style: TextStyle(

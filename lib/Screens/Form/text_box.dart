@@ -4,7 +4,7 @@ class MyTextFormBox<T> extends StatelessWidget {
   final String title;
   final T value;
   final Function(T) onChange;
-  final int? maxLines;
+  final int maxLines;
   final bool validate;
   final bool isNullable;
   const MyTextFormBox(
@@ -12,7 +12,7 @@ class MyTextFormBox<T> extends StatelessWidget {
       required this.title,
       required this.value,
       required this.onChange,
-      this.maxLines,
+      this.maxLines = 1,
       this.validate = false,
       this.isNullable = true})
       : super(key: key);
@@ -32,9 +32,9 @@ class MyTextFormBox<T> extends StatelessWidget {
       textInputAction: TextInputAction.newline,
       keyboardType: TextInputType.multiline,
       onChanged: (v) {
-        if (T is double) {
+        if (T.toString().startsWith('double')) {
           onChange((double.tryParse(v) as T) ?? value);
-        } else if (T is int) {
+        } else if (T.toString().startsWith('int')) {
           onChange((int.tryParse(v) ?? value) as T);
         } else {
           onChange(v.toString() as T);

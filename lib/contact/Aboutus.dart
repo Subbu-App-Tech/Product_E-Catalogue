@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
-
-
+import 'package:productcatalogue/export.dart';
 
 class AboutUs extends StatelessWidget {
   static const routeName = '/AboutUs';
@@ -116,12 +114,12 @@ You can import multiple products simultaneously via CSV file by taking following
                     children: [
                       textformate(''' 
   All of your Image is saved in "Pictures" in 
-  Product E-catalogue > Product Pictures in Internal Storage
+  $AppName > Product Pictures in Internal Storage
   Then export the data as CSV.
   In other Device that you want to clone Copy this "Picture" folder & save in same location ( Android> data> com.subbu.productcatalogue> files).
   Then Import The Data CSV. 
                     '''),
-                    //  Android> data> com.subbu.productcatalogue> files> Pictures.
+                      //  Android> data> com.subbu.productcatalogue> files> Pictures.
                     ],
                   ),
                 ),
