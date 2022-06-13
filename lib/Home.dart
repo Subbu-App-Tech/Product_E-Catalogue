@@ -52,10 +52,12 @@ class _ProductCatalogueState extends State<ProductCatalogue> {
         if (snapshot.hasData) {
           return Tabscreenwithdata();
         } else {
-          if (loginstatus == 'Skiped_login') {
+          if (loginstatus == 'Skip_login') {
             return Tabscreenwithdata();
           } else {
-            return LoginPage();
+            return LoginPage(
+              onDone: () => setState(() {}),
+            );
           }
         }
       },
@@ -81,7 +83,7 @@ class _ProductCatalogueState extends State<ProductCatalogue> {
           ContactUs.routeName: (ctx) => ContactUs(),
           AboutUs.routeName: (ctx) => AboutUs(),
           Tabscreenwithdata.routeName: (ctx) => Tabscreenwithdata(),
-          PDFbrandscatlogue.routeName: (ctx)=>PDFbrandscatlogue(),
+          PDFbrandscatlogue.routeName: (ctx) => PDFbrandscatlogue(),
         },
       ),
     );

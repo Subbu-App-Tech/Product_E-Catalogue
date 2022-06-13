@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import '../Auth/sign_in.dart';
-import '../Home.dart';
 import '../Models/SecureStorage.dart';
 
 class LoginPage extends StatefulWidget {
+  final Function() onDone;
+  const LoginPage({super.key, required this.onDone});
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -14,9 +15,7 @@ class _LoginPageState extends State<LoginPage> {
       onTap: () {
         FutureBuilder(
           future: signInWithGoogle().whenComplete(() {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => HomePage()),
-            );
+            widget.onDone();
           }),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
@@ -44,10 +43,7 @@ class _LoginPageState extends State<LoginPage> {
                 padding: const EdgeInsets.only(left: 20),
                 child: Text(
                   'Sign in with Google',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 20, color: Colors.grey),
                 ),
               )
             ],
@@ -115,14 +111,8 @@ class _LoginPageState extends State<LoginPage> {
                   Spacer(),
                   TextButton(
                     onPressed: () {
-                      storage.setloginval('Skiped_login');
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return HomePage();
-                          },
-                        ),
-                      );
+                      storage.setloginval('Skip_login');
+                      widget.onDone();
                     },
                     child: Text(
                       'Skip Login For Now -->',

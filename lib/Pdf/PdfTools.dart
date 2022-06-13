@@ -119,7 +119,7 @@ class Pdftools {
       double tabletwowidth, int maxlistlen) {
     String? val;
     List<VarietyProductM>? varietylist;
-    if (currency != '') {
+    if (currency.isEmpty) {
       val = 'Price';
     } else {
       val = 'Price in $val';
@@ -168,13 +168,8 @@ class Pdftools {
           fontSize: 10,
           fontWeight: pw.FontWeight.bold,
         ),
-        headerDecoration: pw.BoxDecoration(
-          color: PdfColors.blue600,
-        ),
-        cellStyle: const pw.TextStyle(
-          color: PdfColors.black,
-          fontSize: 10,
-        ),
+        headerDecoration: pw.BoxDecoration(color: PdfColors.blue600),
+        cellStyle: const pw.TextStyle(color: PdfColors.black, fontSize: 10),
         oddRowDecoration: pw.BoxDecoration(color: PdfColors.grey400),
         rowDecoration: pw.BoxDecoration(color: PdfColors.grey200));
   }
@@ -186,7 +181,7 @@ class Pdftools {
       // ExtStorage.DIRECTORY_DOWNLOADS);
       var dir = await ExternalPath.getExternalStoragePublicDirectory(
           ExternalPath.DIRECTORY_DOWNLOADS);
-      File file = await new File("$dir/ProductDataTemplate.csv")
+      File file = await new File("$dir/Product_Data_Template.csv")
           .create(recursive: true);
       var isExist = await file.exists();
       if (isExist) {
@@ -218,29 +213,17 @@ class Pdftools {
                     color: PdfColors.grey200)),
           );
         },
-        theme: pw.ThemeData.withFont(
-            base: pw.Font.ttf(
-                await rootBundle.load("assets/Open_Sans/OpenSans-Regular.ttf")),
-            bold: pw.Font.ttf(
-                await rootBundle.load("assets/Open_Sans/OpenSans-Bold.ttf")),
-            boldItalic: pw.Font.ttf(await rootBundle
-                .load("assets/Open_Sans/OpenSans-BoldItalic.ttf")),
-            italic: pw.Font.ttf(
-                await rootBundle.load("assets/Open_Sans/OpenSans-Italic.ttf"))),
+        // theme: pw.ThemeData.withFont(
+        //     base: pw.Font.ttf(
+        //         await rootBundle.load("assets/Open_Sans/OpenSans-Regular.ttf")),
+        //     bold: pw.Font.ttf(
+        //         await rootBundle.load("assets/Open_Sans/OpenSans-Bold.ttf")),
+        //     boldItalic: pw.Font.ttf(await rootBundle
+        //         .load("assets/Open_Sans/OpenSans-BoldItalic.ttf")),
+        //     italic: pw.Font.ttf(
+        //         await rootBundle.load("assets/Open_Sans/OpenSans-Italic.ttf"))),
         margin: pw.EdgeInsets.all(val),
         pageFormat: PdfPageFormat.a4);
-  }
-
-  Future<pw.ThemeData> theamdata() async {
-    return pw.ThemeData.withFont(
-        base: pw.Font.ttf(
-            await rootBundle.load("assets/Open_Sans/OpenSans-Regular.ttf")),
-        bold: pw.Font.ttf(
-            await rootBundle.load("assets/Open_Sans/OpenSans-Bold.ttf")),
-        boldItalic: pw.Font.ttf(
-            await rootBundle.load("assets/Open_Sans/OpenSans-BoldItalic.ttf")),
-        italic: pw.Font.ttf(
-            await rootBundle.load("assets/Open_Sans/OpenSans-Italic.ttf")));
   }
 
   List<Product> sortedlist({required List<Product> list, String? type}) {

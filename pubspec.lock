@@ -15,13 +15,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "40.0.0"
-  advance_pdf_viewer:
+  advance_pdf_viewer_fork:
     dependency: "direct main"
     description:
-      name: advance_pdf_viewer
+      name: advance_pdf_viewer_fork
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.0"
   analyzer:
     dependency: transitive
     description:

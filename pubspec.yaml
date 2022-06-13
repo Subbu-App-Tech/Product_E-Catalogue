@@ -24,7 +24,7 @@ module:
   androidX: true
 
 dependencies:
-  advance_pdf_viewer: any
+  advance_pdf_viewer_fork: ^2.0.0
   bot_toast: ^4.0.2
   badges: ^2.0.3
   cloud_firestore: ^3.1.17

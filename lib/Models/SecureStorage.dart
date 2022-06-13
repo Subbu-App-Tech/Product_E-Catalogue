@@ -23,13 +23,7 @@ class SecureStorage {
 
   Future<String> getcurrency() async {
     String? value = await storage.read(key: "currency");
-    if (value == null) {
-      return '';
-    } else if (value == 'null') {
-      return '';
-    } else {
-      return value;
-    }
+    return value ?? '';
   }
 
   Future setloginval(String currency) async {

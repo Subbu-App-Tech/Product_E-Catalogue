@@ -67,8 +67,7 @@ Future<Uint8List> gridViewPv(
                         mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: <pw.Widget>[
-                          (productdata.description == null ||
-                                  productdata.description!.trim() == '')
+                          ((productdata.getDesc).isEmpty)
                               ? pw.SizedBox.shrink()
                               : pw.Container(
                                   padding: pw.EdgeInsets.only(
@@ -76,7 +75,7 @@ Future<Uint8List> gridViewPv(
                                   alignment: pw.Alignment.topLeft,
                                   child: pw.Paragraph(
                                       padding: pw.EdgeInsets.all(1),
-                                      text: '''${productdata.description}''',
+                                      text: '''${productdata.getDesc}''',
                                       style: pw.TextStyle(
                                         fontSize: 8,
                                       ),

@@ -53,6 +53,11 @@ class Product extends HiveObject with ChangeNotifier {
     }
   }
 
+  String get getDesc {
+    final str = this.description ?? '';
+    return str;
+  }
+
   bool isequal(Product a, Product b) {
     if (a.name == b.name &&
         a.description == b.description &&
