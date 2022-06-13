@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:productcatalogue/Models/Settings.dart';
-import 'package:productcatalogue/Pdf/PdfTools.dart';
+import 'package:productcatalogue/adMob/my_ad_mod.dart';
 import 'package:productcatalogue/main.dart';
 import '../Models/SecureStorage.dart';
 
@@ -24,7 +24,8 @@ class _SettingScreenState extends State<SettingScreen> {
   TextEditingController _mobilenocontroller = TextEditingController();
   @override
   void initState() {
-    Pdftools.createInterstitialAd();
+    MyMobAd().showInterstitialAd();
+
     super.initState();
   }
 

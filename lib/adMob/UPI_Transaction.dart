@@ -1,7 +1,9 @@
 import 'package:bot_toast/bot_toast.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:productcatalogue/Pdf/PdfTools.dart';
+import 'package:productcatalogue/adMob/my_ad_mod.dart';
 import 'package:upi_india/upi_india.dart';
 import 'package:open_file/open_file.dart';
 import 'dart:io' show Platform;
@@ -11,17 +13,45 @@ import 'dart:convert';
 
 String localeName = Platform.localeName;
 
-class Upitransactionpage extends StatefulWidget {
-  static const routeName = '/upi';
+class PdfDownloadPg extends StatelessWidget {
+  static const routeName = '/PdfDownloadPg';
   final String filepath;
   final bool ispaid;
-  Upitransactionpage({required this.filepath, required this.ispaid});
+  const PdfDownloadPg({required this.filepath, required this.ispaid});
 
   @override
-  _UpitransactionpageState createState() => _UpitransactionpageState();
+  Widget build(BuildContext context) {
+    Future loadAd() async {
+      SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
+        await MyMobAd().showRewardedInterstitialAd(() {
+          Navigator.pop(context);
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (ctx) =>
+                      Upitransactionpg(filepath: filepath, ispaid: ispaid)));
+        });
+      });
+    }
+
+    return FutureBuilder(
+        future: loadAd(),
+        builder: (c, s) {
+          return Scaffold(body: Center(child: CircularProgressIndicator()));
+        });
+  }
 }
 
-class _UpitransactionpageState extends State<Upitransactionpage> {
+class Upitransactionpg extends StatefulWidget {
+  final String filepath;
+  final bool ispaid;
+  Upitransactionpg({required this.filepath, required this.ispaid});
+
+  @override
+  _UpitransactionpgState createState() => _UpitransactionpgState();
+}
+
+class _UpitransactionpgState extends State<Upitransactionpg> {
   UpiResponse? _transaction;
   UpiIndia _upiIndia = UpiIndia();
   late List<UpiApp> apps;
@@ -29,7 +59,7 @@ class _UpitransactionpageState extends State<Upitransactionpage> {
   @override
   void initState() {
     ispaid = widget.ispaid;
-    Pdftools.createInterstitialAd();
+    MyMobAd().showInterstitialAd();
     super.initState();
   }
 
@@ -199,10 +229,6 @@ class _UpitransactionpageState extends State<Upitransactionpage> {
   late bool isIndia;
   @override
   Widget build(BuildContext context) {
-    // if (localeName != 'en_IN') ispaid = false;
-    // if (country != 'India') ispaid = false;
-    // isIndia = country == 'India';
-    // India
     return Scaffold(
       appBar: AppBar(title: Text('Download Catalogue')),
       body: FutureBuilder(
@@ -224,16 +250,16 @@ class _UpitransactionpageState extends State<Upitransactionpage> {
                             padding: const EdgeInsets.fromLTRB(25, 10, 25, 10),
                             // ignore: deprecated_member_use
                             child: RaisedButton(
-                              color: Colors.green,
-                              elevation: 12,
-                              child: Padding(
-                                padding: const EdgeInsets.all(5),
-                                child: Text('>>  Download PDF 🔥  <<',
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 18)),
-                              ),
-                              onPressed: () => OpenFile.open(widget.filepath),
-                            ),
+                                color: Colors.green,
+                                elevation: 12,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5),
+                                  child: Text('>>  Download PDF 🔥  <<',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 18)),
+                                ),
+                                onPressed: () =>
+                                    OpenFile.open(widget.filepath)),
                           ),
                           Center(
                               child: Container(
@@ -241,14 +267,12 @@ class _UpitransactionpageState extends State<Upitransactionpage> {
                             alignment: Alignment.center,
                             padding: EdgeInsets.fromLTRB(30, 10, 30, 10),
                             width: double.infinity,
-                            child: Text(
-                              result ?? '',
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                              textAlign: TextAlign.center,
-                            ),
+                            child: Text(result ?? '',
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                                textAlign: TextAlign.center),
                           ))
                         ],
                       )
@@ -268,16 +292,19 @@ class _UpitransactionpageState extends State<Upitransactionpage> {
                                 textAlign: TextAlign.center),
                           )),
                 SizedBox(height: 30),
-                // if (!widget.ispaid)
-                // if (localeName != 'en_IN')
-                // ignore: deprecated_member_use
-                FlatButton(
+                Container(
                   color: Colors.grey[100],
-                  onPressed: () => OpenFile.open(widget.filepath),
-                  child: Text(
-                    'Skip -> I Don\'t like to Offer you a coffee',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 12),
+                  child: TextButton(
+                    onPressed: () async {
+                      await MyMobAd().showRewardedInterstitialAd(() {
+                        OpenFile.open(widget.filepath);
+                      });
+                    },
+                    child: Text(
+                      'Skip -> I Don\'t like to Offer you a coffee',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 12),
+                    ),
                   ),
                 ),
                 SizedBox(height: 15),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:productcatalogue/Screens/Form/brand_sugs.dart';
 import 'package:productcatalogue/Screens/Form/image_handle.dart';
 import 'package:productcatalogue/Screens/Form/text_box.dart';
+import 'package:productcatalogue/adMob/my_ad_mod.dart';
 import '../../Tool/DynamicTextField.dart';
 import '../../Tool/MultiSelectedChip.dart';
 import '../../export.dart';
@@ -57,7 +58,7 @@ class _ProductFormState extends State<ProductForm> {
     );
   }
 
-  void _saveform() {
+  void _saveform() async {
     final isValid = form.currentState!.validate();
     _product.varieties.removeWhere((e) => e.name.isEmpty);
     if (_product.varieties.length <= 0) {
@@ -67,10 +68,12 @@ class _ProductFormState extends State<ProductForm> {
     } else {
       if (!isValid) return;
       form.currentState!.save();
-      Provider.of<ProductData>(context, listen: false).addproduct(_product);
+      await Provider.of<ProductData>(context, listen: false)
+          .addproduct(_product);
       edit = !edit;
       Navigator.of(context).pop();
     }
+    await MyMobAd().showInterstitialAd();
   }
 
   void _startaddingcat(BuildContext context) async {

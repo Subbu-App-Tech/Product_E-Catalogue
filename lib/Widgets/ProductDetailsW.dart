@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:productcatalogue/Screens/Form/image_handle.dart';
+import 'package:productcatalogue/adMob/my_ad_mod.dart';
 import 'package:productcatalogue/main.dart';
 import '../Screens/Form/product_form.dart';
 import '../Provider/ProductDataP.dart';
@@ -218,6 +219,7 @@ Created with Product E-Catalogue App''';
       } catch (e) {
         BotToast.showText(text: 'Error Occurs :: $e');
       }
+      await MyMobAd().showInterstitialAd();
     }
 
     currency = currency ?? '';

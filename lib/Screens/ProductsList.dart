@@ -41,7 +41,6 @@ class _ProductsListState extends State<ProductsList> {
   bool issortname = false;
   bool issortprice = false;
   bool issortrank = false;
-  // final _nativeAdmob = NativeAdmob();
   @override
   void initState() {
     controller.addListener(() {
@@ -53,16 +52,8 @@ class _ProductsListState extends State<ProductsList> {
   @override
   void dispose() {
     controller.dispose();
-    // _subscription.cancel();
     super.dispose();
   }
-
-// ca-app-pub-9568938816087708~5406343573
-  // static const _adUnitID = "ca-app-pub-9568938816087708/6044993041";
-  // double _height = 0;
-  // late StreamSubscription _subscription;
-  // static const _adUnitID = "ca-app-pub-3940256099942544/2247696110";
-  //-> native sample
 
   @override
   void didChangeDependencies() {
@@ -74,15 +65,6 @@ class _ProductsListState extends State<ProductsList> {
     isProdExist = allproductlist.length > 1;
     super.didChangeDependencies();
   }
-
-  // @override
-  // void didUpdateWidget(ProductsList oldWidget) {
-  //   print('2,filterdata: $filterdata');
-  //   filterdata =
-  //       widget.filterdata ?? Filterdata(brandlist: [], categorylist: []);
-  //   filterdata.isFavOnly = widget.isFavOnly;
-  //   super.didUpdateWidget(oldWidget);
-  // }
 
   bool isProdExist = false;
   void sortbyname(List<Product?> list) {

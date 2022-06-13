@@ -1,4 +1,3 @@
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'dart:io';
@@ -7,7 +6,6 @@ import '../Models/VarietyProduct.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:external_path/external_path.dart';
-import 'package:flutter/services.dart';
 
 class ProcuctbasedModel {
   String? basedon;
@@ -16,22 +14,6 @@ class ProcuctbasedModel {
 }
 
 class Pdftools {
-  static Future createInterstitialAd() async {
-    InterstitialAd? _interstitialAd;
-    await InterstitialAd.load(
-        // adUnitId: InterstitialAd.testAdUnitId,
-        adUnitId: 'ca-app-pub-9568938816087708/7976666598',
-        request: AdRequest(),
-        adLoadCallback: InterstitialAdLoadCallback(
-          onAdLoaded: (InterstitialAd ad) async => await ad.show(),
-          onAdFailedToLoad: (LoadAdError error) {},
-        ));
-    if (_interstitialAd == null) {
-      print('Warning: attempt to show interstitial before loaded.');
-      return;
-    }
-  }
-
   pw.Widget buildFooter(
       {pw.Context? context, String? companyname, String? contactno}) {
     return pw.Container(

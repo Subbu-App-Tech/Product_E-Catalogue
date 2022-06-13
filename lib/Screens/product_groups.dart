@@ -14,9 +14,6 @@ class GridListTiles extends StatefulWidget {
 
 class _GridListTilesState extends State<GridListTiles> {
 
-  // static const _adUnitID = "ca-app-pub-9568938816087708/6044993041";
-  // late StreamSubscription _subscription;
-
   @override
   Widget build(BuildContext context) {
     List<Count> data = widget.isCateg

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:productcatalogue/UPI_Transaction.dart';
+import 'package:productcatalogue/adMob/UPI_Transaction.dart';
+import 'package:productcatalogue/adMob/my_ad_mod.dart';
 import '../../Provider/ProductDataP.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:async';
@@ -15,7 +16,12 @@ class PDFPage extends StatefulWidget {
   final String sortby;
   final bool ispaid;
   static const routeName = '/PDFListviewone';
-  const PDFPage({Key? key, required this.getDataFunc, required this.ispaid, required this.input, required this.sortby})
+  const PDFPage(
+      {Key? key,
+      required this.getDataFunc,
+      required this.ispaid,
+      required this.input,
+      required this.sortby})
       : super(key: key);
 
   @override
@@ -23,10 +29,17 @@ class PDFPage extends StatefulWidget {
 }
 
 class _PDFPageState extends State<PDFPage> {
+  MyMobAd ads = MyMobAd();
   @override
   void initState() {
-    Pdftools.createInterstitialAd();
+    ads.showInterstitialAd();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    ads.dispose();
+    super.dispose();
   }
 
   @override
@@ -95,13 +108,16 @@ class _PDFPageState extends State<PDFPage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (ctx) => Upitransactionpage(
+                              builder: (ctx) => PdfDownloadPg(
                                   filepath: filepath, ispaid: ispaid)));
                     },
                   ),
                 ],
               ),
-              body: PDFViewer(document: _pdfdoc, showNavigation: true));
+              body: PDFViewer(
+                  document: _pdfdoc,
+                  showNavigation: true,
+                  controller: PageController()));
         } else {
           return Scaffold(
               body: Center(
