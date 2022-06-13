@@ -20,15 +20,19 @@ class PdfDownloadPg extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void toPage() {
+      Navigator.pop(context);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (ctx) =>
+                  Upitransactionpg(filepath: filepath, ispaid: ispaid)));
+    }
+
     Future loadAd() async {
       SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
         await MyMobAd().showRewardedInterstitialAd(() {
-          Navigator.pop(context);
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (ctx) =>
-                      Upitransactionpg(filepath: filepath, ispaid: ispaid)));
+          toPage();
         });
       });
     }
@@ -45,7 +49,7 @@ class PdfDownloadPg extends StatelessWidget {
                       builder: (c, s) {
                         return s.connectionState == ConnectionState.done
                             ? IconButton(
-                                onPressed: () {}, icon: Icon(Icons.download))
+                                onPressed: toPage, icon: Icon(Icons.download))
                             : SizedBox();
                       })
                 ],
