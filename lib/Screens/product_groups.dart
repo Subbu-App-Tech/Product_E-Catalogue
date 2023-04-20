@@ -13,7 +13,6 @@ class GridListTiles extends StatefulWidget {
 }
 
 class _GridListTilesState extends State<GridListTiles> {
-
   @override
   Widget build(BuildContext context) {
     List<Count> data = widget.isCateg

@@ -184,7 +184,8 @@ class _ImportExportState extends State<ImportExport> {
     } catch (e) {
       snackBar = SnackBar(content: Text(' 😔 Error Uploading Data! :: $e'));
       // ignore: deprecated_member_use
-      _scaffoldkey.currentState!.showSnackBar(snackBar);
+
+      ScaffoldMessenger.maybeOf(context)?.showSnackBar(snackBar);
     }
     await MyMobAd().showInterstitialAd();
   }
@@ -200,8 +201,8 @@ class _ImportExportState extends State<ImportExport> {
       print('Error ::$e');
       result = 'Error Occurs :: $e';
     }
-    // ignore: deprecated_member_use
-    _scaffoldkey.currentState!.showSnackBar(SnackBar(content: Text(result)));
+    ScaffoldMessenger.maybeOf(context)
+        ?.showSnackBar(SnackBar(content: Text(result)));
     await MyMobAd().showInterstitialAd();
   }
 
@@ -218,7 +219,9 @@ class _ImportExportState extends State<ImportExport> {
       result = 'Error: $e';
     }
     // ignore: deprecated_member_use
-    _scaffoldkey.currentState!.showSnackBar(SnackBar(content: Text(result)));
+
+    ScaffoldMessenger.maybeOf(context)
+        ?.showSnackBar(SnackBar(content: Text(result)));
     await MyMobAd().showInterstitialAd();
   }
 
@@ -255,10 +258,11 @@ class _ImportExportState extends State<ImportExport> {
             Container(
               padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
               alignment: Alignment.center,
-              // ignore: deprecated_member_use
-              child: RaisedButton(
-                color: Colors.blue,
-                elevation: 5,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  elevation: 5,
+                ),
                 onPressed: () => downloadwithdata(context),
                 child: Padding(
                   padding: const EdgeInsets.all(5),
@@ -273,10 +277,11 @@ class _ImportExportState extends State<ImportExport> {
             Container(
               padding: EdgeInsets.fromLTRB(30, 10, 30, 5),
               alignment: Alignment.center,
-              // ignore: deprecated_member_use
-              child: RaisedButton(
-                color: Colors.blue,
-                elevation: 5,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  elevation: 5,
+                ),
                 onPressed: () {
                   emptydownload(context);
                 },
@@ -291,10 +296,11 @@ class _ImportExportState extends State<ImportExport> {
             Container(
               padding: EdgeInsets.fromLTRB(30, 5, 30, 10),
               alignment: Alignment.center,
-              // ignore: deprecated_member_use
-              child: RaisedButton(
-                color: Colors.blue,
-                elevation: 5,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  elevation: 5,
+                ),
                 onPressed: () => getFilePath(context),
                 child: Padding(
                   padding: const EdgeInsets.all(5),

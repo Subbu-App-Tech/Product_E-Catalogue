@@ -298,10 +298,11 @@ class NoItems extends StatelessWidget {
               textAlign: TextAlign.center),
           Container(
             padding: EdgeInsets.all(10),
-            // ignore: deprecated_member_use
-            child: RaisedButton(
-              elevation: 7,
-              color: Colors.blue,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                elevation: 7,
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
@@ -317,9 +318,11 @@ class NoItems extends StatelessWidget {
           Container(
             padding: EdgeInsets.fromLTRB(10, 2, 10, 10),
             // ignore: deprecated_member_use
-            child: RaisedButton(
-              elevation: 7,
-              color: Colors.green,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                elevation: 7,
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
@@ -335,9 +338,11 @@ class NoItems extends StatelessWidget {
           Container(
             padding: EdgeInsets.fromLTRB(10, 2, 10, 10),
             // ignore: deprecated_member_use
-            child: RaisedButton(
-              elevation: 7,
-              color: Colors.blueAccent,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                elevation: 7,
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(

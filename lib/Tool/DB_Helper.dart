@@ -13,7 +13,7 @@
 //     db.execute('''CREATE TABLE product_data ( id TEXT PRIMARY KEY,name TEXT,
 //           description TEXT,imageurl TEXT, catlist TEXT, brand TEXT, fav TEXT,rank INTEGER)''');
 //     db.execute('CREATE TABLE catdata ( id TEXT PRIMARY KEY,name TEXT)');
-//     db.execute('''CREATE TABLE varietydata 
+//     db.execute('''CREATE TABLE varietydata
 //         ( id TEXT PRIMARY KEY,productid TEXT ,name TEXT,price DOUBLE,wsp DOUBLE)''');
 //   }
 

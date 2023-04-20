@@ -314,7 +314,7 @@ class CarouselState extends State<Carousel> {
               Widget pageView = PageView(
                 physics: AlwaysScrollableScrollPhysics(),
                 controller: _controller,
-                children: listImages ,
+                children: listImages,
                 onPageChanged: (currentPage) {
                   if (widget.onImageChange != null) {
                     widget.onImageChange!(_currentImageIndex, currentPage);

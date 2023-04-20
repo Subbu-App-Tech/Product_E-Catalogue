@@ -4,7 +4,6 @@ import 'dart:io';
 import '../../Provider/ProductDataP.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
-import 'dart:typed_data';
 import '../PdfTools.dart';
 
 Future<Uint8List> listViewOne(

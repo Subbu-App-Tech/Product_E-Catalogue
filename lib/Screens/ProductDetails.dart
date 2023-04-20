@@ -7,7 +7,8 @@ class ProductDetails extends StatelessWidget {
   ProductDetails(this.productid);
   @override
   Widget build(BuildContext context) {
-    Product loadproduct = Provider.of<ProductData>(context).findbyid(productid)!;
+    Product loadproduct =
+        Provider.of<ProductData>(context).findbyid(productid)!;
     return ProductDetailsW(loadproduct);
   }
 }

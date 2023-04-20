@@ -50,7 +50,7 @@ class _MyDrawerState extends State<MyDrawer> {
               'Delete Data',
               style: TextStyle(color: Colors.white),
             ),
-            style: ElevatedButton.styleFrom(primary: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               Provider.of<ProductData>(context, listen: false).deleteall();
               Navigator.pushReplacement(context,

@@ -58,10 +58,11 @@ class _MultiSelectChipGroupState extends State<MultiSelectChipGroup> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> choiceChips =[];
+    final List<Widget> choiceChips = [];
     widget.items.asMap().forEach((index, item) {
       choiceChips.add(choiceChip(item!,
-          leftIcon: widget.leftIcons != null ? widget.leftIcons![index] : null));
+          leftIcon:
+              widget.leftIcons != null ? widget.leftIcons![index] : null));
     });
 
     return Wrap(

@@ -107,9 +107,9 @@ class _SettingScreenState extends State<SettingScreen> {
                             })
                       ])),
                 ),
-                // ignore: deprecated_member_use
-                RaisedButton(
-                  color: Colors.green,
+                ElevatedButton(
+                  style:
+                      ElevatedButton.styleFrom(backgroundColor: Colors.green),
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                     child: Text(
@@ -123,8 +123,7 @@ class _SettingScreenState extends State<SettingScreen> {
                     storage.savecompanyname(_companycontroller.text);
                     storage.savecontactnumber(_mobilenocontroller.text);
                     setState(() {});
-                    // ignore: deprecated_member_use
-                    _scafkey.currentState!.showSnackBar(
+                    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
                         SnackBar(content: Text('Saved Succesfully..!')));
                   },
                 ),

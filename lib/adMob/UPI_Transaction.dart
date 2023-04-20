@@ -165,11 +165,13 @@ class _UpitransactionpgState extends State<Upitransactionpg> {
                 height: 200,
                 alignment: Alignment.center,
                 // ignore: deprecated_member_use
-                child: RaisedButton(
-                    padding: EdgeInsets.all(15),
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.all(15),
+                      backgroundColor: Colors.blue,
+                    ),
                     child: Text('Buy me a coffee! ☕',
                         style: TextStyle(color: Colors.white, fontSize: 21)),
-                    color: Colors.blue,
                     onPressed: pop),
               )
             : displayUpiApps(),
@@ -276,9 +278,11 @@ class _UpitransactionpgState extends State<Upitransactionpg> {
                           Container(
                             padding: const EdgeInsets.fromLTRB(25, 10, 25, 10),
                             // ignore: deprecated_member_use
-                            child: RaisedButton(
-                                color: Colors.green,
-                                elevation: 12,
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  elevation: 12,
+                                ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(5),
                                   child: Text('>>  Download PDF 🔥  <<',

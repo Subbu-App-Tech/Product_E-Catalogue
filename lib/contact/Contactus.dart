@@ -54,8 +54,7 @@ class _ContactUsState extends State<ContactUs> {
     }
 
     if (!mounted) return;
-    // ignore: deprecated_member_use
-    _scaffoldKey.currentState!.showSnackBar(SnackBar(
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(
       content: Text(platformResponse),
     ));
   }

@@ -76,7 +76,8 @@ class PDFbrandscatlogue extends StatelessWidget {
                 width: double.infinity,
                 padding: EdgeInsets.fromLTRB(15, 7, 15, 7),
                 // ignore: deprecated_member_use
-                child: RaisedButton(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
                   child: Padding(
                     padding: const EdgeInsets.all(4),
                     child: Text('Sort by Product Added',
@@ -90,8 +91,8 @@ class PDFbrandscatlogue extends StatelessWidget {
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.fromLTRB(15, 7, 15, 7),
-                // ignore: deprecated_member_use
-                child: RaisedButton(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
                   child: Padding(
                     padding: const EdgeInsets.all(4),
                     child: Text('Sort by Product Name',
@@ -106,7 +107,8 @@ class PDFbrandscatlogue extends StatelessWidget {
                 width: double.infinity,
                 padding: EdgeInsets.fromLTRB(15, 7, 15, 7),
                 // ignore: deprecated_member_use
-                child: RaisedButton(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
                   child: Padding(
                     padding: const EdgeInsets.all(4),
                     child: Text('Sorted by Rank', textAlign: TextAlign.center),
@@ -120,7 +122,8 @@ class PDFbrandscatlogue extends StatelessWidget {
                 width: double.infinity,
                 padding: EdgeInsets.fromLTRB(15, 7, 15, 7),
                 // ignore: deprecated_member_use
-                child: RaisedButton(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
                   child: Padding(
                     padding: const EdgeInsets.all(4),
                     child:
@@ -134,13 +137,12 @@ class PDFbrandscatlogue extends StatelessWidget {
             ],
           ),
           actions: [
-            // ignore: deprecated_member_use
-            RaisedButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               child: Text(
                 'Close',
                 style: TextStyle(color: Colors.white),
               ),
-              color: Colors.red,
               onPressed: () {
                 Navigator.of(context).pop('close');
               },
@@ -164,7 +166,8 @@ class PDFbrandscatlogue extends StatelessWidget {
           MaterialPageRoute(
             builder: (context) => PDFPage(
                 getDataFunc: getDataFunc,
-                ispaid: ispaid,input: value,
+                ispaid: ispaid,
+                input: value,
                 sortby: sortby),
           ));
     }

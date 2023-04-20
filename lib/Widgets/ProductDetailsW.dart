@@ -177,7 +177,7 @@ Created with $AppName App''';
         actions: [
           ElevatedButton(
             child: Text('Delete Data'),
-            style: ElevatedButton.styleFrom(primary: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               Navigator.pop(context);
               Provider.of<ProductData>(context, listen: false)
@@ -423,11 +423,12 @@ Created with $AppName App''';
             SizedBox(height: 3),
             appSetting.isViewMode
                 ? SizedBox()
-                // ignore: deprecated_member_use
-                : RaisedButton.icon(
-                    elevation: 3,
-                    padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
-                    color: Colors.red,
+                : ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 3,
+                      padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
+                      backgroundColor: Colors.red,
+                    ),
                     icon: Icon(Icons.delete),
                     label: Text(
                       'Delete Product',

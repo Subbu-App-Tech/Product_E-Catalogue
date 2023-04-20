@@ -9,7 +9,7 @@ import '../Widgets/Drawer.dart';
 import '../Tool/FilterProduct.dart';
 import 'package:rate_my_app/rate_my_app.dart';
 import '../contact/Contactus.dart';
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as b;
 
 class Tabscreenwithdata extends StatelessWidget {
   static const routeName = '/Tabscreenwithdata';
@@ -89,7 +89,7 @@ class _TabScreenState extends State<TabScreen> {
                     arguments: true);
               }),
           SizedBox(width: 5),
-          Badge(
+          b.Badge(
             child: IconButton(
               icon: Icon(Icons.favorite, size: 27),
               onPressed: () {
