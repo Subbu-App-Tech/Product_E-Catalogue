@@ -1,15 +1,16 @@
+import 'package:badges/badges.dart' as b;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:productcatalogue/main.dart';
-import '../Screens/ProductsList.dart';
-import 'product_groups.dart';
 import 'Form/product_form.dart';
-import '../Provider/ProductDataP.dart';
-import '../Widgets/Drawer.dart';
-import '../Tool/FilterProduct.dart';
+import 'package:productcatalogue/main.dart';
 import 'package:rate_my_app/rate_my_app.dart';
+
+import '../Provider/ProductDataP.dart';
+import '../Screens/ProductsList.dart';
+import '../Tool/FilterProduct.dart';
+import '../Widgets/Drawer.dart';
 import '../contact/Contactus.dart';
-import 'package:badges/badges.dart' as b;
+import 'product_groups.dart';
 
 class Tabscreenwithdata extends StatelessWidget {
   static const routeName = '/Tabscreenwithdata';
@@ -110,8 +111,9 @@ class _TabScreenState extends State<TabScreen> {
       floatingActionButton: appSetting.isViewMode
           ? SizedBox()
           : FloatingActionButton(
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(UserAEForm.routeName),
+              onPressed: () async {
+                Navigator.of(context).pushNamed(UserAEForm.routeName);
+              },
               child: Icon(Icons.add)),
       bottomNavigationBar: BottomNavigationBar(
           onTap: _selectPage,

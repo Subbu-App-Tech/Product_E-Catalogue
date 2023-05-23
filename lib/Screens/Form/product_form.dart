@@ -6,6 +6,7 @@ import 'package:productcatalogue/adMob/my_ad_mod.dart';
 import '../../Tool/DynamicTextField.dart';
 import '../../Tool/MultiSelectedChip.dart';
 import '../../export.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserAEForm extends StatelessWidget {
   static const routeName = '/user-AE-Form';
@@ -73,7 +74,15 @@ class _ProductFormState extends State<ProductForm> {
       edit = !edit;
       Navigator.of(context).pop();
     }
-    await MyMobAd().showInterstitialAd();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    int count = prefs.getInt('SaveCount') ?? 0;
+    if (count > 4) {
+      await MyMobAd().showInterstitialAd();
+      count = 0;
+    } else {
+      count++;
+    }
+    prefs.setInt('SaveCount', count);
   }
 
   void _startaddingcat(BuildContext context) async {

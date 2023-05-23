@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:productcatalogue/Screens/Form/image_handle.dart';
 import 'package:productcatalogue/adMob/my_ad_mod.dart';
 import 'package:productcatalogue/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Screens/Form/product_form.dart';
 import '../Provider/ProductDataP.dart';
 import 'dart:io';
@@ -219,7 +220,15 @@ Created with $AppName App''';
       } catch (e) {
         BotToast.showText(text: 'Error Occurs :: $e');
       }
-      await MyMobAd().showInterstitialAd();
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      int count = prefs.getInt('detail_SaveCount') ?? 0;
+      if (count > 3) {
+        await MyMobAd().showInterstitialAd();
+        count = 0;
+      } else {
+        count++;
+      }
+      prefs.setInt('detail_SaveCount', count);
     }
 
     currency = currency ?? '';
@@ -360,7 +369,7 @@ Created with $AppName App''';
                           child: DataTable(
                             headingRowHeight: 50,
                             columnSpacing: 40,
-                            dataRowHeight: 40,
+                            dataRowMaxHeight: 40,
                             sortAscending: _sortAsc,
                             sortColumnIndex: _sortColumnIndex,
                             columns: [

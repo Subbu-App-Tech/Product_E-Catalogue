@@ -1,14 +1,16 @@
+import 'dart:convert';
+import 'dart:io' show Platform;
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:open_filex/open_filex.dart';
 import 'package:productcatalogue/adMob/my_ad_mod.dart';
 import 'package:productcatalogue/export.dart';
 import 'package:upi_india/upi_india.dart';
-import 'package:open_file/open_file.dart';
-import 'dart:io' show Platform;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 String localeName = Platform.localeName;
 
@@ -290,7 +292,7 @@ class _UpitransactionpgState extends State<Upitransactionpg> {
                                           color: Colors.white, fontSize: 18)),
                                 ),
                                 onPressed: () =>
-                                    OpenFile.open(widget.filepath)),
+                                    OpenFilex.open(widget.filepath)),
                           ),
                           Center(
                               child: Container(
@@ -327,9 +329,13 @@ class _UpitransactionpgState extends State<Upitransactionpg> {
                   color: Colors.grey[100],
                   child: TextButton(
                     onPressed: () async {
-                      await MyMobAd().showRewardedInterstitialAd(() {
-                        OpenFile.open(widget.filepath);
-                      });
+                      if (kDebugMode) {
+                        OpenFilex.open(widget.filepath);
+                      } else {
+                        await MyMobAd().showRewardedInterstitialAd(() {
+                          OpenFilex.open(widget.filepath);
+                        });
+                      }
                     },
                     child: Text(
                       'Skip -> I Don\'t like to Offer you a coffee',

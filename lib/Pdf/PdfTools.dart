@@ -110,6 +110,7 @@ class Pdftools {
     if (varietylist.length > maxlistlen) {
       varietylist = varietylist.sublist(0, maxlistlen);
     }
+    
     return pw.Table.fromTextArray(
         cellPadding: pw.EdgeInsets.all(2),
         border: pw.TableBorder(

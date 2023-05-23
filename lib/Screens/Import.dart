@@ -1,17 +1,19 @@
-import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
-import 'dart:io';
-import 'package:csv/csv.dart';
-import 'package:open_file/open_file.dart';
-import 'package:productcatalogue/adMob/my_ad_mod.dart';
-import 'dart:convert';
 import 'dart:async';
-import '../Provider/ProductDataP.dart';
-import 'package:permission_handler/permission_handler.dart';
-import '../Tool/Helper.dart';
-import 'package:flutter/services.dart';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:csv/csv.dart';
 import 'package:external_path/external_path.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:path/path.dart' as Path;
+import 'package:permission_handler/permission_handler.dart';
+import 'package:productcatalogue/adMob/my_ad_mod.dart';
+
+import '../Provider/ProductDataP.dart';
+import '../Tool/Helper.dart';
 
 Future<File> saveFile(String fileName) async {
   bool isAcc = await Permission.storage.request().isGranted;
@@ -196,7 +198,7 @@ class _ImportExportState extends State<ImportExport> {
       final file = await saveFile('Empty_Template.csv');
       file.writeAsString(EmptyHeader);
       result = 'Template Downloaded Succesfully in $AppName folder..!';
-      OpenFile.open(file.path);
+      OpenFilex.open(file.path);
     } catch (e) {
       print('Error ::$e');
       result = 'Error Occurs :: $e';
@@ -212,7 +214,7 @@ class _ImportExportState extends State<ImportExport> {
       ByteData data = await rootBundle.load('assets/SampleData.csv');
       final ffile = await saveFile('Empty_Template.csv');
       await ffile.writeAsBytes(data.buffer.asUint8List());
-      OpenFile.open(ffile.path);
+      OpenFilex.open(ffile.path);
       result = 'Template Downloaded Succesfully in $AppName folder..!';
     } catch (e) {
       print('Eoorr: $e');

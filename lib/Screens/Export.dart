@@ -1,11 +1,13 @@
+import 'dart:io';
+
+import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
-import 'package:open_file/open_file.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:productcatalogue/Screens/Import.dart';
 import 'package:productcatalogue/adMob/my_ad_mod.dart';
-import '../Provider/ProductDataP.dart';
-import 'package:csv/csv.dart';
-import 'dart:io';
+
 import '../Pdf/PDFhomepage.dart';
+import '../Provider/ProductDataP.dart';
 
 String localeName = Platform.localeName;
 
@@ -35,7 +37,7 @@ class ExportData extends StatelessWidget {
         await f.writeAsString(csv);
 
         ScaffoldMessenger.maybeOf(context)?.showSnackBar(snackBar);
-        OpenFile.open(f.path);
+        OpenFilex.open(f.path);
       } catch (e) {
         print(e);
       }
