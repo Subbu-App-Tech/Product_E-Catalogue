@@ -3,12 +3,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:csv/csv.dart';
-import 'package:external_path/external_path.dart';
+// import 'package:external_path/external_path.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path/path.dart' as Path;
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:productcatalogue/adMob/my_ad_mod.dart';
 
@@ -19,9 +20,9 @@ Future<File> saveFile(String fileName) async {
   bool isAcc = await Permission.storage.request().isGranted;
   if (!isAcc) await Permission.storage.request();
   isAcc = await Permission.storage.request().isGranted;
-  String dir = await ExternalPath.getExternalStoragePublicDirectory(
-      ExternalPath.DIRECTORY_DOWNLOADS);
-  File file = await File(Path.join(dir, fileName)).create(recursive: true);
+  final dir = await getApplicationDocumentsDirectory();
+  File file = await File(Path.join(dir.path, fileName)).create(recursive: true);
+  // if (await file.exists()) OpenFilex.open(file.path);
   return file;
 }
 
@@ -86,10 +87,11 @@ class _ImportExportState extends State<ImportExport> {
       }
       List<Product> productdata = [];
       Future<void> validate(datafield) async {
-        String appDirs = await ExternalPath.getExternalStoragePublicDirectory(
-            ExternalPath.DIRECTORY_DOWNLOADS);
+        // String appDirs = await ExternalPath.getExternalStoragePublicDirectory(
+        //     ExternalPath.DIRECTORY_DOWNLOADS);
+        final dir = await getApplicationDocumentsDirectory();
         final ddir =
-            await Directory('$appDirs//$AppName').create(recursive: true);
+            await Directory('${dir.path}//$AppName').create(recursive: true);
         Directory imagedir = await Directory('${ddir.path}//Product Pictures')
             .create(recursive: true);
         for (List i in fields) {

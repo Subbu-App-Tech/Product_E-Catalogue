@@ -31,20 +31,4 @@ void main() async {
 Box<AppSetting> settingBox = Hive.box<AppSetting>('AppSetting');
 AppSetting appSetting = settingBox.get('key') ?? AppSetting();
 
-Future testing() async {
-  // try {
-  //   print(await Permission.storage.status);
-  //   bool isAcc = await Permission.storage.request().isGranted;
-  //   if (!isAcc) await Permission.storage.request();
-  //   isAcc = await Permission.storage.request().isGranted;
-  //   String dir = await ExternalPath.getExternalStoragePublicDirectory(
-  //       ExternalPath.DIRECTORY_DOWNLOADS);
-  //   Directory savedDir = Directory(dir + '/$AppName');
-  //   bool hasExisted = await savedDir.exists();
-  //   print('>>>');
-  //   if (!hasExisted) await savedDir.create(recursive: true);
-  //   print('---$savedDir');
-  // } on Exception catch (e) {
-  //   print('Error:: $e');
-  // }
-}
+Future testing() async {}

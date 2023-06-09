@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:external_path/external_path.dart';
+// import 'package:external_path/external_path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../export.dart';
 
@@ -33,12 +34,10 @@ class ImageHandler {
       ));
       final fileName = path.basename(croppedFile!.path);
       File file = File(croppedFile.path);
-      final appDirs = await ExternalPath.getExternalStoragePublicDirectory(
-          ExternalPath.DIRECTORY_DOWNLOADS);
-      final imagedir = await Directory('$appDirs/$AppName/Product Pictures')
+      final dir = await getApplicationDocumentsDirectory();
+      final imagedir = await Directory('${dir.path}/$AppName/Product Pictures')
           .create(recursive: true);
       final savedImage = await file.copy('${imagedir.path}/$fileName');
-      print('\nsavedImage: $savedImage\n');
       return savedImage.path;
     } else {
       return null;

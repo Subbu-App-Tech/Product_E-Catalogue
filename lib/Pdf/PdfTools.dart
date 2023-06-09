@@ -1,10 +1,12 @@
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:productcatalogue/export.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:external_path/external_path.dart';
+// import 'package:external_path/external_path.dart';
 
 class ProcuctbasedModel {
   String? basedon;
@@ -110,7 +112,7 @@ class Pdftools {
     if (varietylist.length > maxlistlen) {
       varietylist = varietylist.sublist(0, maxlistlen);
     }
-    
+
     return pw.Table.fromTextArray(
         cellPadding: pw.EdgeInsets.all(2),
         border: pw.TableBorder(
@@ -159,18 +161,16 @@ class Pdftools {
   Future<void> download(BuildContext context, SnackBar snackBar,
       GlobalKey<ScaffoldState> _scaffoldkey) async {
     if (await Permission.storage.request().isGranted) {
-      // var dir = await ExtStorage.getExternalStoragePublicDirectory(
-      // ExtStorage.DIRECTORY_DOWNLOADS);
-      var dir = await ExternalPath.getExternalStoragePublicDirectory(
-          ExternalPath.DIRECTORY_DOWNLOADS);
+      final dir = getApplicationDocumentsDirectory();
       File file = await new File("$dir/Product_Data_Template.csv")
           .create(recursive: true);
       var isExist = await file.exists();
       if (isExist) {
-        snackBar = SnackBar(
-            content:
-                Text('Template Downloaded Succesfully in Download folder..!'));
-        ScaffoldMessenger.maybeOf(context)?.showSnackBar(snackBar);
+        OpenFilex.open(file.path);
+        // snackBar = SnackBar(
+        //     content:
+        //         Text('Template Downloaded Succesfully in Download folder..!'));
+        // ScaffoldMessenger.maybeOf(context)?.showSnackBar(snackBar);
         // return
       } else {
         snackBar =
